@@ -1,0 +1,8 @@
+<div class="home-wrap">
+  <h1>Sesión iniciada</h1>
+  @if (user) {
+    <p>Usuario: <strong>{{ user.username }}</strong></p>
+    <p>Rol: <strong>{{ user.role }}</strong></p>
+  }
+  <button type="button" class="logout-btn" (click)="logout()">Cerrar sesión</button>
+</div>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { LoginRequest, LoginResponse, RegisterRequest, User } from '../interfaces/auth.interface';
+import { AuthUser, LoginRequest, LoginResponse, RegisterRequest, User } from '../interfaces/auth.interface';
 import { StorageService } from '../shared/services/storage.service';
 import { API_CONFIG } from '../shared/constants/api.constants';
 
@@ -18,7 +18,8 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.storageService.setToken(response.token);
-          this.storageService.setUser(response.user);
+          const user: AuthUser = { username: response.username, role: response.role };
+          this.storageService.setUser(user);
         }),
         catchError(error => {
           console.error('Error en login:', error);
@@ -45,8 +46,8 @@ export class AuthService {
     return this.storageService.isAuthenticated();
   }
 
-  getCurrentUser(): User | null {
-    return this.storageService.getUser();
+  getCurrentUser(): AuthUser | null {
+    return this.storageService.getUser() as AuthUser | null;
   }
 
   getToken(): string | null {

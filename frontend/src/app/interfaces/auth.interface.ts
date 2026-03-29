@@ -1,11 +1,18 @@
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
+/** Respuesta del backend en login (camelCase). */
 export interface LoginResponse {
+  username: string;
+  role: string;
   token: string;
-  user: User;
+}
+
+export interface AuthUser {
+  username: string;
+  role: string;
 }
 
 export interface RegisterRequest {
@@ -15,6 +22,7 @@ export interface RegisterRequest {
   lastName: string;
 }
 
+/** Reservado para futuros endpoints; el login usa `AuthUser`. */
 export interface User {
   id: string;
   email: string;
@@ -24,4 +32,3 @@ export interface User {
   createdAt: string;
   isActive: boolean;
 }
-

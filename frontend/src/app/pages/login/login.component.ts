@@ -15,22 +15,17 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  email = signal<string>('');
+  username = signal<string>('');
   password = signal<string>('');
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
 
   onSubmit(): void {
-    const emailValue = this.email();
+    const usernameValue = this.username().trim();
     const passwordValue = this.password();
 
-    if (!emailValue || !passwordValue) {
+    if (!usernameValue || !passwordValue) {
       this.errorMessage.set('Por favor, completa todos los campos');
-      return;
-    }
-
-    if (!this.isValidEmail(emailValue)) {
-      this.errorMessage.set('Por favor, ingresa un email válido');
       return;
     }
 
@@ -38,7 +33,7 @@ export class LoginComponent {
     this.errorMessage.set('');
 
     this.authService.login({
-      email: emailValue,
+      username: usernameValue,
       password: passwordValue
     }).subscribe({
       next: () => {
@@ -53,11 +48,6 @@ export class LoginComponent {
         this.errorMessage.set(error);
       }
     });
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 
   clearError(): void {

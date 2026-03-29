@@ -16,7 +16,7 @@
       
       <form (ngSubmit)="onSubmit()" class="login-form">
         <div class="form-group">
-          <label for="email">Correo electrónico:</label>
+          <label for="username">Usuario:</label>
           <div class="input-wrapper">
             <div class="icon-box">
               <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -25,14 +25,14 @@
               </svg>
             </div>
             <input 
-              type="email" 
-              id="email" 
-              name="email"
-              [value]="email()"
-              (input)="email.set($any($event.target).value); clearError()"
-              placeholder="Ingrese su correo electrónico"
+              type="text" 
+              id="username" 
+              name="username"
+              [value]="username()"
+              (input)="username.set($any($event.target).value); clearError()"
+              placeholder="Ingrese su usuario"
               class="form-input"
-              autocomplete="email"
+              autocomplete="username"
               required
               [disabled]="isLoading()"
             />
