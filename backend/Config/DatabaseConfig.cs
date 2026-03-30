@@ -14,6 +14,7 @@ public static class DatabaseConfig
         );
 
         services.AddScoped<IRepository<User, Guid>, Repository<User, Guid>>();
+        services.AddScoped<IRepository<PasswordReset, Guid>, Repository<PasswordReset, Guid>>();
         return services;
     }
 }

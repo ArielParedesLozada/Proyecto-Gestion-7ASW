@@ -18,12 +18,15 @@ var JWT_PUBLIC_KEY_FILE = Environment.GetEnvironmentVariable("JWT_PUBLIC_KEY_FIL
 var JWT_PRIVATE_KEY_FILE = Environment.GetEnvironmentVariable("JWT_PRIVATE_KEY_FILE")!;
 var JWT_TIME = double.Parse(Environment.GetEnvironmentVariable("JWT_TIME") ?? "1");
 var ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "";
+var MAIL_USER = Environment.GetEnvironmentVariable("MAIL_USER")!;
+var MAIL_PSSWD = Environment.GetEnvironmentVariable("MAIL_PASSWORD")!;
 // Add services to the container.
 builder.Services
     .AddSwaggerDoc()
     .AddDatabase(CONNECTION_STRING)
     .AddJWTConfig(JWT_ISSUER, JWT_AUDIENCE, JWT_PUBLIC_KEY_FILE)
-    .AddAppServices(); ;
+    .AddMailer(builder.Configuration, MAIL_USER, MAIL_PSSWD)
+    .AddAppServices(builder.Configuration); ;
 builder.Services.AddScoped<ITokenGenerator>(sp =>
     new JwtTokenGenerator(JWT_PRIVATE_KEY_FILE, JWT_TIME, JWT_ISSUER, JWT_AUDIENCE)
 );

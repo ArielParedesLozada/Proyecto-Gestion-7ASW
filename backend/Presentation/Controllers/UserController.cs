@@ -90,9 +90,10 @@ public class UserController(UserService userService) : ControllerBase
         var username = userRequest.Username;
         var password = userRequest.Password;
         var role = userRequest.Role;
+        var email = userRequest.Email;
         try
         {
-            var user = await _userService.CreateUser(username, password, role);
+            var user = await _userService.CreateUser(username, password, role, email);
             return Ok(Map(user));
         }
         catch (CustomError e)

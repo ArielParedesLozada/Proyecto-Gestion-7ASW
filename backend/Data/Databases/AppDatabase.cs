@@ -16,6 +16,16 @@ public class AppDatabase : DbContext
             entity.HasKey(u => u.Id);
             entity.HasIndex(u => u.Id);
             entity.HasIndex(u => u.Username).IsUnique();
+            entity.HasIndex(u => u.Email).IsUnique();
+        });
+        modelBuilder.Entity<PasswordReset>(entity =>
+        {
+            entity.ToTable("password-reset-tokens");
+            entity.HasKey(t => t.Id);
+            entity.HasOne<User>()
+                 .WithMany()
+                 .HasForeignKey(t => t.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
