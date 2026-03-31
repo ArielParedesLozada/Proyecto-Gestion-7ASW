@@ -1,4 +1,5 @@
 using Backend.App.Auth;
+using Backend.App.Polizas;
 using Backend.Data.Repository;
 using Backend.Domain.Models;
 using Backend.Domain.Services;
@@ -23,6 +24,9 @@ public static class ServicesConfig
                 domain
             );
         });
+        services.AddScoped<EmpresasService>();
+        services.AddScoped<RamoService>();
+        services.AddScoped<PolizaService>();
         return services;
     }
 }

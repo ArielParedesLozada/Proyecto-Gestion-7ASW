@@ -19,7 +19,7 @@ public class RamoController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<IEnumerable<RamoDtoResponse>>> GetAll()
     {
         var ramos = await _ramoService.GetAllRamos();
@@ -27,7 +27,7 @@ public class RamoController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<RamoDtoResponse>> GetById(Guid id)
     {
         var ramo = await _ramoService.GetRamoById(id);
@@ -35,7 +35,7 @@ public class RamoController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<RamoDtoResponse>> Create([FromBody] RamoRequest request)
     {
         var ramo = await _ramoService.CreateRamo(
@@ -48,7 +48,7 @@ public class RamoController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<RamoDtoResponse>> Update(Guid id, [FromBody] RamoRequest request)
     {
         var ramo = await _ramoService.UpdateRamo(
@@ -62,7 +62,7 @@ public class RamoController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<bool>> Delete(Guid id)
     {
         var result = await _ramoService.DeleteRamo(id);

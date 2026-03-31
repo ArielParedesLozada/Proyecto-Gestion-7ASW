@@ -14,7 +14,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     private readonly EmpresasService _empresaService = empresaService;
 
     [HttpGet]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<IEnumerable<EmpresaDtoResponse>>> GetAll()
     {
         var empresas = await _empresaService.GetAllEmpresas();
@@ -22,7 +22,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<EmpresaDtoResponse>> GetById(Guid id)
     {
         var empresa = await _empresaService.GetEmpresaById(id);
@@ -30,7 +30,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<EmpresaDtoResponse>> Create([FromBody] EmpresaRequest request)
     {
         var empresa = await _empresaService.CreateEmpresa(request.Nombre, request.Email);
@@ -38,7 +38,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<EmpresaDtoResponse>> Update(Guid id, [FromBody] EmpresaRequest request)
     {
         var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre, request.Email);
@@ -46,7 +46,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "ADMIN-ACCESS")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<bool>> Delete(Guid id)
     {
         var result = await _empresaService.DeleteEmpresa(id);
