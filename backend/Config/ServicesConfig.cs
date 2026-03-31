@@ -9,7 +9,7 @@ public static class ServicesConfig
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var domain = configuration.GetValue<string>("Settings:Domain")!;
+        var domain = configuration.GetValue<string>("Frontend:Url")!;
         services.AddScoped<LoginService>();
         services.AddScoped<MeService>();
         services.AddScoped<UserService>();

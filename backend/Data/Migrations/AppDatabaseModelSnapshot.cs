@@ -22,6 +22,30 @@ namespace backend.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Backend.Domain.Models.Empresa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("empresas", (string)null);
+                });
+
             modelBuilder.Entity("Backend.Domain.Models.PasswordReset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -46,6 +70,92 @@ namespace backend.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("password-reset-tokens", (string)null);
+                });
+
+            modelBuilder.Entity("Backend.Domain.Models.Poliza", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Aseguradora")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("Contratista")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("FechaEmision")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("FechaExpiracion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Obra")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("Ramo")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("ValorActual")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("ValorOriginal")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Contratista");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("Numero")
+                        .IsUnique();
+
+                    b.HasIndex("Ramo");
+
+                    b.ToTable("polizas", (string)null);
+                });
+
+            modelBuilder.Entity("Backend.Domain.Models.Ramo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CambiaValor")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("ramos", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Domain.Models.User", b =>
@@ -91,6 +201,21 @@ namespace backend.Data.Migrations
                     b.HasOne("Backend.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Domain.Models.Poliza", b =>
+                {
+                    b.HasOne("Backend.Domain.Models.Empresa", null)
+                        .WithMany()
+                        .HasForeignKey("Contratista")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Domain.Models.Ramo", null)
+                        .WithMany()
+                        .HasForeignKey("Ramo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

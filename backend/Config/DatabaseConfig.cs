@@ -15,6 +15,9 @@ public static class DatabaseConfig
 
         services.AddScoped<IRepository<User, Guid>, Repository<User, Guid>>();
         services.AddScoped<IRepository<PasswordReset, Guid>, Repository<PasswordReset, Guid>>();
+        services.AddScoped<IRepository<Empresa, Guid>, Repository<Empresa, Guid>>();
+        services.AddScoped<IRepository<Ramo, Guid>, Repository<Ramo, Guid>>();
+        services.AddScoped<IRepository<Poliza, Guid>, Repository<Poliza, Guid>>();
         return services;
     }
 }

@@ -4,6 +4,7 @@ using Backend.Data.Databases;
 using Backend.Data.Seed;
 using Backend.Domain.Services;
 using Backend.Infrastructure.Security;
+using Backend.Presentation.Middleware;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -49,5 +50,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

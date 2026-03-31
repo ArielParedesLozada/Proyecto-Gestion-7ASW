@@ -27,5 +27,33 @@ public class AppDatabase : DbContext
                  .HasForeignKey(t => t.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
         });
+        modelBuilder.Entity<Ramo>(entity =>
+        {
+            entity.ToTable("ramos");
+            entity.HasKey(r => r.Id);
+            entity.HasIndex(r => r.Id);
+        });
+        modelBuilder.Entity<Empresa>(entity =>
+        {
+            entity.ToTable("empresas");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Id);
+            entity.HasIndex(e => e.Email).IsUnique();
+        });
+        modelBuilder.Entity<Poliza>(entity =>
+        {
+            entity.ToTable("polizas");
+            entity.HasKey(p => p.Id);
+            entity.HasIndex(p => p.Id);
+            entity.HasIndex(p => p.Numero).IsUnique();
+            entity.HasOne<Empresa>()
+                .WithMany()
+                .HasForeignKey(p => p.Contratista)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<Ramo>()
+                .WithMany()
+                .HasForeignKey(p => p.Ramo)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }
