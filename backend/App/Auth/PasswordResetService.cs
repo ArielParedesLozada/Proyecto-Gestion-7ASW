@@ -19,7 +19,7 @@ public class PasswordResetService(IRepository<User, Guid> userRepo, IRepository<
     public async Task RequestPasswordReset(string email)
     {
         var user = await _userRepo.FirstOrDefaultAsync(u => u.Email == email)
-            ?? throw new CustomError("User not found", 404);
+            ?? throw new CustomError("Invalid credentials", 404);
         var existingTokens = await _tokenRepo.FindAsync(t => t.UserId == user.Id && !t.Used);
         foreach (var t in existingTokens)
         {
@@ -38,9 +38,10 @@ public class PasswordResetService(IRepository<User, Guid> userRepo, IRepository<
         };
 
         await _tokenRepo.CreateAsync(resetToken);
+        var urlSafeToken = rawToken.Replace("+", "-").Replace("/", "_").Replace("=", "");
 
         // 🌐 5. Generar link (esto debería venir de config)
-        var resetLink = $"{_baseLink}/reset-password?token={rawToken}";
+        var resetLink = $"{_baseLink}/reset-password?token={urlSafeToken}";
 
         // ✉️ 6. Enviar notificación
         await _notifier.SendAsync(
@@ -51,8 +52,9 @@ public class PasswordResetService(IRepository<User, Guid> userRepo, IRepository<
     }
     public async Task ResetPassword(string token, string newPassword)
     {
+        var originalToken = FromUrlSafe(token);
         // 🔐 1. Hashear token recibido
-        var tokenHash = HashToken(token);
+        var tokenHash = HashToken(originalToken);
 
         // 🔍 2. Buscar token en DB
         var reset = await _tokenRepo.FirstOrDefaultAsync(t => t.TokenHash == tokenHash)
@@ -82,7 +84,19 @@ public class PasswordResetService(IRepository<User, Guid> userRepo, IRepository<
         await _tokenRepo.UpdateAsync(reset);
     }
 
+    private static string FromUrlSafe(string token)
+    {
+        token = token.Replace("-", "+").Replace("_", "/");
 
+        // Padding
+        switch (token.Length % 4)
+        {
+            case 2: token += "=="; break;
+            case 3: token += "="; break;
+        }
+
+        return token;
+    }
     private static string GenerateSecureToken()
     {
         var bytes = RandomNumberGenerator.GetBytes(32);
