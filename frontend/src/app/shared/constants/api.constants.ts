@@ -3,8 +3,10 @@ export const API_CONFIG = {
   BASE_URL: '/api',
   ENDPOINTS: {
     AUTH: {
-      LOGIN: '/login',
-      REGISTER: '/auth/register'
+      LOGIN: '/auth/login',
+      REGISTER: '/auth/register',
+      FORGOT_PASSWORD:  '/auth/request-password-reset',
+      RESET_PASSWORD: '/auth/reset-password'
     }
   }
 } as const;

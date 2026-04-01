@@ -7,11 +7,15 @@ export interface LoginRequest {
 export interface LoginResponse {
   username: string;
   role: string;
+  email: string;
+  mustChangePassword: boolean;
   token: string;
 }
 
 export interface AuthUser {
   username: string;
+  email: string;
+  mustChangePassword: boolean;
   role: string;
 }
 
