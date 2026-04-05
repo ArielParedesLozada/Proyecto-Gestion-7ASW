@@ -67,6 +67,7 @@ public class Repository<T, TKey> : IRepository<T, TKey> where T : class
         if (pageSize <= 0) pageSize = 10;
         var items = await _dbSet
             .AsNoTracking()
+            .Where(predicate)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

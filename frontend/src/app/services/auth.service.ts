@@ -18,11 +18,11 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.storageService.setToken(response.token);
-          const user: AuthUser = { username: response.username, role: response.role };
+          const user: AuthUser = { username: response.username, role: response.role, email: response.email, mustChangePassword: response.mustChangePassword };
           this.storageService.setUser(user);
         }),
         catchError(error => {
-          console.error('Error en login:', error);
+          console.error('Error en login:', error.error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -46,6 +46,10 @@ export class AuthService {
     return this.storageService.isAuthenticated();
   }
 
+  isAdmin(): boolean {
+    return this.getCurrentUser()?.role === 'ADMIN'
+  }
+
   getCurrentUser(): AuthUser | null {
     return this.storageService.getUser() as AuthUser | null;
   }
@@ -59,10 +63,13 @@ export class AuthService {
       return error.error.message;
     }
     if (error.status === 401) {
-      return 'Credenciales inválidas';
+      return 'No autenticado';
     }
     if (error.status === 404) {
-      return 'Servicio no disponible. Verifica que el backend esté ejecutándose.';
+      return 'Credenciales inválidas';
+    }
+    if (error.status == 403) {
+      return 'No autorizado'
     }
     if (error.status === 0) {
       return 'No se pudo conectar con el servidor. Verifica tu conexión.';

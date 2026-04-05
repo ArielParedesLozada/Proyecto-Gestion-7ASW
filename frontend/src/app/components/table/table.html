@@ -1,0 +1,41 @@
+<div class="table-box">
+    <div class="pagination">
+        <button (click)="page.set(page() - 1)" [disabled]="page() === 1">
+            ←
+        </button>
+        <span>Página {{ page() }}</span>
+        <button (click)="page.set(page() + 1)" [disabled]="page() * pageSize() >= data().length">
+            →
+        </button>
+    </div>
+    <table>
+
+        <!-- HEADER -->
+        <thead>
+            <tr>
+                @for (col of columns(); track col.key) {
+                <th>{{ col.label }}</th>
+                }
+            </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody>
+            @for (row of paginatedData(); track $index) {
+            <tr>
+                @for (col of columns(); track col.key) {
+                <td>
+                    <!-- CUSTOM TEMPLATE -->
+                    @if (col.template) {
+                    <ng-container *ngTemplateOutlet="col.template; context: { $implicit: row }">
+                    </ng-container>
+                    } @else {
+                    {{ row[col.key] }}
+                    }
+                </td>
+                }
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

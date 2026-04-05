@@ -18,6 +18,7 @@ namespace backend.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Username = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
                     MustChangePassword = table.Column<bool>(type: "boolean", nullable: false),
                     Role = table.Column<string>(type: "text", nullable: false)
                 },
@@ -25,6 +26,12 @@ namespace backend.Data.Migrations
                 {
                     table.PrimaryKey("PK_users", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_Email",
+                table: "users",
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_Id",

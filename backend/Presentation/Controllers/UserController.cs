@@ -31,57 +31,15 @@ public class UserController(UserService userService) : ControllerBase
     [Authorize(Policy = "ADMIN-ACCESS")]
     public async Task<ActionResult<UserDtoResponse>> GetUserById(Guid id)
     {
-        try
-        {
-            var user = await _userService.FindUserById(id);
-            return Ok(Map(user));
-        }
-        catch (CustomError e)
-        {
-            return StatusCode(e.Code, new ErrorDtoResponse
-            {
-                Message = e.Message,
-                StatusCode = e.Code,
-                Details = e.StackTrace,
-            });
-        }
-        catch (System.Exception e)
-        {
-            return StatusCode(500, new ErrorDtoResponse
-            {
-                StatusCode = 500,
-                Message = "An internal error occurred",
-                Details = e.Message
-            });
-        }
+        var user = await _userService.FindUserById(id);
+        return Ok(Map(user));
     }
     [HttpGet("by-username/{username}")]
     [Authorize(Policy = "ADMIN-ACCESS")]
     public async Task<ActionResult<UserDtoResponse>> GetUserByUsername(string username)
     {
-        try
-        {
-            var user = await _userService.FindUserByUsername(username);
-            return Ok(Map(user));
-        }
-        catch (CustomError e)
-        {
-            return StatusCode(e.Code, new ErrorDtoResponse
-            {
-                Message = e.Message,
-                StatusCode = e.Code,
-                Details = e.StackTrace,
-            });
-        }
-        catch (System.Exception e)
-        {
-            return StatusCode(500, new ErrorDtoResponse
-            {
-                StatusCode = 500,
-                Message = "An internal error occurred",
-                Details = e.Message
-            });
-        }
+        var user = await _userService.FindUserByUsername(username);
+        return Ok(Map(user));
     }
     [HttpPost]
     [Authorize(Policy = "ADMIN-ACCESS")]
@@ -90,29 +48,9 @@ public class UserController(UserService userService) : ControllerBase
         var username = userRequest.Username;
         var password = userRequest.Password;
         var role = userRequest.Role;
-        try
-        {
-            var user = await _userService.CreateUser(username, password, role);
-            return Ok(Map(user));
-        }
-        catch (CustomError e)
-        {
-            return StatusCode(e.Code, new ErrorDtoResponse
-            {
-                Message = e.Message,
-                StatusCode = e.Code,
-                Details = e.StackTrace,
-            });
-        }
-        catch (System.Exception e)
-        {
-            return StatusCode(500, new ErrorDtoResponse
-            {
-                StatusCode = 500,
-                Message = "An internal error occurred",
-                Details = e.Message
-            });
-        }
+        var email = userRequest.Email;
+        var user = await _userService.CreateUser(username, password, role, email);
+        return Ok(Map(user));
     }
     [HttpPut("{id}")]
     [Authorize(Policy = "ADMIN-ACCESS")]
@@ -121,57 +59,15 @@ public class UserController(UserService userService) : ControllerBase
         var username = userRequest.Username;
         var password = userRequest.Password;
         var role = userRequest.Role;
-        try
-        {
-            var user = await _userService.UpdateUser(id, username, password, role);
-            return Ok(Map(user));
-        }
-        catch (CustomError e)
-        {
-            return StatusCode(e.Code, new ErrorDtoResponse
-            {
-                Message = e.Message,
-                StatusCode = e.Code,
-                Details = e.StackTrace,
-            });
-        }
-        catch (System.Exception e)
-        {
-            return StatusCode(500, new ErrorDtoResponse
-            {
-                StatusCode = 500,
-                Message = "An internal error occurred",
-                Details = e.Message
-            });
-        }
+        var user = await _userService.UpdateUser(id, username, password, role);
+        return Ok(Map(user));
     }
     [HttpDelete("{id}")]
     [Authorize(Policy = "ADMIN-ACCESS")]
     public async Task<ActionResult<UserDtoResponse>> DeleteUser(Guid id)
     {
-        try
-        {
-            var user = await _userService.DeleteUser(id);
-            return Ok(Map(user));
-        }
-        catch (CustomError e)
-        {
-            return StatusCode(e.Code, new ErrorDtoResponse
-            {
-                Message = e.Message,
-                StatusCode = e.Code,
-                Details = e.StackTrace,
-            });
-        }
-        catch (System.Exception e)
-        {
-            return StatusCode(500, new ErrorDtoResponse
-            {
-                StatusCode = 500,
-                Message = "An internal error occurred",
-                Details = e.Message
-            });
-        }
+        var user = await _userService.DeleteUser(id);
+        return Ok(Map(user));
     }
 
     private static UserDtoResponse Map(User user)
@@ -181,7 +77,8 @@ public class UserController(UserService userService) : ControllerBase
             Id = user.Id,
             MustChangePassword = user.MustChangePassword,
             Role = user.Role,
-            Username = user.Username
+            Username = user.Username,
+            Email = user.Email
         };
         return response;
     }
