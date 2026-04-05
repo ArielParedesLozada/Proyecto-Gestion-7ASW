@@ -1,3 +1,4 @@
+using Backend.App.Dtos;
 using Backend.App.Polizas;
 using Backend.Domain.Models;
 using Backend.Presentation.Dtos.Requests;
@@ -49,7 +50,7 @@ public class PolizaController(PolizaService polizaService) : ControllerBase
     }
 
     // 🔁 Mapper
-    private static PolizaDtoResponse Map(Poliza p) => new()
+    private static PolizaDtoResponse Map(PolizaRes p) => new()
     {
         Id = p.Id,
         Numero = p.Numero,
@@ -59,6 +60,8 @@ public class PolizaController(PolizaService polizaService) : ControllerBase
         ValorActual = p.ValorActual,
         FechaEmision = p.FechaEmision,
         FechaExpiracion = p.FechaExpiracion,
-        Estado = p.Estado
+        Estado = p.Estado,
+        Contratista = p.ContratistaNombre,
+        Ramo = p.RamoNombre
     };
 }

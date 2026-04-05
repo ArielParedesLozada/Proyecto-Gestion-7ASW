@@ -7,6 +7,8 @@ public class PolizaDtoResponse
     public string Numero { get; set; } = null!;
     public string Obra { get; set; } = null!;
     public string Aseguradora { get; set; } = null!;
+    public string Contratista { get; set; } = null!;
+    public string Ramo { get; set; } = null!;
     public decimal ValorOriginal { get; set; }
     public decimal ValorActual { get; set; }
     public DateTimeOffset FechaEmision { get; set; }

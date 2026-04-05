@@ -1,16 +1,18 @@
-using Backend.Data.Repository;
+using Backend.App.Dtos;
+using Backend.Data.Databases;
+using Microsoft.EntityFrameworkCore;
 using Backend.Domain.Enums;
 using Backend.Domain.Models;
 using Backend.Presentation.Dtos.Requests;
 
 namespace Backend.App.Polizas;
 
-public class PolizaService(IRepository<Poliza, Guid> polizaRepo)
+public class PolizaService(AppDatabase context)
 {
-    private readonly IRepository<Poliza, Guid> _polizaRepo = polizaRepo;
+    private readonly AppDatabase _context = context;
 
     // ✅ Crear
-    public async Task<Poliza> CrearAsync(PolizaRequest request)
+    public async Task<PolizaRes> CrearAsync(PolizaRequest request)
     {
         var poliza = new Poliza
         {
@@ -24,41 +26,91 @@ public class PolizaService(IRepository<Poliza, Guid> polizaRepo)
             FechaExpiracion = request.FechaExpiracion,
             ValorOriginal = request.ValorOriginal,
             ValorActual = request.ValorOriginal,
-            Estado = EstadoPoliza.Vigente, // ajusta según tu enum
+            Estado = EstadoPoliza.Vigente,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
-
-        return await _polizaRepo.CreateAsync(poliza);
+        _context.Polizas.Add(poliza);
+        await _context.SaveChangesAsync();
+        var result = await _context.Polizas
+            .Where(p => p.Id == poliza.Id)
+            .Include(p => p.ContratistaNav)
+            .Include(p => p.RamoNav)
+            .Select(p => new PolizaRes
+            {
+                Id = p.Id,
+                Numero = p.Numero,
+                Obra = p.Obra,
+                ContratistaNombre = p.ContratistaNav.Nombre,
+                RamoNombre = p.RamoNav.Nombre
+            })
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+        return result;
     }
 
     // ✅ Obtener paginado + búsqueda
-    public async Task<(IEnumerable<Poliza>, int)> ObtenerPaginadoAsync(
-        int page,
-        int pageSize,
-        string? search)
+    public async Task<(IEnumerable<PolizaRes>, int)> ObtenerPaginadoAsync(
+          int page,
+          int pageSize,
+          string? search)
     {
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        var query = _context.Polizas
+            .AsNoTracking()
+            .Include(p => p.ContratistaNav)
+            .Include(p => p.RamoNav)
+            .AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var items = await _polizaRepo.FindPagedAsync(
-                p => p.Numero.Contains(search) || p.Obra.Contains(search),
-                page,
-                pageSize
-            );
-
-            var total = (await _polizaRepo.FindAsync(
-                p => p.Numero.Contains(search) || p.Obra.Contains(search)
-            )).Count();
-
-            return (items, total);
+            query = query.Where(p =>
+                p.Numero.Contains(search) ||
+                p.Obra.Contains(search));
         }
 
-        return await _polizaRepo.GetAllPagedAsync(page, pageSize);
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(p => new PolizaRes
+            {
+                Id = p.Id,
+                Numero = p.Numero,
+                Obra = p.Obra,
+                Aseguradora = p.Aseguradora,
+                ContratistaId = p.Contratista,
+                ContratistaNombre = p.ContratistaNav.Nombre,
+                RamoId = p.Ramo,
+                RamoNombre = p.RamoNav.Nombre,
+                FechaExpiracion = p.FechaExpiracion,
+                Estado = p.Estado
+            })
+            .ToListAsync();
+
+        return (items, total);
     }
 
     // ✅ Obtener por Id
-    public async Task<Poliza?> ObtenerPorIdAsync(Guid id)
+    public async Task<PolizaRes?> ObtenerPorIdAsync(Guid id)
     {
-        return await _polizaRepo.GetByIdAsync(id);
+        return await _context.Polizas
+            .Where(p => p.Id == id)
+            .Include(p => p.ContratistaNav)
+            .Include(p => p.RamoNav)
+            .Select(p => new PolizaRes
+            {
+                Id = p.Id,
+                Numero = p.Numero,
+                Obra = p.Obra,
+                ContratistaNombre = p.ContratistaNav.Nombre,
+                RamoNombre = p.RamoNav.Nombre
+            })
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
     }
 }

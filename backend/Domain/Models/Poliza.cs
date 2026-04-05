@@ -7,8 +7,10 @@ public class Poliza
     public Guid Id { get; set; }
     public string Numero { get; set; }
     public Guid Contratista { get; set; }
+    public Empresa ContratistaNav { get; set; } = null!;
     public string Obra { get; set; }
     public Guid Ramo { get; set; }
+    public Ramo RamoNav { get; set; } = null!;
     public string Aseguradora { get; set; }
     public DateTimeOffset FechaEmision { get; set; }
     public DateTimeOffset FechaExpiracion { get; set; }
