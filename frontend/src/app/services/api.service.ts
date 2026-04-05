@@ -14,7 +14,6 @@ export class ApiService {
   }
 
   post<T>(endpoint: string, body: any) {
-    console.log(`Mandar la cosa a ${this.baseUrl}/${endpoint}`)
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, body);
   }
 

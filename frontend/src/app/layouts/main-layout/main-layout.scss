@@ -1,0 +1,123 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  transition: all 0.3s ease;
+  font-size: 1.5rem; /* Base font 1.5x larger */
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #c1121f, #780000);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  transition: width 0.3s ease;
+  position: relative;
+  font-size: inherit; /* Inherit base font size */
+}
+
+/* COLAPSADO */
+.layout.collapsed .sidebar {
+  width: 80px;
+}
+
+/* HEADER */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.sidebar-header img {
+  width: 60px;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-header h2 {
+  font-size: 0.9rem; /* Relative to base (0.9 * 1.5 = 1.35rem effective) */
+  font-weight: 600;
+}
+
+/* BOTÓN TOGGLE */
+.toggle-btn {
+  position: absolute;
+  top: 0;
+  right: -15px;
+  background: white;
+  border-color: black;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* MENU */
+.menu {
+  flex: 1;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  color: white;
+  transition: all 0.2s;
+}
+
+.menu-item .icon {
+  font-size: 1.2rem; /* 1.2 * 1.5 = 1.8rem effective */
+  min-width: 20px;
+  text-align: center;
+}
+
+/* HOVER */
+.menu-item:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ACTIVO */
+.menu-item.active {
+  background: white;
+  color: #c1121f;
+  font-weight: 600;
+}
+
+/* COLLAPSE TEXT */
+.layout.collapsed .menu-item span:not(.icon) {
+  display: none;
+}
+
+/* LOGOUT */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  padding: 0.7rem;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: inherit; /* Inherit larger font */
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  background: #f5f7fb;
+  padding: 1rem;
+  font-size: inherit; /* Content area also uses larger font */
+}
