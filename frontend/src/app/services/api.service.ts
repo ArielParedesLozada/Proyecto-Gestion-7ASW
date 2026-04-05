@@ -8,7 +8,7 @@ import { API_CONFIG } from '../shared/constants/api.constants';
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = API_CONFIG.BASE_URL;
-  
+
   get<T>(endpoint: string) {
     return this.http.get<T>(`${this.baseUrl}${endpoint}`);
   }

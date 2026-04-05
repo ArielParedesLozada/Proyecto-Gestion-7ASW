@@ -1,0 +1,16 @@
+<app-main-layout>
+    <p>PAPU SKIBIDI SIGMA</p>
+    <app-table [columns]="columns()" [data]="data"></app-table>
+
+    <!-- TEMPLATE: ESTADO -->
+    <ng-template #estadoTpl let-row>
+        <span class="badge">
+            {{ row.estado }}
+        </span>
+    </ng-template>
+
+    <!-- TEMPLATE: ACCIONES -->
+    <ng-template #accionesTpl let-row>
+        <a class="link">Ver Detalles</a>
+    </ng-template>
+</app-main-layout>

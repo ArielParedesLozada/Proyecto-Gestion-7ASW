@@ -1,0 +1,27 @@
+.table-box {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+  background: #f9fafb;
+}
+
+td {
+  padding: 0.9rem;
+  border-top: 1px solid #eee;
+}
+
+tr:hover {
+  background: #fafafa;
+}

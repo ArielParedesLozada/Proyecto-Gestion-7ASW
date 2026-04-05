@@ -39,7 +39,7 @@ export class LoginComponent {
       next: () => {
         this.isLoading.set(false);
         // Redirigir a la página principal después del login exitoso
-        this.router.navigate(['/home']).catch(err => {
+        this.router.navigate(['/dashboard']).catch(err => {
           console.error('Error al redirigir:', err);
         });
       },

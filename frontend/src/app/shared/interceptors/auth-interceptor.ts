@@ -5,7 +5,6 @@ import { inject } from '@angular/core';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const storage = inject(StorageService);
   const token = storage.getToken();
-
   if (token) {
     const cloned = req.clone({
       setHeaders: {
@@ -14,6 +13,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
     return next(cloned);
   }
-
   return next(req);
 };

@@ -8,7 +8,7 @@
       <img src="/img/Gobierno.png" alt="Logo" />
 
       @if (!isCollapsed()) {
-        <h2>Sistema de Control de Pólizas</h2>
+      <h2>Sistema de Control de Pólizas</h2>
       }
 
     </div>
@@ -59,14 +59,14 @@
     <!-- FOOTER -->
     <button class="logout-btn">
       <span class="icon">🚪</span>
-      @if (!isCollapsed()) { <span>Cerrar Sesión</span> }
+      @if (!isCollapsed()) { <app-button (action)="logout()">Cerrar Sesión</app-button> }
     </button>
 
   </aside>
 
   <!-- CONTENIDO -->
   <div class="content">
-    <router-outlet></router-outlet>
+    <ng-content></ng-content>
   </div>
 
 </div>
