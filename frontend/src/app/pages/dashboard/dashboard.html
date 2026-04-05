@@ -1,5 +1,43 @@
 <app-main-layout>
-    <p>PAPU SKIBIDI SIGMA</p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Bienvenido al Sistema de Control de Pólizas</p>
+        </div>
+
+        <div class="user-avatar">
+            <span>👤</span>
+        </div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="dashboard-cards">
+
+        <div class="card card-primary">
+            <div class="icon">+</div>
+            <div>
+                <h3>Nueva Póliza</h3>
+                <p>Registrar póliza</p>
+            </div>
+        </div>
+
+        <div class="card card-info">
+            <div class="icon">📊</div>
+            <div>
+                <h3>Reportes</h3>
+                <p>Generar reportes</p>
+            </div>
+        </div>
+
+        <div class="card card-success">
+            <div class="icon">🔄</div>
+            <div>
+                <h3>Renovaciones</h3>
+                <p>Gestionar renovaciones</p>
+            </div>
+        </div>
+
+    </div>
     <app-table [columns]="columns()" [data]="data"></app-table>
 
     <!-- TEMPLATE: ESTADO -->

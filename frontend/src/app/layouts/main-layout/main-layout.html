@@ -44,6 +44,13 @@
         @if (!isCollapsed()) { <span>Reportes</span> }
       </a>
 
+      @if (canShowAdminStuff()) {
+      <a routerLink="/users" routerLinkActive="active" class="menu-item">
+        <span class="icon">👤</span>
+        @if (!isCollapsed()) { <span>Usuarios</span> }
+      </a>
+      }
+
       <a routerLink="/empresas" routerLinkActive="active" class="menu-item">
         <span class="icon">🏢</span>
         @if (!isCollapsed()) { <span>Empresas</span> }
@@ -53,6 +60,13 @@
         <span class="icon">🏷️</span>
         @if (!isCollapsed()) { <span>Ramos</span> }
       </a>
+      
+      @if (canShowAdminStuff()) {
+      <a routerLink="/auditoria" routerLinkActive="active" class="menu-item">
+        <span class="icon">📄</span>
+        @if (!isCollapsed()) { <span>Auditorias</span> }
+      </a>
+      }
 
     </nav>
 

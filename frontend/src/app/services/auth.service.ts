@@ -46,6 +46,10 @@ export class AuthService {
     return this.storageService.isAuthenticated();
   }
 
+  isAdmin(): boolean {
+    return this.getCurrentUser()?.role === 'ADMIN'
+  }
+
   getCurrentUser(): AuthUser | null {
     return this.storageService.getUser() as AuthUser | null;
   }

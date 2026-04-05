@@ -4,7 +4,7 @@
             ←
         </button>
         <span>Página {{ page() }}</span>
-        <button (click)="page.set(page() + 1)" [disabled]="page() * pageSize() >= data.length">
+        <button (click)="page.set(page() + 1)" [disabled]="page() * pageSize() >= data().length">
             →
         </button>
     </div>

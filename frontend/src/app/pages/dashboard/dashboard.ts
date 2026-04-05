@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, LOCALE_ID, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { Table } from '../../components/table/table';
 import { ApiService } from '../../services/api.service';
 import { Poliza, PolizaItemSet } from '../../interfaces/poliza.interface';
 import { API_CONFIG } from '../../shared/constants/api.constants';
+import { formatDate } from '@angular/common';
 
 export interface PolizaTableRow {
   id: string
@@ -23,6 +24,7 @@ export interface PolizaTableRow {
 })
 export class Dashboard implements OnInit, AfterViewInit {
   private readonly apiService = inject(ApiService)
+  private readonly locale = inject(LOCALE_ID)
 
   // @ViewChild('estadoTpl') estadoTpl!: TemplateRef<any>;
   // @ViewChild('accionesTpl') accionesTpl!: TemplateRef<any>;
@@ -39,7 +41,7 @@ export class Dashboard implements OnInit, AfterViewInit {
           numero: p.numero,
           obra: p.obra,
           ramo: p.ramo,
-          fechaExpiracion: p.fechaExpiracion,
+          fechaExpiracion: formatDate(p.fechaExpiracion, 'dd/MM/yyyy', this.locale),
           diasRestantes: this.calcularDias(p.fechaExpiracion)
         }))
         console.log(this.data)

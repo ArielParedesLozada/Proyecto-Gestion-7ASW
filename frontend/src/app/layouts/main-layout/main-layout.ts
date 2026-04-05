@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class MainLayout {
   private readonly auth = inject(AuthService)
   private readonly router = inject(Router);
+  readonly user = this.auth.getCurrentUser()
   isCollapsed = signal(false);
 
   toggleSidebar() {
@@ -21,5 +22,8 @@ export class MainLayout {
   logout(): void {
     this.auth.logout();
     void this.router.navigate(['/login']);
+  }
+  canShowAdminStuff(){
+    return this.auth.isAdmin()
   }
 }
