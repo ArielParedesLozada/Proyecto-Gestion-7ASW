@@ -1,123 +1,165 @@
+// Variables
+$sidebar-width: 240px;
+$sidebar-collapsed: 68px;
+$sidebar-bg: linear-gradient(180deg, #c1121f 0%, #7a0000 100%);
+$sidebar-text: #ffffff;
+$content-bg: #f5f7fb;
+
+// ── Layout shell ─────────────────────────────────────────────────────────
 .layout {
   display: flex;
   height: 100vh;
+  font-family: 'Roboto', sans-serif;   // Roboto — igual que el login
+  font-size: 1rem;                     // base normal, NO más zoom 1.5x
   transition: all 0.3s ease;
-  font-size: 1.5rem; /* Base font 1.5x larger */
+  overflow: hidden;
 }
 
-/* SIDEBAR */
+// ── Sidebar ───────────────────────────────────────────────────────────────
 .sidebar {
-  width: 260px;
-  background: linear-gradient(180deg, #c1121f, #780000);
-  color: white;
+  width: $sidebar-width;
+  background: $sidebar-bg;
+  color: $sidebar-text;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 0.75rem;
   transition: width 0.3s ease;
   position: relative;
-  font-size: inherit; /* Inherit base font size */
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-/* COLAPSADO */
 .layout.collapsed .sidebar {
-  width: 80px;
+  width: $sidebar-collapsed;
 }
 
-/* HEADER */
+// ── Header ────────────────────────────────────────────────────────────────
 .sidebar-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  margin-bottom: 2rem;
   text-align: center;
+  padding: 0.5rem 0 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 0.75rem;
+
+  img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+
+  h2 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: rgba(255,255,255,0.95);
+  }
 }
 
-.sidebar-header img {
-  width: 60px;
-  margin-bottom: 0.5rem;
-}
-
-.sidebar-header h2 {
-  font-size: 0.9rem; /* Relative to base (0.9 * 1.5 = 1.35rem effective) */
-  font-weight: 600;
-}
-
-/* BOTÓN TOGGLE */
+// ── Toggle button ─────────────────────────────────────────────────────────
 .toggle-btn {
   position: absolute;
-  top: 0;
-  right: -15px;
+  top: 0.75rem;
+  right: -14px;
   background: white;
-  border-color: black;
+  border: 1px solid #e0e0e0;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: box-shadow 0.2s;
+
+  &:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #c1121f;
+  }
 }
 
-/* MENU */
+// ── Menu ──────────────────────────────────────────────────────────────────
 .menu {
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0.7rem 1rem;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
+  gap: 10px;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
   text-decoration: none;
-  color: white;
-  transition: all 0.2s;
+  color: rgba(255,255,255,0.88);
+  font-size: 0.88rem;
+  font-weight: 400;
+  transition: background 0.18s, color 0.18s;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255,255,255,0.13);
+    color: white;
+  }
+
+  &.active {
+    background: white;
+    color: #c1121f;
+    font-weight: 600;
+
+    mat-icon { color: #c1121f; }
+  }
+
+  mat-icon.icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.9;
+  }
+
+  span { overflow: hidden; text-overflow: ellipsis; }
 }
 
-.menu-item .icon {
-  font-size: 1.2rem; /* 1.2 * 1.5 = 1.8rem effective */
-  min-width: 20px;
-  text-align: center;
-}
-
-/* HOVER */
-.menu-item:hover {
-  background: rgba(255,255,255,0.15);
-}
-
-/* ACTIVO */
-.menu-item.active {
-  background: white;
-  color: #c1121f;
-  font-weight: 600;
-}
-
-/* COLLAPSE TEXT */
-.layout.collapsed .menu-item span:not(.icon) {
-  display: none;
-}
-
-/* LOGOUT */
-.logout-btn {
+// ── Footer ────────────────────────────────────────────────────────────────
+.sidebar-footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  padding: 0.7rem;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  font-size: inherit; /* Inherit larger font */
+  padding: 0.6rem 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  margin-top: 0.5rem;
+
+  .logout-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: rgba(255,255,255,0.8);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
 }
 
-.logout-btn:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-/* CONTENT */
+// ── Content area ──────────────────────────────────────────────────────────
 .content {
   flex: 1;
-  background: #f5f7fb;
-  padding: 1rem;
-  font-size: inherit; /* Content area also uses larger font */
+  background: $content-bg;
+  overflow-y: auto;
+  padding: 1.5rem;
+  min-width: 0;       // prevents flex overflow
 }

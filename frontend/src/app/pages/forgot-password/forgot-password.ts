@@ -4,10 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { API_CONFIG } from '../../shared/constants/api.constants';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule, FormsModule, RouterLink,
+    MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
+  ],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss',
 })

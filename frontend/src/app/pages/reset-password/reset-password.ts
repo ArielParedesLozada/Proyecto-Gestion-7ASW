@@ -1,12 +1,19 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { API_CONFIG } from '../../shared/constants/api.constants';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [FormsModule],
+  imports: [
+    FormsModule, RouterLink,
+    MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
+  ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
 })

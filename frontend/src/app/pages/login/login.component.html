@@ -11,52 +11,37 @@
     <div class="login-form-container">
       <h1 class="login-title">
         <span class="title-line-1">Sistema de</span>
-        <span class="title-line-2">Gestión de Pólizas</span>
+        <span class="title-line-2">Control de Pólizas</span>
       </h1>
 
       <form (ngSubmit)="onSubmit()" class="login-form">
-        <div class="form-group">
-          <label for="username">Usuario:</label>
-          <div class="input-wrapper">
-            <div class="icon-box">
-              <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M2.5 5.83333C2.5 4.91286 3.24619 4.16667 4.16667 4.16667H15.8333C16.7538 4.16667 17.5 4.91286 17.5 5.83333V14.1667C17.5 15.0871 16.7538 15.8333 15.8333 15.8333H4.16667C3.24619 15.8333 2.5 15.0871 2.5 14.1667V5.83333Z"
-                  stroke="white" stroke-width="1.5" />
-                <path d="M2.5 6.66667L10 11.25L17.5 6.66667" stroke="white" stroke-width="1.5" stroke-linecap="round" />
-              </svg>
-            </div>
-            <!-- ENFOCATE EN ESTA PARTE -->
-            <input type="text" id="username" name="username" [value]="username()"
-              (input)="username.set($any($event.target).value); clearError()" placeholder="Ingrese su usuario"
-              class="form-input" autocomplete="username" required [disabled]="isLoading()" />
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="password">Contraseña:</label>
-          <div class="input-wrapper">
-            <div class="icon-box">
-              <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M15.625 9.375V6.25C15.625 4.17893 13.9461 2.5 11.875 2.5H8.125C6.05393 2.5 4.375 4.17893 4.375 6.25V9.375M15.625 9.375H4.375M15.625 9.375V14.375C15.625 16.4461 13.9461 18.125 11.875 18.125H8.125C6.05393 18.125 4.375 16.4461 4.375 14.375V9.375"
-                  stroke="white" stroke-width="1.5" stroke-linecap="round" />
-                <circle cx="10" cy="12.5" r="1.25" fill="white" />
-              </svg>
-            </div>
-            <input type="password" id="password" name="password" [value]="password()"
-              (input)="password.set($any($event.target).value); clearError()" placeholder="Ingrese su contraseña"
-              class="form-input" autocomplete="current-password" required [disabled]="isLoading()" />
-          </div>
-        </div>
+        <!-- Usuario -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Usuario</mat-label>
+          <input matInput type="text" id="username" [value]="username()"
+            (input)="username.set($any($event.target).value); clearError()" placeholder="Ingrese su usuario"
+            autocomplete="username" required [disabled]="isLoading()" />
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <!-- Contraseña -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" id="password" [value]="password()"
+            (input)="password.set($any($event.target).value); clearError()" placeholder="Ingrese su contraseña"
+            autocomplete="current-password" required [disabled]="isLoading()" />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
 
         @if (errorMessage()) {
         <div class="error-message">
+          <mat-icon>error_outline</mat-icon>
           {{ errorMessage() }}
         </div>
         }
 
-        <button type="submit" class="login-button" [disabled]="isLoading()">
+        <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
           @if (isLoading()) {
           <span>Iniciando sesión...</span>
           } @else {
