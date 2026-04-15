@@ -5,6 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { Poliza, PolizaItemSet } from '../../interfaces/poliza.interface';
 import { API_CONFIG } from '../../shared/constants/api.constants';
 import { formatDate } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 export interface PolizaTableRow {
   id: string
@@ -18,7 +19,7 @@ export interface PolizaTableRow {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MainLayout, Table],
+  imports: [MainLayout, Table, MatIconModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
