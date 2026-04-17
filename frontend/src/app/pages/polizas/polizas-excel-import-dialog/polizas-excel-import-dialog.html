@@ -1,16 +1,30 @@
 <header mat-dialog-title class="dialog-header">
-  <h2 class="dialog-title">
-    <mat-icon class="dialog-title__icon">table_view</mat-icon>
-    <span class="dialog-title__text">Vista previa de importación</span>
-  </h2>
+  <div class="dialog-title-wrap">
+    <h2 class="dialog-title">
+      <mat-icon class="dialog-title__icon">table_view</mat-icon>
+      <span class="dialog-title__text">Vista previa de importación</span>
+    </h2>
+    <p class="dialog-subtitle">Revisa los resultados antes de confirmar la importación</p>
+  </div>
 </header>
 
 <mat-dialog-content class="dialog-body">
-  <p class="dialog-file">
-    <strong>Archivo:</strong> {{ data.preview.fileName }}
-  </p>
+  <section class="meta-card">
+    <p class="dialog-file">
+      <mat-icon>description</mat-icon>
+      <strong>Archivo:</strong>
+      <span>{{ data.preview.fileName }}</span>
+    </p>
 
-  <div class="summary-grid summary-grid--primary">
+    @if (data.preview.sheetsDetected.length) {
+      <div class="sheets-row">
+        <span class="sheets-row__label">Hojas detectadas:</span>
+        <span class="sheets-row__tags">{{ data.preview.sheetsDetected.join(' · ') }}</span>
+      </div>
+    }
+  </section>
+
+  <section class="summary-grid summary-grid--primary">
     <div class="summary-card summary-card--ok summary-card--primary">
       <span class="summary-card__label">
         <mat-icon class="summary-card__icon">check_circle</mat-icon>
@@ -27,68 +41,69 @@
     </div>
     <div class="summary-card summary-card--primary">
       <span class="summary-card__label">
-        <mat-icon class="summary-card__icon">info</mat-icon>
+        <mat-icon class="summary-card__icon">warning_amber</mat-icon>
         Incompletas
       </span>
       <span class="summary-card__value">{{ data.preview.incompleteRows }}</span>
     </div>
-  </div>
+  </section>
 
-  <div class="summary-grid summary-grid--secondary">
+  <section class="summary-grid summary-grid--secondary">
     <div class="summary-card summary-card--secondary">
-      <span class="summary-card__label">Filas totales</span>
+      <span class="summary-card__label">
+        <mat-icon class="summary-card__icon">dataset</mat-icon>
+        Filas totales
+      </span>
       <span class="summary-card__value">{{ data.preview.totalRows }}</span>
     </div>
     <div class="summary-card summary-card--secondary">
-      <span class="summary-card__label">Ignoradas</span>
+      <span class="summary-card__label">
+        <mat-icon class="summary-card__icon">remove_circle_outline</mat-icon>
+        Ignoradas
+      </span>
       <span class="summary-card__value">{{ data.preview.ignoredRows }}</span>
     </div>
-  </div>
+  </section>
 
-  @if (data.preview.sheetsDetected.length) {
-    <div class="sheets-row">
-      <span class="sheets-row__label">Hojas detectadas:</span>
-      <span class="sheets-row__tags">{{ data.preview.sheetsDetected.join(' · ') }}</span>
-    </div>
-  }
+  <section class="toolbar-card">
+    <div class="toolbar">
+      <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+        <mat-label>Filtrar resultados</mat-label>
+        <mat-select [value]="filtro()" (selectionChange)="onFiltroChange($event.value)">
+          @for (opt of opcionesFiltro; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-  <div class="toolbar">
-    <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
-      <mat-label>Filtrar resultados</mat-label>
-      <mat-select [value]="filtro()" (selectionChange)="onFiltroChange($event.value)">
-        @for (opt of opcionesFiltro; track opt.value) {
-          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+      <div class="toolbar__count">
+        <strong>Filas visibles:</strong>
+        {{ filasFiltradas().length }}
+        @if (filtro() !== 'todas') {
+          <span class="toolbar__count-hint">de {{ data.preview.totalRows }} totales</span>
         }
-      </mat-select>
-    </mat-form-field>
+      </div>
 
-    <div class="toolbar__count">
-      <strong>Filas visibles:</strong>
-      {{ filasFiltradas().length }}
-      @if (filtro() !== 'todas') {
-        <span class="toolbar__count-hint">de {{ data.preview.totalRows }} totales</span>
-      }
+      <div class="toolbar__exports">
+        <span class="toolbar__exports-label">Exportar CSV:</span>
+        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvErrores()">
+          <mat-icon>download</mat-icon>
+          Errores
+        </button>
+        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIncompletas()">
+          <mat-icon>download</mat-icon>
+          Incompletas
+        </button>
+        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIgnoradas()">
+          <mat-icon>download</mat-icon>
+          Ignoradas
+        </button>
+      </div>
     </div>
+  </section>
 
-    <div class="toolbar__exports">
-      <span class="toolbar__exports-label">Exportar CSV:</span>
-      <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvErrores()">
-        <mat-icon>download</mat-icon>
-        Errores
-      </button>
-      <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIncompletas()">
-        <mat-icon>download</mat-icon>
-        Incompletas
-      </button>
-      <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIgnoradas()">
-        <mat-icon>download</mat-icon>
-        Ignoradas
-      </button>
-    </div>
-  </div>
-
-  <p class="hint">
-    Revisa los resultados antes de confirmar la importación.
+  <p class="hint hint--helper">
+    Usa el filtro para enfocarte en las filas con observaciones y exportar CSV por categoría.
   </p>
   @if (data.preview.validRows === 0) {
     <p class="hint hint--warn">
@@ -113,15 +128,15 @@
       </ng-container>
       <ng-container matColumnDef="numeroPoliza">
         <th mat-header-cell *matHeaderCellDef>Nº póliza</th>
-        <td mat-cell *matCellDef="let row">{{ row.numeroPoliza }}</td>
+        <td mat-cell *matCellDef="let row" [attr.title]="row.numeroPoliza">{{ row.numeroPoliza }}</td>
       </ng-container>
       <ng-container matColumnDef="contratista">
         <th mat-header-cell *matHeaderCellDef>Contratista</th>
-        <td mat-cell *matCellDef="let row">{{ row.contratista }}</td>
+        <td mat-cell *matCellDef="let row" [attr.title]="row.contratista">{{ row.contratista }}</td>
       </ng-container>
       <ng-container matColumnDef="obra">
         <th mat-header-cell *matHeaderCellDef>Obra</th>
-        <td mat-cell *matCellDef="let row" class="cell-obra">{{ row.obra || '—' }}</td>
+        <td mat-cell *matCellDef="let row" class="cell-obra" [attr.title]="row.obra || '—'">{{ row.obra || '—' }}</td>
       </ng-container>
       <ng-container matColumnDef="ramo">
         <th mat-header-cell *matHeaderCellDef>Ramo</th>
@@ -149,7 +164,7 @@
       </ng-container>
       <ng-container matColumnDef="mensajes">
         <th mat-header-cell *matHeaderCellDef>Mensajes / motivo</th>
-        <td mat-cell *matCellDef="let row" class="cell-mensajes">
+        <td mat-cell *matCellDef="let row" class="cell-mensajes" [attr.title]="mensajesDetalle(row)">
           @if (row.mensajes?.length) {
             <ul class="msg-list">
               @for (m of row.mensajes; track $index) {
