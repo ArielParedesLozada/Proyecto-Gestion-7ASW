@@ -9,10 +9,14 @@ namespace Backend.Presentation.Controllers;
 
 [ApiController]
 [Route("polizas")]
-public class PolizaController(PolizaService polizaService, PolizaExcelImportService excelImportService) : ControllerBase
+public class PolizaController(
+    PolizaService polizaService,
+    PolizaExcelImportService excelImportService,
+    PolizaPdfService polizaPdfService) : ControllerBase
 {
     private readonly PolizaService _polizaService = polizaService;
     private readonly PolizaExcelImportService _excelImportService = excelImportService;
+    private readonly PolizaPdfService _polizaPdfService = polizaPdfService;
 
     /// <summary>
     /// Rutas <c>import/*</c> antes de <c>{id:guid}</c> para evitar ambigüedad en el enrutador.
@@ -63,6 +67,18 @@ public class PolizaController(PolizaService polizaService, PolizaExcelImportServ
         if (poliza == null)
             return NotFound();
         return Ok(Map(poliza));
+    }
+
+    /// <summary>Reporte PDF individual de la póliza (QuestPDF).</summary>
+    [HttpGet("{id:guid}/pdf")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
+    public async Task<IActionResult> GetPdf(Guid id)
+    {
+        var result = await _polizaPdfService.GenerarPdfAsync(id, DateTimeOffset.UtcNow);
+        if (result == null)
+            return NotFound();
+
+        return File(result.Value.Bytes, "application/pdf", result.Value.FileName);
     }
 
     [HttpPost]

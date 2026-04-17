@@ -59,6 +59,17 @@ export class PolizasDetailPage {
       }
       return;
     }
+    if (accion === 'PDF') {
+      const p = this.poliza();
+      if (!p?.id) {
+        return;
+      }
+      this.polizaService.downloadPdfPoliza(p.id, p.numero).subscribe({
+        next: () => this.notify.success('PDF descargado.'),
+        error: (err: unknown) => this.notify.fromHttpError(err),
+      });
+      return;
+    }
     this.notify.info(`La acción «${accion}» estará disponible próximamente.`);
   }
 }

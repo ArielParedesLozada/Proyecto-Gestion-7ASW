@@ -13,6 +13,11 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}${endpoint}`);
   }
 
+  /** Descarga binaria (p. ej. PDF). */
+  getBlob(endpoint: string) {
+    return this.http.get(`${this.baseUrl}${endpoint}`, { responseType: 'blob' });
+  }
+
   post<T>(endpoint: string, body: unknown) {
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, body);
   }

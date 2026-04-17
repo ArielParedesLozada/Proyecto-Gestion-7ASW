@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { PolizaDetail } from '../pages/polizas/models/poliza-detail.model';
 import { PolizaEstado, PolizaListRow } from '../pages/polizas/models/poliza-list.model';
 import { ApiService } from './api.service';
@@ -231,6 +231,27 @@ export class PolizaService {
         map(mapImportResult),
         catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),
       );
+  }
+
+  /**
+   * Descarga el PDF individual de la póliza (`GET /polizas/{id}/pdf`).
+   * @param numeroPoliza Solo para el nombre del archivo local.
+   */
+  downloadPdfPoliza(id: string, numeroPoliza: string): Observable<void> {
+    const safeNumero = (numeroPoliza || 'poliza').replace(/[^\w.\-]/g, '_');
+    const fileName = `Poliza-${safeNumero}.pdf`;
+    return this.api.getBlob(`${this.basePath}/${id}/pdf`).pipe(
+      tap((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }),
+      map(() => undefined),
+      catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),
+    );
   }
 
   actualizar(id: string, payload: PolizaActualizarPayload): Observable<PolizaApiDto> {
