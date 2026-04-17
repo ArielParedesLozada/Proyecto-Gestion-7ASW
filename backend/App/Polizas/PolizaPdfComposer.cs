@@ -50,33 +50,33 @@ public static class PolizaPdfComposer
     {
         container.Column(column =>
         {
-            column.Spacing(10);
-            column.Item().Border(1).BorderColor("#e2e8f0").Background("#f8fafc").Padding(12).Row(row =>
+            column.Spacing(8);
+            column.Item().Background("#f8fafc").BorderBottom(1).BorderColor("#e2e8f0").PaddingBottom(10).PaddingHorizontal(6).Row(row =>
             {
                 if (!string.IsNullOrEmpty(logoPath) && File.Exists(logoPath))
                 {
-                    row.ConstantItem(78).Height(58).Image(logoPath).FitArea();
+                    row.ConstantItem(84).Height(60).Image(logoPath).FitArea();
                 }
                 else
                 {
-                    row.ConstantItem(78).Height(58);
+                    row.ConstantItem(84).Height(60);
                 }
 
                 row.RelativeItem().Column(right =>
                 {
-                    right.Spacing(3);
-                    right.Item().Text(Sistema).FontSize(11).SemiBold().FontColor("#b91c1c");
+                    right.Spacing(2);
+                    right.Item().Text(Sistema).FontSize(12).SemiBold().FontColor("#b91c1c");
                     right.Item().Text(Institucion).FontSize(9).FontColor("#64748b");
-                    right.Item().PaddingTop(4).Text("Reporte individual de póliza")
-                        .FontSize(17).SemiBold().FontColor("#0f172a");
+                    right.Item().PaddingTop(5).Text("Reporte individual de póliza")
+                        .FontSize(18).SemiBold().FontColor("#0f172a");
                     right.Item().Text("Informe institucional de seguimiento y trazabilidad")
                         .FontSize(9).FontColor("#64748b");
                 });
             });
 
-            column.Item().PaddingTop(2).LineHorizontal(1.2f).LineColor("#d1d5db");
+            column.Item().PaddingTop(2).LineHorizontal(0.8f).LineColor("#b91c1c");
 
-            column.Item().PaddingTop(5).Border(1).BorderColor("#e2e8f0").Background("#ffffff").Padding(10).Row(r =>
+            column.Item().PaddingTop(8).Background("#ffffff").PaddingVertical(8).PaddingHorizontal(6).Row(r =>
             {
                 r.RelativeItem().Column(c =>
                 {
@@ -104,25 +104,25 @@ public static class PolizaPdfComposer
     {
         container.Column(column =>
         {
-            column.Spacing(22);
+            column.Spacing(26);
 
-            column.Item().Border(1).BorderColor("#e2e8f0").Background("#ffffff").Padding(12).Column(c =>
+            column.Item().Column(c =>
             {
-                c.Spacing(10);
+                c.Spacing(12);
                 c.Item().Element(x => SectionTitle(x, "1. Información general de la póliza"));
                 c.Item().Element(x => GeneralTable(x, poliza));
             });
 
-            column.Item().Border(1).BorderColor("#e2e8f0").Background("#ffffff").Padding(12).Column(c =>
+            column.Item().Column(c =>
             {
-                c.Spacing(10);
+                c.Spacing(12);
                 c.Item().Element(x => SectionTitle(x, "2. Historial de renovaciones"));
                 c.Item().Element(x => EmptyOrMessage(x, true));
             });
 
-            column.Item().Border(1).BorderColor("#e2e8f0").Background("#ffffff").Padding(12).Column(c =>
+            column.Item().Column(c =>
             {
-                c.Spacing(10);
+                c.Spacing(12);
                 c.Item().Element(x => SectionTitle(x, "3. Notificaciones enviadas"));
                 c.Item().Element(x => EmptyOrMessage(x, false));
             });
@@ -131,13 +131,18 @@ public static class PolizaPdfComposer
 
     private static void SectionTitle(IContainer container, string title)
     {
-        container.Row(row =>
+        container.Column(col =>
         {
-            row.ConstantItem(4).Height(18).Background("#b91c1c");
-            row.RelativeItem().PaddingLeft(8).Text(title)
-                .FontSize(11)
-                .SemiBold()
-                .FontColor("#0f172a");
+            col.Spacing(5);
+            col.Item().Row(row =>
+            {
+                row.ConstantItem(4).Height(20).Background("#b91c1c");
+                row.RelativeItem().PaddingLeft(8).Text(title)
+                    .FontSize(12)
+                    .SemiBold()
+                    .FontColor("#0f172a");
+            });
+            col.Item().PaddingLeft(12).LineHorizontal(0.7f).LineColor("#e2e8f0");
         });
     }
 
@@ -164,18 +169,21 @@ public static class PolizaPdfComposer
         {
             table.ColumnsDefinition(columns =>
             {
-                columns.ConstantColumn(160);
+                columns.ConstantColumn(170);
                 columns.RelativeColumn();
             });
 
+            var rowIndex = 0;
             foreach (var (label, value) in rows)
             {
-                table.Cell().PaddingVertical(6).PaddingRight(8).Background("#f8fafc").Border(1).BorderColor("#e2e8f0")
-                    .PaddingVertical(9).PaddingHorizontal(10)
-                    .Text(label).SemiBold().FontSize(9).FontColor("#475569");
-                table.Cell().PaddingVertical(6).Border(1).BorderColor("#e2e8f0")
-                    .PaddingVertical(9).PaddingHorizontal(10)
-                    .Text(value).FontSize(9).FontColor("#0f172a");
+                var bg = rowIndex % 2 == 0 ? "#ffffff" : "#fafbfd";
+                table.Cell().Background(bg).BorderBottom(0.7f).BorderColor("#e2e8f0")
+                    .PaddingVertical(8).PaddingRight(10).PaddingLeft(6)
+                    .Text(label).FontSize(8.7f).FontColor("#64748b");
+                table.Cell().Background(bg).BorderBottom(0.7f).BorderColor("#e2e8f0")
+                    .PaddingVertical(8).PaddingHorizontal(8)
+                    .Text(value).FontSize(9.4f).SemiBold().FontColor("#0f172a");
+                rowIndex++;
             }
         });
     }
@@ -187,33 +195,36 @@ public static class PolizaPdfComposer
             : "No existen notificaciones registradas.";
 
         container
-            .PaddingVertical(14)
-            .PaddingHorizontal(8)
             .Background("#f8fafc")
             .Border(1)
             .BorderColor("#e2e8f0")
-            .Padding(16)
-            .Text(msg)
-            .Italic()
-            .FontColor("#64748b")
-            .FontSize(9.5f);
+            .PaddingVertical(18)
+            .PaddingHorizontal(14)
+            .AlignCenter()
+            .Column(col =>
+            {
+                col.Spacing(4);
+                col.Item().Text("i").FontSize(14).SemiBold().FontColor("#94a3b8");
+                col.Item().Text(msg).Italic().FontColor("#64748b").FontSize(9.3f);
+                col.Item().Text("No existen registros disponibles").FontSize(8.2f).FontColor("#94a3b8");
+            });
     }
 
     private static void ComposeFooter(IContainer container)
     {
-        container.PaddingTop(10).Column(col =>
+        container.PaddingTop(12).Column(col =>
         {
-            col.Item().LineHorizontal(1).LineColor("#e2e8f0");
-            col.Item().PaddingTop(8).Row(row =>
+            col.Item().LineHorizontal(0.7f).LineColor("#e2e8f0");
+            col.Item().PaddingTop(6).Row(row =>
             {
                 row.RelativeItem().Text($"{Sistema} · {Institucion}")
-                    .FontSize(8).FontColor("#94a3b8");
+                    .FontSize(7.4f).FontColor("#94a3b8");
                 row.RelativeItem().AlignRight().Text(t =>
                 {
-                    t.Span("Página ").FontSize(8).FontColor("#94a3b8");
-                    t.CurrentPageNumber().FontSize(8).FontColor("#94a3b8");
-                    t.Span(" de ").FontSize(8).FontColor("#94a3b8");
-                    t.TotalPages().FontSize(8).FontColor("#94a3b8");
+                    t.Span("Página ").FontSize(7.4f).FontColor("#94a3b8");
+                    t.CurrentPageNumber().FontSize(7.4f).FontColor("#94a3b8");
+                    t.Span(" de ").FontSize(7.4f).FontColor("#94a3b8");
+                    t.TotalPages().FontSize(7.4f).FontColor("#94a3b8");
                 });
             });
         });
