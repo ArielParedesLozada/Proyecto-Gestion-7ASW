@@ -260,7 +260,7 @@ public class PolizaExcelImportService(
 
     /// <summary>
     /// Misma fila lógica repetida en el archivo (mismo número y misma obra): una sola se importa.
-    /// Criterio: mayor puntuación de completitud; empate → última fila en el Excel.
+    /// Criterio: mayor fecha de expiración; empate → última fila en el Excel.
     /// Las demás pasan a <c>ignorada</c> con mensaje informativo (no es error de negocio).
     /// </summary>
     private static void ResolveIntraFileDuplicatePolicyNumbers(List<ImportPreviewRowInternal> rows)
@@ -278,7 +278,7 @@ public class PolizaExcelImportService(
         foreach (var g in grupos)
         {
             var ordered = g
-                .OrderBy(x => ScoreFilaCompletitud(x))
+                .OrderBy(x => x.FechaExpiracion ?? DateTimeOffset.MinValue)
                 .ThenBy(x => x.OrdenLectura)
                 .ToList();
 
@@ -290,24 +290,9 @@ public class PolizaExcelImportService(
                 r.EstadoAnalisis = "ignorada";
                 r.PuedeAplicar = false;
                 r.Mensajes.Clear();
-                r.Mensajes.Add(
-                    "Registro duplicado (misma póliza y misma obra); se importa la fila más completa (o la posterior si empatan).");
+                r.Mensajes.Add("Duplicado: se conserva el registro con mayor fecha de expiración");
             }
         }
-    }
-
-    private static int ScoreFilaCompletitud(ImportPreviewRowInternal r)
-    {
-        var s = 0;
-        if (!string.IsNullOrWhiteSpace(r.NumeroPoliza)) s += 2;
-        if (!string.IsNullOrWhiteSpace(r.Contratista)) s += 2;
-        if (!string.IsNullOrWhiteSpace(r.Obra)) s += 2;
-        if (!string.IsNullOrWhiteSpace(r.Aseguradora)) s += 2;
-        if (r.RamoId != null) s += 3;
-        if (r.Valor is > 0) s += 2;
-        if (r.FechaEmision != null) s += 2;
-        if (r.FechaExpiracion != null) s += 2;
-        return s;
     }
 
     private void ApplyExistenceAndValidation(
