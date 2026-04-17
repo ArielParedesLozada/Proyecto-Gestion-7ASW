@@ -1,0 +1,62 @@
+<app-main-layout>
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Bienvenido al Sistema de Control de Pólizas</p>
+    </div>
+    <div class="user-avatar">
+      <mat-icon>account_circle</mat-icon>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="dashboard-cards">
+
+    <div class="card">
+      <div class="card-icon card-icon--primary">
+        <mat-icon>add_circle</mat-icon>
+      </div>
+      <div class="card-body">
+        <h3>Nueva Póliza</h3>
+        <p>Registrar póliza</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon card-icon--info">
+        <mat-icon>bar_chart</mat-icon>
+      </div>
+      <div class="card-body">
+        <h3>Reportes</h3>
+        <p>Generar reportes</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon card-icon--success">
+        <mat-icon>autorenew</mat-icon>
+      </div>
+      <div class="card-body">
+        <h3>Renovaciones</h3>
+        <p>Gestionar renovaciones</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <app-table [columns]="columns()" [data]="data"></app-table>
+
+  <!-- TEMPLATE: ESTADO -->
+  <ng-template #estadoTpl let-row>
+    <span class="badge">{{ row.estado }}</span>
+  </ng-template>
+
+  <!-- TEMPLATE: ACCIONES -->
+  <ng-template #accionesTpl let-row>
+    <a class="link">Ver Detalles</a>
+  </ng-template>
+
+</app-main-layout>

@@ -1,0 +1,277 @@
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fondo */
+.login-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/img/fondo.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  filter: brightness(0.85);
+}
+
+/* Izquierda — logo */
+.login-left {
+  flex: 0 0 42%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo-container {
+  text-align: center;
+  z-index: 2;
+  padding: 1.5rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 90%;
+  height: 65vh;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* Derecha — formulario */
+.login-right {
+  flex: 0 0 58%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto; // scroll si el form no entra en altura
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(0.5px);
+  }
+}
+
+.login-form-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem 2.5rem;
+  margin: auto 0; // push desde arriba y abajo para centrar con scroll
+}
+
+/* Título */
+.login-title {
+  color: #d32f2f;
+  font-weight: bold;
+  margin-bottom: 1.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.title-line-1,
+.title-line-2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+/* Form */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Error */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+  border-left: 4px solid #c62828;
+  animation: slideIn 0.3s ease-out;
+
+  mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+/* Botón */
+.login-button {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 8px !important;
+  margin-top: 0.25rem;
+}
+
+/* Link */
+.login-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.link-red {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #b71c1c;
+    text-decoration: underline;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive — Tablet (≤ 1024px) ──────────────────────── */
+@media (max-width: 1024px) {
+  .login-left {
+    flex: 0 0 35%;
+  }
+
+  .login-right {
+    flex: 0 0 65%;
+  }
+
+  .login-form-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .title-line-1,
+  .title-line-2 {
+    font-size: 1.9rem;
+  }
+
+  .logo {
+    width: 220px;
+  }
+}
+
+/* ── Responsive — Mobile (≤ 768px) ───────────────────────── */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .login-left {
+    flex: 0 0 auto;
+    min-height: 28vh;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .login-right {
+    flex: 1;
+    min-height: 72vh;
+    overflow-y: auto;
+  }
+
+  .logo {
+    width: 120px;
+  }
+
+  .login-form-container {
+    padding: 1.75rem 1.5rem;
+    max-width: 100%;
+  }
+
+  .title-line-1,
+  .title-line-2 {
+    font-size: 1.7rem;
+  }
+}
+
+/* ── Responsive — Mobile pequeño (≤ 480px) ───────────────── */
+@media (max-width: 480px) {
+  .login-left {
+    min-height: 22vh;
+  }
+
+  .logo {
+    width: 100px;
+  }
+
+  .login-form-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .title-line-1,
+  .title-line-2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Short viewport (altura ≤ 650px, ej. browser compacto) ─ */
+@media (max-height: 650px) and (min-width: 769px) {
+  .login-left {
+    align-items: flex-start;
+    padding-top: 1rem;
+  }
+
+  .logo {
+    width: 180px;
+  }
+
+  .login-form-container {
+    padding: 1.5rem 2rem;
+  }
+
+  .login-title {
+    margin-bottom: 1rem;
+  }
+
+  .title-line-1,
+  .title-line-2 {
+    font-size: 1.7rem;
+  }
+}

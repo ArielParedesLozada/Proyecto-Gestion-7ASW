@@ -1,0 +1,23 @@
+@use '../polizas/polizas-admin-header';
+
+.empresas-placeholder__back {
+  display: inline-block;
+  font-size: 0.88rem;
+  color: #c1121f;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.empresas-placeholder__card {
+  background: #fff;
+  border: 1px solid #e8eaef;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  color: #6b7280;
+  font-size: 0.92rem;
+}

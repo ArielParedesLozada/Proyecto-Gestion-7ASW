@@ -1,0 +1,129 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon">table_view</mat-icon>
+  Vista previa de importación
+</h2>
+
+<mat-dialog-content class="dialog-body">
+  <p class="dialog-file">
+    <strong>Archivo:</strong> {{ data.preview.fileName }}
+  </p>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span class="summary-card__label">Filas totales</span>
+      <span class="summary-card__value">{{ data.preview.totalRows }}</span>
+    </div>
+    <div class="summary-card summary-card--ok">
+      <span class="summary-card__label">Válidas (importar)</span>
+      <span class="summary-card__value">{{ data.preview.validRows }}</span>
+    </div>
+    <div class="summary-card summary-card--warn">
+      <span class="summary-card__label">Con error</span>
+      <span class="summary-card__value">{{ data.preview.errorRows }}</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-card__label">Incompletas</span>
+      <span class="summary-card__value">{{ data.preview.incompleteRows }}</span>
+    </div>
+    <div class="summary-card summary-card--accent">
+      <span class="summary-card__label">Inserciones</span>
+      <span class="summary-card__value">{{ data.preview.insertCount }}</span>
+    </div>
+    <div class="summary-card summary-card--accent">
+      <span class="summary-card__label">Actualizaciones</span>
+      <span class="summary-card__value">{{ data.preview.updateCount }}</span>
+    </div>
+  </div>
+
+  @if (data.preview.sheetsDetected.length) {
+    <div class="sheets-row">
+      <span class="sheets-row__label">Hojas detectadas:</span>
+      <span class="sheets-row__tags">{{ data.preview.sheetsDetected.join(' · ') }}</span>
+    </div>
+  }
+
+  <p class="hint">
+    Se muestran como máximo las primeras 50 filas en la tabla. Revisa los mensajes por fila antes de confirmar.
+  </p>
+
+  <div class="table-wrap">
+    <table mat-table [dataSource]="previewRows()" class="preview-table">
+      <ng-container matColumnDef="excelRow">
+        <th mat-header-cell *matHeaderCellDef>Fila</th>
+        <td mat-cell *matCellDef="let row">{{ row.excelRow }}</td>
+      </ng-container>
+      <ng-container matColumnDef="sheetName">
+        <th mat-header-cell *matHeaderCellDef>Hoja</th>
+        <td mat-cell *matCellDef="let row">{{ row.sheetName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="numeroPoliza">
+        <th mat-header-cell *matHeaderCellDef>Nº póliza</th>
+        <td mat-cell *matCellDef="let row">{{ row.numeroPoliza }}</td>
+      </ng-container>
+      <ng-container matColumnDef="contratista">
+        <th mat-header-cell *matHeaderCellDef>Contratista</th>
+        <td mat-cell *matCellDef="let row">{{ row.contratista }}</td>
+      </ng-container>
+      <ng-container matColumnDef="ramo">
+        <th mat-header-cell *matHeaderCellDef>Ramo</th>
+        <td mat-cell *matCellDef="let row">{{ row.ramo }}</td>
+      </ng-container>
+      <ng-container matColumnDef="aseguradora">
+        <th mat-header-cell *matHeaderCellDef>Aseguradora</th>
+        <td mat-cell *matCellDef="let row">{{ row.aseguradora }}</td>
+      </ng-container>
+      <ng-container matColumnDef="fechaEmision">
+        <th mat-header-cell *matHeaderCellDef>Emisión</th>
+        <td mat-cell *matCellDef="let row">{{ row.fechaEmision ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="fechaExpiracion">
+        <th mat-header-cell *matHeaderCellDef>Vigencia hasta</th>
+        <td mat-cell *matCellDef="let row">{{ row.fechaExpiracion ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="estadoAnalisis">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let row">{{ estadoLabel(row.estadoAnalisis) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="empresaResolucion">
+        <th mat-header-cell *matHeaderCellDef>Empresa</th>
+        <td mat-cell *matCellDef="let row">{{ empresaLabel(row.empresaResolucion) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="mensajes">
+        <th mat-header-cell *matHeaderCellDef>Notas</th>
+        <td mat-cell *matCellDef="let row" class="cell-mensajes">
+          @if (row.mensajes?.length) {
+            <ul class="msg-list">
+              @for (m of row.mensajes; track $index) {
+                <li>{{ m }}</li>
+              }
+            </ul>
+          } @else {
+            —
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button type="button" mat-stroked-button (click)="cancelar()" [disabled]="importing()">Cancelar</button>
+  <button
+    type="button"
+    mat-flat-button
+    color="primary"
+    class="btn-confirm"
+    (click)="confirmar()"
+    [disabled]="!puedeConfirmar()"
+  >
+    @if (importing()) {
+      <mat-spinner diameter="20" />
+    } @else {
+      <mat-icon>cloud_upload</mat-icon>
+    }
+    Confirmar importación
+  </button>
+</mat-dialog-actions>

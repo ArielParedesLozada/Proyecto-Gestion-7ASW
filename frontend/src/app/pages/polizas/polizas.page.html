@@ -1,0 +1,44 @@
+<app-main-layout>
+  <header class="polizas-header">
+    <div>
+      <h1 class="page-title">Pólizas</h1>
+      <p class="page-subtitle">Gestión de pólizas contractuales</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+      </button>
+      <mat-icon class="polizas-header__profile" aria-hidden="true">account_circle</mat-icon>
+    </div>
+  </header>
+
+  <app-polizas-toolbar
+    [searchQuery]="searchQuery()"
+    [estadoFiltro]="estadoFiltro()"
+    (searchQueryChange)="searchQuery.set($event)"
+    (estadoFiltroChange)="estadoFiltro.set($event)"
+    (cargarExcel)="onCargarExcel()"
+    (nuevaPoliza)="onNuevaPoliza()"
+    (limpiarFiltros)="limpiarFiltros()"
+  />
+
+  <app-polizas-table
+    [rows]="pagedRows()"
+    [paginatorLength]="totalFiltered()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize"
+    (pageChange)="onPage($event)"
+    (ver)="onVer($event)"
+    (editar)="onEditar($event)"
+    (renovar)="onRenovar($event)"
+  />
+
+  <input
+    #excelFileInput
+    type="file"
+    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    hidden
+    (change)="onExcelFileSelected($event)"
+  />
+</app-main-layout>

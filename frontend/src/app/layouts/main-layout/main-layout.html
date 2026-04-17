@@ -1,0 +1,97 @@
+<div class="layout" [class.collapsed]="isCollapsed()">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- HEADER -->
+    <div class="sidebar-header">
+      <img src="/img/Gobierno.png" alt="Logo" />
+      @if (!isCollapsed()) {
+        <h2>Sistema de Control de Pólizas</h2>
+      }
+    </div>
+
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <mat-icon>{{ isCollapsed() ? 'menu' : 'menu_open' }}</mat-icon>
+    </button>
+
+    <!-- MENU -->
+    <nav class="menu">
+
+      <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
+        <mat-icon class="icon">dashboard</mat-icon>
+        @if (!isCollapsed()) { <span>Dashboard</span> }
+      </a>
+
+      <a routerLink="/polizas" routerLinkActive="active" class="menu-item">
+        <mat-icon class="icon">description</mat-icon>
+        @if (!isCollapsed()) { <span>Pólizas</span> }
+      </a>
+
+      <a routerLink="/renovaciones" routerLinkActive="active" class="menu-item">
+        <mat-icon class="icon">autorenew</mat-icon>
+        @if (!isCollapsed()) { <span>Renovaciones</span> }
+      </a>
+
+      <a routerLink="/notificaciones" routerLinkActive="active" class="menu-item">
+        <mat-icon class="icon">notifications</mat-icon>
+        @if (!isCollapsed()) { <span>Notificaciones</span> }
+      </a>
+
+      <a routerLink="/reportes" routerLinkActive="active" class="menu-item">
+        <mat-icon class="icon">bar_chart</mat-icon>
+        @if (!isCollapsed()) { <span>Reportes</span> }
+      </a>
+
+      @if (canShowAdminStuff()) {
+        <a routerLink="/users" routerLinkActive="active" class="menu-item">
+          <mat-icon class="icon">manage_accounts</mat-icon>
+          @if (!isCollapsed()) { <span>Usuarios</span> }
+        </a>
+      }
+
+      <a
+        routerLink="/empresas"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
+        <mat-icon class="icon">business</mat-icon>
+        @if (!isCollapsed()) { <span>Empresas</span> }
+      </a>
+
+      <a
+        routerLink="/ramos"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
+        <mat-icon class="icon">label</mat-icon>
+        @if (!isCollapsed()) { <span>Ramos</span> }
+      </a>
+
+      @if (canShowAdminStuff()) {
+        <a routerLink="/auditoria" routerLinkActive="active" class="menu-item">
+          <mat-icon class="icon">history</mat-icon>
+          @if (!isCollapsed()) { <span>Auditorías</span> }
+        </a>
+      }
+
+    </nav>
+
+    <!-- FOOTER -->
+    <div class="sidebar-footer">
+      <mat-icon class="logout-icon">logout</mat-icon>
+      @if (!isCollapsed()) {
+        <app-button (action)="logout()">Cerrar Sesión</app-button>
+      }
+    </div>
+
+  </aside>
+
+  <!-- CONTENIDO -->
+  <div class="content">
+    <ng-content></ng-content>
+  </div>
+
+</div>
