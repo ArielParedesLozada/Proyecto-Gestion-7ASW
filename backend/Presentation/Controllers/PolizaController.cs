@@ -16,12 +16,12 @@ public class PolizaController(PolizaService polizaService, PolizaExcelImportServ
 
     /// <summary>
     /// Rutas <c>import/*</c> antes de <c>{id:guid}</c> para evitar ambigüedad en el enrutador.
-    /// No usar <see cref="ConsumesAttribute"/> con <c>multipart/form-data</c> aquí: el Content-Type real incluye <c>boundary=...</c> y en algunos casos la acción no se selecciona (404).
+    /// Sin <see cref="FromFormAttribute"/> en <see cref="IFormFile"/>: Swashbuckle no lo documenta y lanza 500 al generar <c>swagger.json</c>.
     /// </summary>
     [HttpPost("import/preview")]
     [Authorize(Policy = "ACCESS-GRANTED")]
     [RequestSizeLimit(25_000_000)]
-    public async Task<ActionResult<PolizaImportPreviewResponse>> ImportPreview([FromForm] IFormFile? file)
+    public async Task<ActionResult<PolizaImportPreviewResponse>> ImportPreview(IFormFile? file)
     {
         if (file == null || file.Length == 0)
             return BadRequest(new { message = "Debes adjuntar un archivo Excel (.xlsx)." });

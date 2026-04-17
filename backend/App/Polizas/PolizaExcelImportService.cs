@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Backend.Data.Databases;
 using Backend.Domain.Errors;
 using Backend.Domain.Models;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Backend.App.Polizas;
 
+/// <summary>Importa pólizas desde Excel. Los ramos solo se referencian contra el catálogo en BD; nunca se crean aquí (altas vía API/UI).</summary>
 public class PolizaExcelImportService(
     AppDatabase context,
     EmpresasService empresasService,
@@ -63,22 +65,24 @@ public class PolizaExcelImportService(
             throw new CustomError($"No se pudo leer el Excel: {ex.Message}", 400);
         }
 
-        MarkDuplicateNumerosEnArchivo(rows);
-        FinalizeStatuses(rows);
+        ResolveIntraFileDuplicatePolicyNumbers(rows);
 
         var numeros = rows
+            .Where(r => r.EstadoAnalisis != "ignorada")
             .Where(r => !string.IsNullOrWhiteSpace(r.NumeroPoliza))
             .Select(r => r.NumeroPoliza.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var existentesPorNumero = await CargarPolizasExistentesPorNumeroAsync(numeros);
+        var existentesPorClave = await CargarPolizasExistentesPorNumeroYObraAsync(numeros);
         foreach (var r in rows)
         {
+            if (r.EstadoAnalisis == "ignorada")
+                continue;
             if (string.IsNullOrWhiteSpace(r.NumeroPoliza))
                 continue;
-            var n = r.NumeroPoliza.Trim();
-            if (existentesPorNumero.TryGetValue(n, out var id))
+            var clave = ClaveNegocioPoliza(r.NumeroPoliza, r.Obra);
+            if (existentesPorClave.TryGetValue(clave, out var id))
                 r.PolizaExistenteId = id;
         }
 
@@ -214,7 +218,7 @@ public class PolizaExcelImportService(
 
     private async Task<Guid> ResolverOcrearEmpresaAsync(ImportPreviewRowInternal row, Dictionary<string, Guid> creadasPorNombre)
     {
-        var key = row.Contratista.Trim();
+        var key = NormalizeNombreContratista(row.Contratista);
         if (row.EmpresaIdExistente != null)
             return row.EmpresaIdExistente.Value;
 
@@ -229,38 +233,81 @@ public class PolizaExcelImportService(
         return creada.Id;
     }
 
-    private async Task<Dictionary<string, Guid>> CargarPolizasExistentesPorNumeroAsync(IReadOnlyList<string> numeros)
+    /// <summary>Clave de negocio alineada con lectura de fila y con índice único (Numero, Obra) en BD.</summary>
+    private static string ClaveNegocioPoliza(string? numeroPoliza, string? obra) =>
+        $"{(numeroPoliza ?? "").Trim()}\u001F{CollapseWhitespace(obra).Trim()}";
+
+    private async Task<Dictionary<string, Guid>> CargarPolizasExistentesPorNumeroYObraAsync(IReadOnlyList<string> numeros)
     {
         if (numeros.Count == 0)
             return new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
 
         var list = await _context.Polizas.AsNoTracking()
             .Where(p => numeros.Contains(p.Numero))
-            .Select(p => new { p.Numero, p.Id })
+            .Select(p => new { p.Numero, p.Obra, p.Id })
             .ToListAsync();
 
-        return list.ToDictionary(x => x.Numero, x => x.Id, StringComparer.OrdinalIgnoreCase);
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        var dict = new Dictionary<string, Guid>(comparer);
+        foreach (var x in list)
+        {
+            var k = ClaveNegocioPoliza(x.Numero, x.Obra);
+            dict.TryAdd(k, x.Id);
+        }
+
+        return dict;
     }
 
-    private static void MarkDuplicateNumerosEnArchivo(List<ImportPreviewRowInternal> rows)
+    /// <summary>
+    /// Misma fila lógica repetida en el archivo (mismo número y misma obra): una sola se importa.
+    /// Criterio: mayor puntuación de completitud; empate → última fila en el Excel.
+    /// Las demás pasan a <c>ignorada</c> con mensaje informativo (no es error de negocio).
+    /// </summary>
+    private static void ResolveIntraFileDuplicatePolicyNumbers(List<ImportPreviewRowInternal> rows)
     {
-        var groups = rows
+        var candidatos = rows
+            .Where(r => r.EstadoAnalisis != "ignorada")
             .Where(r => !string.IsNullOrWhiteSpace(r.NumeroPoliza))
-            .GroupBy(r => r.NumeroPoliza.Trim(), StringComparer.OrdinalIgnoreCase);
-        foreach (var g in groups.Where(x => x.Count() > 1))
+            .ToList();
+
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        var grupos = candidatos
+            .GroupBy(r => ClaveNegocioPoliza(r.NumeroPoliza, r.Obra), comparer)
+            .Where(g => g.Count() > 1);
+
+        foreach (var g in grupos)
         {
-            foreach (var r in g)
-                r.Mensajes.Add("El número de póliza está duplicado en este archivo.");
+            var ordered = g
+                .OrderBy(x => ScoreFilaCompletitud(x))
+                .ThenBy(x => x.OrdenLectura)
+                .ToList();
+
+            var ganadora = ordered[^1];
+            foreach (var r in ordered)
+            {
+                if (ReferenceEquals(r, ganadora))
+                    continue;
+                r.EstadoAnalisis = "ignorada";
+                r.PuedeAplicar = false;
+                r.Mensajes.Clear();
+                r.Mensajes.Add(
+                    "Registro duplicado (misma póliza y misma obra); se importa la fila más completa (o la posterior si empatan).");
+            }
         }
     }
 
-    private static void FinalizeStatuses(List<ImportPreviewRowInternal> rows)
+    private static int ScoreFilaCompletitud(ImportPreviewRowInternal r)
     {
-        foreach (var r in rows)
-        {
-            if (r.Mensajes.Any(m => m.Contains("duplicado", StringComparison.OrdinalIgnoreCase)))
-                r.EstadoAnalisis = "error";
-        }
+        var s = 0;
+        if (!string.IsNullOrWhiteSpace(r.NumeroPoliza)) s += 2;
+        if (!string.IsNullOrWhiteSpace(r.Contratista)) s += 2;
+        if (!string.IsNullOrWhiteSpace(r.Obra)) s += 2;
+        if (!string.IsNullOrWhiteSpace(r.Aseguradora)) s += 2;
+        if (r.RamoId != null) s += 3;
+        if (r.Valor is > 0) s += 2;
+        if (r.FechaEmision != null) s += 2;
+        if (r.FechaExpiracion != null) s += 2;
+        return s;
     }
 
     private void ApplyExistenceAndValidation(
@@ -270,6 +317,12 @@ public class PolizaExcelImportService(
     {
         foreach (var r in rows)
         {
+            if (r.EstadoAnalisis == "ignorada")
+            {
+                r.PuedeAplicar = false;
+                continue;
+            }
+
             if (r.EstadoAnalisis == "error")
             {
                 r.PuedeAplicar = false;
@@ -293,9 +346,9 @@ public class PolizaExcelImportService(
                 r.Mensajes.Add("Falta la vigencia (fecha hasta) o no es válida.");
 
             if (r.RamoId == null)
-                r.Mensajes.Add("No se pudo resolver el ramo (columna o nombre de hoja).");
+                r.Mensajes.Add("El ramo no existe en el sistema o no coincide con los ramos configurados.");
 
-            var emp = ResolverEmpresa(r.Contratista, empresas);
+            var emp = ResolverEmpresa(NormalizeNombreContratista(r.Contratista), empresas);
             r.EmpresaResolucion = emp.Kind;
             r.EmpresaIdExistente = emp.IdExistente;
             r.EmailProvisional = emp.EmailProvisional;
@@ -304,9 +357,8 @@ public class PolizaExcelImportService(
 
             if (r.Mensajes.Count > 0)
             {
-                r.EstadoAnalisis = r.Mensajes.Any(m => m.Contains("Falta", StringComparison.OrdinalIgnoreCase))
-                    ? "incompleta"
-                    : "error";
+                var soloFaltantes = r.Mensajes.All(m => m.Contains("Falta", StringComparison.OrdinalIgnoreCase));
+                r.EstadoAnalisis = r.RamoId == null ? "error" : (soloFaltantes ? "incompleta" : "error");
                 r.PuedeAplicar = false;
                 continue;
             }
@@ -343,13 +395,13 @@ public class PolizaExcelImportService(
         if (string.IsNullOrWhiteSpace(nombre))
             return ("sinNombre", null, null);
 
-        var t = nombre.Trim();
+        var t = NormalizeNombreContratista(nombre);
         var exact = empresas.FirstOrDefault(e => string.Equals(e.Nombre.Trim(), t, StringComparison.OrdinalIgnoreCase));
         if (exact != null)
             return ("existente", exact.Id, null);
 
         var candidates = empresas
-            .Where(e => e.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase))
+            .Where(e => NormalizeNombreContratista(e.Nombre).Contains(t, StringComparison.OrdinalIgnoreCase))
             .ToList();
         if (candidates.Count == 1)
             return ("existente", candidates[0].Id, null);
@@ -370,6 +422,7 @@ public class PolizaExcelImportService(
         var update = rows.Count(r => r.EstadoAnalisis == "paraActualizar");
         var err = rows.Count(r => r.EstadoAnalisis == "error");
         var incom = rows.Count(r => r.EstadoAnalisis == "incompleta");
+        var ign = rows.Count(r => r.EstadoAnalisis == "ignorada");
         var valid = insert + update;
 
         var sheetSummaries = rows
@@ -383,6 +436,7 @@ public class PolizaExcelImportService(
             SheetName = r.SheetName,
             NumeroPoliza = r.NumeroPoliza,
             Contratista = r.Contratista,
+            Obra = r.Obra,
             Ramo = r.RamoNombre,
             Aseguradora = r.Aseguradora,
             FechaEmision = r.FechaEmision?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
@@ -400,6 +454,7 @@ public class PolizaExcelImportService(
             ValidRows = valid,
             ErrorRows = err,
             IncompleteRows = incom,
+            IgnoredRows = ign,
             InsertCount = insert,
             UpdateCount = update,
             SheetsDetected = sheetsDetected,
@@ -415,6 +470,7 @@ public class PolizaExcelImportService(
     {
         var rows = new List<ImportPreviewRowInternal>();
         var sheets = new List<string>();
+        var ordenLectura = 0;
 
         foreach (var ws in wb.Worksheets)
         {
@@ -440,7 +496,16 @@ public class PolizaExcelImportService(
                 if (IsRowEmpty(row, colMap))
                     continue;
 
+                if (TryDetectIgnorableNonPolicyRow(ws, r, colMap, out var motivoIgnorar))
+                {
+                    var ig = CreateIgnoradaRow(ws, r, motivoIgnorar);
+                    ig.OrdenLectura = ordenLectura++;
+                    rows.Add(ig);
+                    continue;
+                }
+
                 var internalRow = ReadDataRow(ws, r, colMap, defaultRamo, ramos);
+                internalRow.OrdenLectura = ordenLectura++;
                 rows.Add(internalRow);
             }
         }
@@ -465,6 +530,70 @@ public class PolizaExcelImportService(
         }
 
         return true;
+    }
+
+    /// <summary>Fila de mes, encabezado duplicado u otra fila “decorativa” del Excel del cliente.</summary>
+    private static bool TryDetectIgnorableNonPolicyRow(
+        IXLWorksheet ws,
+        int excelRow,
+        Dictionary<string, int> colMap,
+        out string motivo)
+    {
+        motivo = "";
+
+        string? Cell(string key) =>
+            colMap.TryGetValue(key, out var col) ? GetCellStringTrim(ws.Cell(excelRow, col)) : null;
+
+        var numero = Cell("numero");
+        var contratista = Cell("contratista");
+        var obra = Cell("obra");
+        var ramo = Cell("ramo");
+        var aseguradora = Cell("aseguradora");
+
+        foreach (var fragment in new[] { numero, contratista, obra, ramo, aseguradora })
+        {
+            if (string.IsNullOrWhiteSpace(fragment))
+                continue;
+            if (Regex.IsMatch(fragment, @"MES\s+DE\s+\w+", RegexOptions.IgnoreCase))
+            {
+                motivo = "Fila de título por mes (no es un registro de póliza).";
+                return true;
+            }
+        }
+
+        var nNum = NormalizeHeader(numero ?? "");
+        var nCon = NormalizeHeader(contratista ?? "");
+        // Repetición de encabezados: texto típico de cabecera en celda de dato
+        if (nNum.Contains("DEPOLIZ") || nNum.Contains("NUMERODEPOLIZ") || (nNum.Contains("POLIZ") && nNum.Contains("NUMERO")))
+        {
+            motivo = "Fila de encabezado repetido (no es un registro de póliza).";
+            return true;
+        }
+        if (nCon == "CONTRATISTA" || nCon == "CONTRATIST")
+        {
+            motivo = "Fila de encabezado repetido (no es un registro de póliza).";
+            return true;
+        }
+        if (NormalizeHeader(ramo ?? "") == "RAMO")
+        {
+            motivo = "Fila de encabezado repetido (no es un registro de póliza).";
+            return true;
+        }
+
+        return false;
+    }
+
+    private static ImportPreviewRowInternal CreateIgnoradaRow(IXLWorksheet ws, int excelRow, string motivo)
+    {
+        return new ImportPreviewRowInternal
+        {
+            ExcelRow = excelRow,
+            SheetName = ws.Name.Trim(),
+            EstadoAnalisis = "ignorada",
+            EmpresaResolucion = "sinNombre",
+            Mensajes = new List<string> { motivo },
+            PuedeAplicar = false,
+        };
     }
 
     private static ImportPreviewRowInternal ReadDataRow(
@@ -502,10 +631,10 @@ public class PolizaExcelImportService(
         {
             ExcelRow = excelRow,
             SheetName = ws.Name.Trim(),
-            NumeroPoliza = numero,
-            Contratista = contratista,
-            Obra = obra,
-            Aseguradora = aseguradora,
+            NumeroPoliza = numero.Trim(),
+            Contratista = NormalizeNombreContratista(contratista),
+            Obra = CollapseWhitespace(obra).Trim(),
+            Aseguradora = CollapseWhitespace(aseguradora).Trim(),
             RamoNombre = ramoResolved.Nombre ?? "",
             RamoId = ramoResolved.Id,
             Valor = valor,
@@ -516,56 +645,149 @@ public class PolizaExcelImportService(
         };
     }
 
+    /// <summary>Resuelve ramo: texto columna → alias → coincidencia flexible con nombres en BD → fallback nombre de hoja.</summary>
     private static (Guid? Id, string? Nombre) ResolverRamoNombre(
         string? ramoColumna,
         string? defaultRamoCanonical,
         IReadOnlyList<Ramo> ramos)
     {
-        var target = !string.IsNullOrWhiteSpace(ramoColumna) ? ramoColumna.Trim() : defaultRamoCanonical;
-        if (string.IsNullOrWhiteSpace(target))
-            return (null, null);
+        if (TryResolveRamoSingleSource(ramoColumna, ramos, out var id1, out var nom1))
+            return (id1, nom1);
 
-        var exact = ramos.FirstOrDefault(r => r.Nombre.Equals(target, StringComparison.OrdinalIgnoreCase));
-        if (exact != null)
-            return (exact.Id, exact.Nombre);
+        if (TryResolveRamoSingleSource(defaultRamoCanonical, ramos, out var id2, out var nom2))
+            return (id2, nom2);
 
-        var canon = MapRamoAlias(target);
-        if (!string.IsNullOrEmpty(canon))
-        {
-            var r = ramos.FirstOrDefault(x => x.Nombre.Equals(canon, StringComparison.OrdinalIgnoreCase));
-            if (r != null)
-                return (r.Id, r.Nombre);
-        }
-
-        var fuzzy = ramos.Where(r => r.Nombre.Contains(target, StringComparison.OrdinalIgnoreCase)).ToList();
-        if (fuzzy.Count == 1)
-            return (fuzzy[0].Id, fuzzy[0].Nombre);
-
-        return (null, target);
+        var etiqueta = !string.IsNullOrWhiteSpace(ramoColumna)
+            ? CollapseWhitespace(ramoColumna).Trim()
+            : CollapseWhitespace(defaultRamoCanonical ?? "").Trim();
+        return (null, string.IsNullOrEmpty(etiqueta) ? null : etiqueta);
     }
 
-    private static string? MapRamoAlias(string s)
+    private static bool TryResolveRamoSingleSource(string? texto, IReadOnlyList<Ramo> ramos, out Guid? id, out string? nombre)
     {
-        var n = NormalizeHeader(s);
-        if ((n.Contains("BUEN") && n.Contains("USO")) || n.Contains("ANTICIPO"))
+        id = null;
+        nombre = null;
+        if (string.IsNullOrWhiteSpace(texto))
+            return false;
+
+        var display = CollapseWhitespace(texto).Trim();
+
+        // 1) Igualdad directa (espacios colapsados, sin distinguir mayúsculas)
+        var direct = ramos.FirstOrDefault(r =>
+            string.Equals(CollapseWhitespace(r.Nombre).Trim(), display, StringComparison.OrdinalIgnoreCase));
+        if (direct != null)
+        {
+            id = direct.Id;
+            nombre = direct.Nombre;
+            return true;
+        }
+
+        // 2) Nombre canónico por alias (variaciones BUEN USO DE/DEL ANTICIPO, etc.)
+        var canon = MapRamoToCanonicalNombre(display);
+        if (canon != null)
+        {
+            var r = ramos.FirstOrDefault(x => string.Equals(x.Nombre, canon, StringComparison.OrdinalIgnoreCase));
+            if (r != null)
+            {
+                id = r.Id;
+                nombre = r.Nombre;
+                return true;
+            }
+        }
+
+        // 3) Clave sin espacios ni acentos: igualdad o contención con nombres de BD
+        var keyInput = RamoNormalizeKey(display);
+        if (keyInput.Length == 0)
+            return false;
+
+        foreach (var r in ramos)
+        {
+            var keyDb = RamoNormalizeKey(r.Nombre);
+            if (keyDb.Length > 0 && keyInput == keyDb)
+            {
+                id = r.Id;
+                nombre = r.Nombre;
+                return true;
+            }
+        }
+
+        // 4) Fuzzy por contención de claves (solo si no hay ambigüedad)
+        List<Ramo> fuzzyHits = new();
+        foreach (var r in ramos)
+        {
+            var keyDb = RamoNormalizeKey(r.Nombre);
+            if (keyDb.Length < 6 || keyInput.Length < 6)
+                continue;
+            if (keyInput.Contains(keyDb, StringComparison.OrdinalIgnoreCase)
+                || keyDb.Contains(keyInput, StringComparison.OrdinalIgnoreCase))
+                fuzzyHits.Add(r);
+        }
+        fuzzyHits = fuzzyHits.DistinctBy(x => x.Id).ToList();
+        if (fuzzyHits.Count == 1)
+        {
+            id = fuzzyHits[0].Id;
+            nombre = fuzzyHits[0].Nombre;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Mapea variaciones típicas del Excel cliente a los tres nombres oficiales del sistema.</summary>
+    private static string? MapRamoToCanonicalNombre(string textoVisible)
+    {
+        var n = NormalizeHeader(CollapseWhitespace(textoVisible));
+        if (n.Length == 0)
+            return null;
+
+        // Buen uso (de/del) anticipo — "ANTICIPO" ancla bien; también BUEN+USO sin depender de espacios
+        if (n.Contains("ANTICIPO") || (n.Contains("BUEN") && n.Contains("USO")))
             return "Buen Uso de Anticipo";
+
         if (n.Contains("AMBIENTAL") || (n.Contains("MANEJO") && n.Contains("AMBIENTAL")))
             return "Cumplimiento al Manejo Ambiental";
+
         if (n.Contains("FIEL") || (n.Contains("CUMPLIMIENTO") && n.Contains("CONTRATO")))
             return "Fiel Cumplimiento";
+
         return null;
+    }
+
+    private static string RamoNormalizeKey(string s)
+    {
+        var t = CollapseWhitespace(s).ToUpperInvariant().Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var ch in t)
+        {
+            if (char.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                continue;
+            if (char.IsWhiteSpace(ch) || ch is '.' or '#' or '-' or '_' or '/')
+                continue;
+            sb.Append(ch);
+        }
+        return sb.ToString();
     }
 
     private static string? DefaultRamoFromSheetName(string sheetName)
     {
-        var n = NormalizeHeader(sheetName);
-        if (n.Contains("BUEN") && n.Contains("ANTICIPO"))
-            return "Buen Uso de Anticipo";
-        if (n.Contains("AMBIENTAL") || (n.Contains("MANEJO") && n.Contains("AMBIENTAL")))
-            return "Cumplimiento al Manejo Ambiental";
-        if (n.Contains("CUMPLIMIENTO") && n.Contains("CONTRATO"))
-            return "Fiel Cumplimiento";
-        return null;
+        if (string.IsNullOrWhiteSpace(sheetName))
+            return null;
+        var collapsed = CollapseWhitespace(sheetName).Trim();
+        return MapRamoToCanonicalNombre(collapsed);
+    }
+
+    /// <summary>Espacios internos repetidos → uno; trim.</summary>
+    private static string CollapseWhitespace(string? s)
+    {
+        if (string.IsNullOrEmpty(s))
+            return "";
+        return Regex.Replace(s.Trim(), @"\s+", " ");
+    }
+
+    /// <summary>Contratista u otros nombres libres: trim + espacios colapsados (evita <c>sinNombre</c> fantasma).</summary>
+    private static string NormalizeNombreContratista(string? s)
+    {
+        return CollapseWhitespace(s);
     }
 
     private static (int HeaderRow, Dictionary<string, int> ColMap)? FindHeaderRow(IXLWorksheet ws)
@@ -756,6 +978,8 @@ internal sealed class ImportPreviewRowInternal
     public string? EmailProvisional { get; set; }
     public List<string> Mensajes { get; set; } = new();
     public bool PuedeAplicar { get; set; }
+    /// <summary>Orden de aparición al leer el libro (desempate para duplicados).</summary>
+    public int OrdenLectura { get; set; }
 }
 
 internal sealed class PolizaImportSession

@@ -46,6 +46,7 @@ interface PolizaImportPreviewApi {
   validRows: number;
   errorRows: number;
   incompleteRows: number;
+  ignoredRows: number;
   insertCount: number;
   updateCount: number;
   sheetsDetected: string[];
@@ -58,6 +59,7 @@ interface PolizaImportPreviewRowApi {
   sheetName: string;
   numeroPoliza: string;
   contratista: string;
+  obra?: string;
   ramo: string;
   aseguradora: string;
   fechaEmision: string | null;
@@ -82,6 +84,7 @@ function mapImportPreview(api: PolizaImportPreviewApi): PolizaImportPreview {
     validRows: api.validRows,
     errorRows: api.errorRows,
     incompleteRows: api.incompleteRows,
+    ignoredRows: api.ignoredRows ?? 0,
     insertCount: api.insertCount,
     updateCount: api.updateCount,
     sheetsDetected: api.sheetsDetected,
@@ -91,6 +94,7 @@ function mapImportPreview(api: PolizaImportPreviewApi): PolizaImportPreview {
       sheetName: i.sheetName,
       numeroPoliza: i.numeroPoliza,
       contratista: i.contratista,
+      obra: i.obra ?? '',
       ramo: i.ramo,
       aseguradora: i.aseguradora,
       fechaEmision: i.fechaEmision,

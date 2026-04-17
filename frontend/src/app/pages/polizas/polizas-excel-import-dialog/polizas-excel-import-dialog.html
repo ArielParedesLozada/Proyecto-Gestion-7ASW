@@ -25,6 +25,10 @@
       <span class="summary-card__label">Incompletas</span>
       <span class="summary-card__value">{{ data.preview.incompleteRows }}</span>
     </div>
+    <div class="summary-card">
+      <span class="summary-card__label">Ignoradas</span>
+      <span class="summary-card__value">{{ data.preview.ignoredRows }}</span>
+    </div>
     <div class="summary-card summary-card--accent">
       <span class="summary-card__label">Inserciones</span>
       <span class="summary-card__value">{{ data.preview.insertCount }}</span>
@@ -35,6 +39,23 @@
     </div>
   </div>
 
+  @if (!auditoria().ok) {
+    <div class="audit-warn" role="alert">
+      <mat-icon class="audit-warn__icon">warning</mat-icon>
+      <div class="audit-warn__text">
+        Los contadores del resumen no coinciden con la suma por categorías en las filas cargadas. Revisa la respuesta del
+        servidor o vuelve a previsualizar.
+        <span class="audit-warn__detail">
+          (Esperado: válidas {{ data.preview.validRows }}, error {{ data.preview.errorRows }}, incompletas
+          {{ data.preview.incompleteRows }}, ignoradas {{ data.preview.ignoredRows }}, total
+          {{ data.preview.totalRows }} · Reconstruido desde ítems: válidas {{ auditoria().cValid }}, error
+          {{ auditoria().cErr }}, incompletas {{ auditoria().cInc }}, ignoradas {{ auditoria().cIgn }}, suma
+          {{ auditoria().sumaCategorias }}.)
+        </span>
+      </div>
+    </div>
+  }
+
   @if (data.preview.sheetsDetected.length) {
     <div class="sheets-row">
       <span class="sheets-row__label">Hojas detectadas:</span>
@@ -42,12 +63,48 @@
     </div>
   }
 
+  <div class="toolbar">
+    <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+      <mat-label>Filtrar por categoría</mat-label>
+      <mat-select [value]="filtro()" (selectionChange)="onFiltroChange($event.value)">
+        @for (opt of opcionesFiltro; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="toolbar__count">
+      <strong>Filas visibles:</strong>
+      {{ filasFiltradas().length }}
+      @if (filtro() !== 'todas') {
+        <span class="toolbar__count-hint">de {{ data.preview.totalRows }} totales</span>
+      }
+    </div>
+
+    <div class="toolbar__exports">
+      <span class="toolbar__exports-label">Exportar CSV:</span>
+      <button type="button" mat-stroked-button (click)="exportarCsvErrores()">
+        <mat-icon>download</mat-icon>
+        Errores ({{ data.preview.errorRows }})
+      </button>
+      <button type="button" mat-stroked-button (click)="exportarCsvIncompletas()">
+        <mat-icon>download</mat-icon>
+        Incompletas ({{ data.preview.incompleteRows }})
+      </button>
+      <button type="button" mat-stroked-button (click)="exportarCsvIgnoradas()">
+        <mat-icon>download</mat-icon>
+        Ignoradas ({{ data.preview.ignoredRows }})
+      </button>
+    </div>
+  </div>
+
   <p class="hint">
-    Se muestran como máximo las primeras 50 filas en la tabla. Revisa los mensajes por fila antes de confirmar.
+    Cada fila tiene una sola categoría (válida = insertar o actualizar; error; incompleta; ignorada). Los mensajes listan
+    el motivo (validación, duplicado, fila de mes, etc.).
   </p>
 
   <div class="table-wrap">
-    <table mat-table [dataSource]="previewRows()" class="preview-table">
+    <table mat-table [dataSource]="filasFiltradas()" class="preview-table">
       <ng-container matColumnDef="excelRow">
         <th mat-header-cell *matHeaderCellDef>Fila</th>
         <td mat-cell *matCellDef="let row">{{ row.excelRow }}</td>
@@ -63,6 +120,10 @@
       <ng-container matColumnDef="contratista">
         <th mat-header-cell *matHeaderCellDef>Contratista</th>
         <td mat-cell *matCellDef="let row">{{ row.contratista }}</td>
+      </ng-container>
+      <ng-container matColumnDef="obra">
+        <th mat-header-cell *matHeaderCellDef>Obra</th>
+        <td mat-cell *matCellDef="let row">{{ row.obra || '—' }}</td>
       </ng-container>
       <ng-container matColumnDef="ramo">
         <th mat-header-cell *matHeaderCellDef>Ramo</th>
@@ -89,7 +150,7 @@
         <td mat-cell *matCellDef="let row">{{ empresaLabel(row.empresaResolucion) }}</td>
       </ng-container>
       <ng-container matColumnDef="mensajes">
-        <th mat-header-cell *matHeaderCellDef>Notas</th>
+        <th mat-header-cell *matHeaderCellDef>Mensajes / motivo</th>
         <td mat-cell *matCellDef="let row" class="cell-mensajes">
           @if (row.mensajes?.length) {
             <ul class="msg-list">
@@ -97,6 +158,8 @@
                 <li>{{ m }}</li>
               }
             </ul>
+          } @else if (filaEsImportable(row)) {
+            <span class="msg-ok">Sin observaciones; lista para importar.</span>
           } @else {
             —
           }

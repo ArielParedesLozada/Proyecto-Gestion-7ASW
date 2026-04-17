@@ -5,6 +5,8 @@ export interface PolizaImportPreview {
   validRows: number;
   errorRows: number;
   incompleteRows: number;
+  /** Separadores, cabeceras repetidas, duplicados descartados, etc. */
+  ignoredRows: number;
   insertCount: number;
   updateCount: number;
   sheetsDetected: string[];
@@ -17,6 +19,7 @@ export interface PolizaImportPreviewRow {
   sheetName: string;
   numeroPoliza: string;
   contratista: string;
+  obra: string;
   ramo: string;
   aseguradora: string;
   fechaEmision: string | null;

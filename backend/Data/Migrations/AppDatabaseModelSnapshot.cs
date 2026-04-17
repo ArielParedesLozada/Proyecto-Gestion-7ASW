@@ -126,10 +126,10 @@ namespace backend.Data.Migrations
 
                     b.HasIndex("Id");
 
-                    b.HasIndex("Numero")
-                        .IsUnique();
-
                     b.HasIndex("Ramo");
+
+                    b.HasIndex("Numero", "Obra")
+                        .IsUnique();
 
                     b.ToTable("polizas", (string)null);
                 });
@@ -207,17 +207,21 @@ namespace backend.Data.Migrations
 
             modelBuilder.Entity("Backend.Domain.Models.Poliza", b =>
                 {
-                    b.HasOne("Backend.Domain.Models.Empresa", null)
+                    b.HasOne("Backend.Domain.Models.Empresa", "ContratistaNav")
                         .WithMany()
                         .HasForeignKey("Contratista")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Domain.Models.Ramo", null)
+                    b.HasOne("Backend.Domain.Models.Ramo", "RamoNav")
                         .WithMany()
                         .HasForeignKey("Ramo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ContratistaNav");
+
+                    b.Navigation("RamoNav");
                 });
 #pragma warning restore 612, 618
         }

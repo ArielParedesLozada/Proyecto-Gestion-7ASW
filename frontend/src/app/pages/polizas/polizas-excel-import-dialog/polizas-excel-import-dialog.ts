@@ -4,12 +4,38 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
-import { PolizaImportPreview } from '../models/poliza-import.model';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { PolizaImportPreview, PolizaImportPreviewRow } from '../models/poliza-import.model';
 import { PolizaService } from '../../../services/poliza.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
+export type FiltroCategoriaImport = 'todas' | 'validas' | 'error' | 'incompletas' | 'ignoradas';
+
 export interface PolizasExcelImportDialogData {
   preview: PolizaImportPreview;
+}
+
+/** Clasificación backend: cada fila tiene exactamente un <code>estadoAnalisis</code>. */
+function esFilaValida(row: PolizaImportPreviewRow): boolean {
+  return row.estadoAnalisis === 'paraInsertar' || row.estadoAnalisis === 'paraActualizar';
+}
+
+function coincideFiltro(row: PolizaImportPreviewRow, filtro: FiltroCategoriaImport): boolean {
+  switch (filtro) {
+    case 'todas':
+      return true;
+    case 'validas':
+      return esFilaValida(row);
+    case 'error':
+      return row.estadoAnalisis === 'error';
+    case 'incompletas':
+      return row.estadoAnalisis === 'incompleta';
+    case 'ignoradas':
+      return row.estadoAnalisis === 'ignorada';
+    default:
+      return true;
+  }
 }
 
 @Component({
@@ -20,6 +46,8 @@ export interface PolizasExcelImportDialogData {
     MatIconModule,
     MatProgressSpinnerModule,
     MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
   ],
   templateUrl: './polizas-excel-import-dialog.html',
   styleUrl: './polizas-excel-import-dialog.scss',
@@ -32,14 +60,57 @@ export class PolizasExcelImportDialogComponent {
   readonly data = inject<PolizasExcelImportDialogData>(MAT_DIALOG_DATA);
 
   readonly importing = signal(false);
+  readonly filtro = signal<FiltroCategoriaImport>('todas');
 
-  readonly previewRows = computed(() => this.data.preview.items.slice(0, 50));
+  readonly opcionesFiltro: { value: FiltroCategoriaImport; label: string }[] = [
+    { value: 'todas', label: 'Todas' },
+    { value: 'validas', label: 'Válidas (importar)' },
+    { value: 'error', label: 'Con error' },
+    { value: 'incompletas', label: 'Incompletas' },
+    { value: 'ignoradas', label: 'Ignoradas' },
+  ];
+
+  readonly filasFiltradas = computed(() => {
+    const items = this.data.preview.items;
+    const f = this.filtro();
+    return items.filter((row) => coincideFiltro(row, f));
+  });
+
+  /** Coincide conteos de API con recomputo desde <code>items</code> (auditoría de clasificación). */
+  readonly auditoria = computed(() => {
+    const p = this.data.preview;
+    const items = p.items;
+    const cValid = items.filter(esFilaValida).length;
+    const cErr = items.filter((r) => r.estadoAnalisis === 'error').length;
+    const cInc = items.filter((r) => r.estadoAnalisis === 'incompleta').length;
+    const cIgn = items.filter((r) => r.estadoAnalisis === 'ignorada').length;
+    const sumaCategorias = cValid + cErr + cInc + cIgn;
+    return {
+      cValid,
+      cErr,
+      cInc,
+      cIgn,
+      sumaCategorias,
+      matchTotalRows: sumaCategorias === p.totalRows,
+      matchValid: cValid === p.validRows,
+      matchError: cErr === p.errorRows,
+      matchIncomplete: cInc === p.incompleteRows,
+      matchIgnored: cIgn === p.ignoredRows,
+      ok:
+        sumaCategorias === p.totalRows &&
+        cValid === p.validRows &&
+        cErr === p.errorRows &&
+        cInc === p.incompleteRows &&
+        cIgn === p.ignoredRows,
+    };
+  });
 
   readonly displayedColumns: string[] = [
     'excelRow',
     'sheetName',
     'numeroPoliza',
     'contratista',
+    'obra',
     'ramo',
     'aseguradora',
     'fechaEmision',
@@ -51,6 +122,14 @@ export class PolizasExcelImportDialogComponent {
 
   readonly puedeConfirmar = computed(() => this.data.preview.validRows > 0 && !this.importing());
 
+  filaEsImportable(row: PolizaImportPreviewRow): boolean {
+    return esFilaValida(row);
+  }
+
+  onFiltroChange(value: FiltroCategoriaImport): void {
+    this.filtro.set(value);
+  }
+
   estadoLabel(codigo: string): string {
     switch (codigo) {
       case 'paraInsertar':
@@ -61,6 +140,8 @@ export class PolizasExcelImportDialogComponent {
         return 'Error';
       case 'incompleta':
         return 'Incompleta';
+      case 'ignorada':
+        return 'Ignorada';
       default:
         return codigo;
     }
@@ -79,6 +160,108 @@ export class PolizasExcelImportDialogComponent {
       default:
         return codigo;
     }
+  }
+
+  /** Texto único para export / búsqueda (todos los motivos concatenados). */
+  mensajesDetalle(row: PolizaImportPreviewRow): string {
+    if (!row.mensajes?.length) {
+      return '';
+    }
+    return row.mensajes.join(' | ');
+  }
+
+  exportarCsvErrores(): void {
+    this.exportarCsvCategoria(
+      (r) => r.estadoAnalisis === 'error',
+      'errores',
+    );
+  }
+
+  exportarCsvIncompletas(): void {
+    this.exportarCsvCategoria(
+      (r) => r.estadoAnalisis === 'incompleta',
+      'incompletas',
+    );
+  }
+
+  exportarCsvIgnoradas(): void {
+    this.exportarCsvCategoria(
+      (r) => r.estadoAnalisis === 'ignorada',
+      'ignoradas',
+    );
+  }
+
+  private exportarCsvCategoria(
+    predicate: (r: PolizaImportPreviewRow) => boolean,
+    etiquetaArchivo: string,
+  ): void {
+    const filas = this.data.preview.items.filter(predicate);
+    if (filas.length === 0) {
+      this.notify.info('No hay filas en esa categoría para exportar.');
+      return;
+    }
+    const base = this.data.preview.fileName.replace(/\.[^.]+$/, '');
+    const nombre = `${base}-import-${etiquetaArchivo}-${this.fechaArchivo()}.csv`;
+    this.descargarCsv(filas, nombre);
+    this.notify.success(`Exportado: ${filas.length} fila(s).`);
+  }
+
+  private fechaArchivo(): string {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+  }
+
+  private descargarCsv(filas: PolizaImportPreviewRow[], nombreArchivo: string): void {
+    const sep = ';';
+    const headers = [
+      'Fila Excel',
+      'Hoja',
+      'Número póliza',
+      'Obra',
+      'Contratista',
+      'Ramo',
+      'Aseguradora',
+      'Fecha emisión',
+      'Vigencia hasta',
+      'Estado análisis',
+      'Resolución empresa',
+      'Mensajes validación',
+    ];
+    const lines = [headers.join(sep)];
+    for (const row of filas) {
+      const cells = [
+        String(row.excelRow),
+        row.sheetName,
+        row.numeroPoliza,
+        row.obra ?? '',
+        row.contratista,
+        row.ramo,
+        row.aseguradora,
+        row.fechaEmision ?? '',
+        row.fechaExpiracion ?? '',
+        row.estadoAnalisis,
+        row.empresaResolucion,
+        this.mensajesDetalle(row),
+      ].map((c) => this.escapeCsvCell(c));
+      lines.push(cells.join(sep));
+    }
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private escapeCsvCell(value: string): string {
+    const s = value ?? '';
+    if (/[";\n\r]/.test(s)) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
   }
 
   cancelar(): void {

@@ -8,6 +8,8 @@ public class PolizaImportPreviewResponse
     public int ValidRows { get; set; }
     public int ErrorRows { get; set; }
     public int IncompleteRows { get; set; }
+    /// <summary>Separadores mensuales, cabeceras repetidas, filas duplicadas (mismo número y misma obra) descartadas a favor de otra, etc.</summary>
+    public int IgnoredRows { get; set; }
     public int InsertCount { get; set; }
     public int UpdateCount { get; set; }
     public IReadOnlyList<string> SheetsDetected { get; set; } = Array.Empty<string>();
@@ -27,11 +29,12 @@ public class PolizaImportPreviewRowDto
     public string SheetName { get; set; } = "";
     public string NumeroPoliza { get; set; } = "";
     public string Contratista { get; set; } = "";
+    public string Obra { get; set; } = "";
     public string Ramo { get; set; } = "";
     public string Aseguradora { get; set; } = "";
     public string? FechaEmision { get; set; }
     public string? FechaExpiracion { get; set; }
-    /// <summary>paraInsertar, paraActualizar, error, incompleta</summary>
+    /// <summary>paraInsertar, paraActualizar, error, incompleta, ignorada</summary>
     public string EstadoAnalisis { get; set; } = "";
     /// <summary>existente, seCreara, ambiguo, sinNombre</summary>
     public string EmpresaResolucion { get; set; } = "";

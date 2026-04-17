@@ -48,7 +48,7 @@ public class AppDatabase : DbContext
             entity.ToTable("polizas");
             entity.HasKey(p => p.Id);
             entity.HasIndex(p => p.Id);
-            entity.HasIndex(p => p.Numero).IsUnique();
+            entity.HasIndex(p => new { p.Numero, p.Obra }).IsUnique();
             entity.HasQueryFilter(p => p.DeletedAt == null);
             entity.HasOne<Empresa>(p => p.ContratistaNav)
                 .WithMany()
