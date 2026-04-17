@@ -10,6 +10,8 @@ public static class JWTConfig
         services.AddAuthentication("Bearer")
             .AddJwtBearer(options =>
             {
+                // Conservar nombres de claims del JWT (p. ej. must_change_password) para las políticas.
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,

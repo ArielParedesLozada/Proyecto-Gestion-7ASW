@@ -1,0 +1,25 @@
+// Chip tipo mockup: píldora gris; “Sí” con leve contraste para distinguir sin romper la línea visual.
+.ramo-cambio-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.ramo-cambio-badge--no {
+  background: #f3f4f6;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+
+.ramo-cambio-badge--si {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #e0e7ff;
+}

@@ -9,7 +9,8 @@ export interface Poliza {
     valorActual: number;
     fechaEmision: string; // o Date si prefieres
     fechaExpiracion: string; // o Date si prefieres
-    estado: number; // posiblemente un enum si tiene valores fijos
+    /** 0=Vigente, 1=Por vencer, 2=Expirado (derivado en API). */
+    estado: number;
 }
 
 export interface PolizaItemSet {

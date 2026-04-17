@@ -1,0 +1,73 @@
+// Encabezado admin reutilizable (listado y formularios de pólizas).
+.polizas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.polizas-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.polizas-header__notif {
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 0.2rem;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 50%;
+
+  mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: #6b7280;
+  }
+
+  &:hover mat-icon {
+    color: #374151;
+  }
+}
+
+.polizas-header__notif-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #c1121f;
+  border-radius: 50%;
+  border: 2px solid #f5f7fb;
+}
+
+.polizas-header__profile {
+  font-size: 2.2rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: #c1121f;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,7 @@
+<span
+  class="ramo-cambio-badge"
+  [class.ramo-cambio-badge--si]="cambioValor()"
+  [class.ramo-cambio-badge--no]="!cambioValor()"
+>
+  {{ cambioValor() ? 'Sí' : 'No' }}
+</span>

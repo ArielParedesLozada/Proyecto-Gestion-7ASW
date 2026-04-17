@@ -34,24 +34,23 @@ export class Dashboard implements OnInit, AfterViewInit {
   data: PolizaTableRow[] = []
 
   ngOnInit(): void {
-    this.apiService.get<PolizaItemSet>(API_CONFIG.ENDPOINTS.POLIZAS.POLIZAS).subscribe({
+    const url = `${API_CONFIG.ENDPOINTS.POLIZAS.POLIZAS}?page=1&pageSize=100`;
+    this.apiService.get<PolizaItemSet>(url).subscribe({
       next: (response) => {
-        this.data = response.items.map(p => ({
+        this.data = response.items.map((p) => ({
           id: p.id,
           contratista: p.contratista,
           numero: p.numero,
           obra: p.obra,
           ramo: p.ramo,
           fechaExpiracion: formatDate(p.fechaExpiracion, 'dd/MM/yyyy', this.locale),
-          diasRestantes: this.calcularDias(p.fechaExpiracion)
-        }))
-        console.log(this.data)
+          diasRestantes: this.calcularDias(p.fechaExpiracion),
+        }));
       },
-      error: (err) => {
-        this.data = []
-        console.log(err)
-      }
-    })
+      error: () => {
+        this.data = [];
+      },
+    });
   }
 
   ngAfterViewInit() {

@@ -50,12 +50,22 @@
         </a>
       }
 
-      <a routerLink="/empresas" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/empresas"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
         <mat-icon class="icon">business</mat-icon>
         @if (!isCollapsed()) { <span>Empresas</span> }
       </a>
 
-      <a routerLink="/ramos" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/ramos"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
         <mat-icon class="icon">label</mat-icon>
         @if (!isCollapsed()) { <span>Ramos</span> }
       </a>

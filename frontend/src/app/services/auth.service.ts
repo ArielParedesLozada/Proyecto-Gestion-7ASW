@@ -18,7 +18,12 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.storageService.setToken(response.token);
-          const user: AuthUser = { username: response.username, role: response.role, email: response.email, mustChangePassword: response.mustChangePassword };
+          const user: AuthUser = {
+            username: response.username,
+            role: response.role,
+            email: response.email ?? '',
+            mustChangePassword: response.mustChangePassword ?? false,
+          };
           this.storageService.setUser(user);
         }),
         catchError(error => {

@@ -1,0 +1,83 @@
+<div class="polizas-card">
+  <h2 class="polizas-card__title">Listado de Pólizas</h2>
+
+  <div class="table-scroll">
+    <table class="polizas-table">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Contratista</th>
+          <th>Obra</th>
+          <th>Ramo</th>
+          <th>Aseguradora</th>
+          <th>Vencimiento</th>
+          <th>Valor</th>
+          <th>Estado</th>
+          <th class="polizas-table__col-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr>
+            <td class="polizas-table__mono">{{ row.numero }}</td>
+            <td>{{ row.contratista }}</td>
+            <td>{{ row.obra }}</td>
+            <td>{{ row.ramo }}</td>
+            <td>{{ row.aseguradora }}</td>
+            <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
+            <td class="polizas-table__valor">${{ row.valor | number: '1.0-0' }}</td>
+            <td>
+              <app-poliza-status-badge [estado]="row.estado" />
+            </td>
+            <td>
+              <div class="polizas-table__actions">
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="action-btn"
+                  aria-label="Ver"
+                  (click)="onVer(row)"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="action-btn"
+                  aria-label="Editar"
+                  (click)="onEditar(row)"
+                >
+                  <mat-icon>edit_square</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="action-btn"
+                  aria-label="Renovar"
+                  (click)="onRenovar(row)"
+                >
+                  <mat-icon>autorenew</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" class="polizas-table__empty">
+              No hay pólizas que coincidan con los filtros.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="polizas-card__paginator">
+    <app-local-paginator
+      [length]="paginatorLength()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      (page)="pageChange.emit($event)"
+    />
+  </div>
+</div>

@@ -8,6 +8,8 @@ public class AppDatabase : DbContext
     public AppDatabase(DbContextOptions<AppDatabase> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Empresa> Empresas { get; set; }
+    public DbSet<Ramo> Ramos { get; set; }
     public DbSet<Poliza> Polizas { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +49,7 @@ public class AppDatabase : DbContext
             entity.HasKey(p => p.Id);
             entity.HasIndex(p => p.Id);
             entity.HasIndex(p => p.Numero).IsUnique();
+            entity.HasQueryFilter(p => p.DeletedAt == null);
             entity.HasOne<Empresa>(p => p.ContratistaNav)
                 .WithMany()
                 .HasForeignKey(p => p.Contratista)

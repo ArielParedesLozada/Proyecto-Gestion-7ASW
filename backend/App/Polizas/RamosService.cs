@@ -10,12 +10,14 @@ public class RamoService(IRepository<Ramo, Guid> ramoRepo)
     // ✅ Crear
     public async Task<Ramo> CreateRamo(string nombre, bool cambiaValor, string descripcion)
     {
+        var nombreTrim = nombre.Trim();
+        var descripcionTrim = descripcion.Trim();
         var ramo = new Ramo
         {
             Id = Guid.NewGuid(),
-            Nombre = nombre,
+            Nombre = nombreTrim,
             CambiaValor = cambiaValor,
-            Descripcion = descripcion
+            Descripcion = descripcionTrim
         };
 
         return await _ramoRepo.CreateAsync(ramo);
@@ -24,7 +26,8 @@ public class RamoService(IRepository<Ramo, Guid> ramoRepo)
     // ✅ Obtener todos
     public async Task<IEnumerable<Ramo>> GetAllRamos()
     {
-        return await _ramoRepo.GetAllAsync();
+        var items = await _ramoRepo.GetAllAsync();
+        return items.OrderBy(r => r.Nombre);
     }
 
     // ✅ Obtener por Id
@@ -44,9 +47,9 @@ public class RamoService(IRepository<Ramo, Guid> ramoRepo)
         var ramo = await _ramoRepo.GetByIdAsync(id);
         if (ramo == null) return null;
 
-        ramo.Nombre = nombre;
+        ramo.Nombre = nombre.Trim();
         ramo.CambiaValor = cambiaValor;
-        ramo.Descripcion = descripcion;
+        ramo.Descripcion = descripcion.Trim();
 
         return await _ramoRepo.UpdateAsync(ramo);
     }

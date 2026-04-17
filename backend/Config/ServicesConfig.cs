@@ -27,6 +27,7 @@ public static class ServicesConfig
         services.AddScoped<EmpresasService>();
         services.AddScoped<RamoService>();
         services.AddScoped<PolizaService>();
+        services.AddScoped<PolizaExcelImportService>();
         return services;
     }
 }

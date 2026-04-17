@@ -13,8 +13,13 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}${endpoint}`);
   }
 
-  post<T>(endpoint: string, body: any) {
+  post<T>(endpoint: string, body: unknown) {
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, body);
+  }
+
+  /** Multipart (p. ej. Excel); el navegador fija el boundary automáticamente. */
+  postFormData<T>(endpoint: string, formData: FormData) {
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, formData);
   }
 
   put<T>(endpoint: string, body: any) {

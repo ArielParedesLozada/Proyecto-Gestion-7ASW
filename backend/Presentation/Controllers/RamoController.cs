@@ -31,7 +31,9 @@ public class RamoController : ControllerBase
     public async Task<ActionResult<RamoDtoResponse>> GetById(Guid id)
     {
         var ramo = await _ramoService.GetRamoById(id);
-        return Ok(Map(ramo!));
+        if (ramo == null)
+            return NotFound();
+        return Ok(Map(ramo));
     }
 
     [HttpPost]
@@ -58,7 +60,9 @@ public class RamoController : ControllerBase
             request.Descripcion
         );
 
-        return Ok(Map(ramo!));
+        if (ramo == null)
+            return NotFound();
+        return Ok(Map(ramo));
     }
 
     [HttpDelete("{id}")]
