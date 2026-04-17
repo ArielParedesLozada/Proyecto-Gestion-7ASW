@@ -128,7 +128,9 @@ public class PolizaExcelImportService(
                 try
                 {
                     var empresaId = await ResolverOcrearEmpresaAsync(row, creadasPorNombre);
-                    PolizaFechaValidacion.ValidarEmisionYExpiracion(row.FechaEmision!.Value, row.FechaExpiracion!.Value);
+                    var emisionUtc = AUtc(row.FechaEmision!.Value);
+                    var expiracionUtc = AUtc(row.FechaExpiracion!.Value);
+                    PolizaFechaValidacion.ValidarEmisionYExpiracion(emisionUtc, expiracionUtc);
 
                     var valor = row.Valor ?? 0;
                     var valorActual = valor;
@@ -154,12 +156,13 @@ public class PolizaExcelImportService(
                         entity.Obra = row.Obra!.Trim();
                         entity.Ramo = ramo.Id;
                         entity.Aseguradora = row.Aseguradora!.Trim();
-                        entity.FechaEmision = row.FechaEmision!.Value;
-                        entity.FechaExpiracion = row.FechaExpiracion!.Value;
+                        entity.FechaEmision = emisionUtc;
+                        entity.FechaExpiracion = expiracionUtc;
                         entity.ValorOriginal = valor;
                         entity.ValorActual = valorActual;
+                        entity.Observaciones = NormalizeObservaciones(row.Observaciones);
                         entity.Estado = PolizaEstadoDerivadoHelper.EstadoPersistido(
-                            row.FechaExpiracion!.Value,
+                            expiracionUtc,
                             DateTimeOffset.UtcNow);
                         entity.UpdatedAt = DateTimeOffset.UtcNow;
                         await _context.SaveChangesAsync();
@@ -176,12 +179,13 @@ public class PolizaExcelImportService(
                             Obra = row.Obra!.Trim(),
                             Ramo = ramo.Id,
                             Aseguradora = row.Aseguradora!.Trim(),
-                            FechaEmision = row.FechaEmision!.Value,
-                            FechaExpiracion = row.FechaExpiracion!.Value,
+                            FechaEmision = emisionUtc,
+                            FechaExpiracion = expiracionUtc,
                             ValorOriginal = valor,
                             ValorActual = valorActual,
+                            Observaciones = NormalizeObservaciones(row.Observaciones),
                             Estado = PolizaEstadoDerivadoHelper.EstadoPersistido(
-                                row.FechaExpiracion!.Value,
+                                expiracionUtc,
                                 DateTimeOffset.UtcNow),
                             CreatedAt = DateTimeOffset.UtcNow,
                             UpdatedAt = DateTimeOffset.UtcNow,
@@ -596,6 +600,7 @@ public class PolizaExcelImportService(
         var obra = G("obra") ?? "";
         var ramoCol = G("ramo");
         var aseguradora = G("aseguradora") ?? "";
+        var observaciones = G("observaciones");
 
         DateTime? fe = null, fv = null;
         if (colMap.TryGetValue("fechaEmision", out var cfe))
@@ -620,6 +625,7 @@ public class PolizaExcelImportService(
             Contratista = NormalizeNombreContratista(contratista),
             Obra = CollapseWhitespace(obra).Trim(),
             Aseguradora = CollapseWhitespace(aseguradora).Trim(),
+            Observaciones = observaciones?.Trim(),
             RamoNombre = ramoResolved.Nombre ?? "",
             RamoId = ramoResolved.Id,
             Valor = valor,
@@ -773,6 +779,13 @@ public class PolizaExcelImportService(
     private static string NormalizeNombreContratista(string? s)
     {
         return CollapseWhitespace(s);
+    }
+
+    private static string? NormalizeObservaciones(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s))
+            return null;
+        return s.Trim();
     }
 
     private static (int HeaderRow, Dictionary<string, int> ColMap)? FindHeaderRow(IXLWorksheet ws)
@@ -941,6 +954,11 @@ public class PolizaExcelImportService(
             0,
             TimeSpan.FromHours(-5));
     }
+
+    /// <summary>
+    /// Alineado con el flujo manual: Npgsql solo permite persistir <c>timestamptz</c> con offset UTC.
+    /// </summary>
+    private static DateTimeOffset AUtc(DateTimeOffset dto) => dto.ToUniversalTime();
 }
 
 internal sealed class ImportPreviewRowInternal
@@ -951,6 +969,7 @@ internal sealed class ImportPreviewRowInternal
     public string Contratista { get; set; } = "";
     public string Obra { get; set; } = "";
     public string Aseguradora { get; set; } = "";
+    public string? Observaciones { get; set; }
     public string RamoNombre { get; set; } = "";
     public Guid? RamoId { get; set; }
     public decimal? Valor { get; set; }

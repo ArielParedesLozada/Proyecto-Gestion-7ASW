@@ -9,6 +9,7 @@ export interface Poliza {
     valorActual: number;
     fechaEmision: string; // o Date si prefieres
     fechaExpiracion: string; // o Date si prefieres
+    observaciones?: string | null;
     /** 0=Vigente, 1=Por vencer, 2=Expirado (derivado en API). */
     estado: number;
 }

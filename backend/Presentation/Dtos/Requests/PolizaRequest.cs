@@ -33,4 +33,7 @@ public class PolizaRequest
 
     [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "El valor actual debe ser mayor o igual a cero.")]
     public decimal ValorActual { get; set; }
+
+    [MaxLength(5000, ErrorMessage = "Las observaciones no pueden superar los 5000 caracteres.")]
+    public string? Observaciones { get; set; }
 }

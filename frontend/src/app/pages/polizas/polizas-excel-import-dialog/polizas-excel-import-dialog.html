@@ -102,6 +102,12 @@
     Cada fila tiene una sola categoría (válida = insertar o actualizar; error; incompleta; ignorada). Los mensajes listan
     el motivo (validación, duplicado, fila de mes, etc.).
   </p>
+  @if (data.preview.validRows === 0) {
+    <p class="hint hint--warn">
+      No hay filas válidas para confirmar importación. Corrige las filas con error o incompletas y vuelve a cargar el
+      archivo.
+    </p>
+  }
 
   <div class="table-wrap">
     <table mat-table [dataSource]="filasFiltradas()" class="preview-table">

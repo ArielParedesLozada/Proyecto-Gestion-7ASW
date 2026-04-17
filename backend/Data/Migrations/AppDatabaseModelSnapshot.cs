@@ -108,6 +108,9 @@ namespace backend.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("Ramo")
                         .HasColumnType("uuid");
 

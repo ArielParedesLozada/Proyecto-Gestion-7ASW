@@ -133,9 +133,9 @@ export class PolizasExcelImportDialogComponent {
   estadoLabel(codigo: string): string {
     switch (codigo) {
       case 'paraInsertar':
-        return 'Insertar';
+        return 'Válida (insertar)';
       case 'paraActualizar':
-        return 'Actualizar';
+        return 'Válida (actualizar)';
       case 'error':
         return 'Error';
       case 'incompleta':
@@ -240,8 +240,8 @@ export class PolizasExcelImportDialogComponent {
         row.aseguradora,
         row.fechaEmision ?? '',
         row.fechaExpiracion ?? '',
-        row.estadoAnalisis,
-        row.empresaResolucion,
+        this.estadoLabel(row.estadoAnalisis),
+        this.empresaLabel(row.empresaResolucion),
         this.mensajesDetalle(row),
       ].map((c) => this.escapeCsvCell(c));
       lines.push(cells.join(sep));
@@ -280,11 +280,15 @@ export class PolizasExcelImportDialogComponent {
         if (r.inserted > 0) partes.push(`${r.inserted} nueva(s)`);
         if (r.updated > 0) partes.push(`${r.updated} actualizada(s)`);
         if (r.failed > 0) partes.push(`${r.failed} con error`);
-        this.notify.success(
+        const mensaje =
           partes.length > 0
             ? `Importación completada: ${partes.join(', ')}.`
-            : 'Importación completada.',
-        );
+            : 'Importación completada.';
+        if (r.failed > 0) {
+          this.notify.warn(`${mensaje} Revisa las filas con error para corregir y reintentar.`);
+        } else {
+          this.notify.success(mensaje);
+        }
         this.dialogRef.close(true);
       },
       error: (err: unknown) => {

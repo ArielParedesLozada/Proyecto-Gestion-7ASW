@@ -128,6 +128,7 @@ interface PolizaApiDto {
   valorActual: number;
   fechaEmision: string;
   fechaExpiracion: string;
+  observaciones?: string | null;
   estado: number;
 }
 
@@ -207,6 +208,7 @@ export class PolizaService {
       fechaExpiracion: dateToBackendOffset(payload.fechaExpiracion),
       valorOriginal: vo,
       valorActual: Number.isFinite(va) ? va : vo,
+      observaciones: normalizeObservaciones(payload.observaciones),
     };
     return this.api.post<PolizaApiDto>(this.basePath, body).pipe(
       catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),
@@ -244,6 +246,7 @@ export class PolizaService {
       fechaExpiracion: dateToBackendOffset(payload.fechaExpiracion),
       valorOriginal: payload.valorOriginal,
       valorActual: payload.valorActual,
+      observaciones: normalizeObservaciones(payload.observaciones),
     };
     return this.api.put<PolizaApiDto>(`${this.basePath}/${id}`, body).pipe(
       catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),
@@ -315,10 +318,17 @@ export class PolizaService {
       estado: mapApiEstadoToUi(d.estado),
       valorOriginal: d.valorOriginal,
       valorActual: d.valorActual,
-      observaciones: '',
+      observaciones: d.observaciones ?? '',
       historialRenovaciones: [],
       notificaciones: [],
       auditoria: [],
     };
   }
+}
+
+function normalizeObservaciones(value?: string): string | null {
+  if (!value || !value.trim()) {
+    return null;
+  }
+  return value.trim();
 }

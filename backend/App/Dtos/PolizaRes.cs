@@ -16,6 +16,7 @@ public class PolizaRes
     public decimal ValorActual { get; set; }
     public DateTimeOffset FechaEmision { get; set; }
     public DateTimeOffset FechaExpiracion { get; set; }
+    public string? Observaciones { get; set; }
     /// <summary>Derivado de <see cref="FechaExpiracion"/> y la fecha actual (no es el campo persistido).</summary>
     public EstadoPolizaDerivado Estado { get; set; }
 }

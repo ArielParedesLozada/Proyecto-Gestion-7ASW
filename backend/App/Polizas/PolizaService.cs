@@ -34,6 +34,7 @@ public class PolizaService(AppDatabase context)
             FechaExpiracion = expiracionUtc,
             ValorOriginal = request.ValorOriginal,
             ValorActual = valorActual,
+            Observaciones = NormalizeObservaciones(request.Observaciones),
             Estado = PolizaEstadoDerivadoHelper.EstadoPersistido(expiracionUtc, DateTimeOffset.UtcNow),
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -95,6 +96,7 @@ public class PolizaService(AppDatabase context)
                 FechaExpiracion = p.FechaExpiracion,
                 ValorOriginal = p.ValorOriginal,
                 ValorActual = p.ValorActual,
+                Observaciones = p.Observaciones,
                 Estado = EstadoPolizaDerivado.Vigente
             })
             .ToListAsync();
@@ -127,6 +129,7 @@ public class PolizaService(AppDatabase context)
         entity.FechaExpiracion = expiracionUtc;
         entity.ValorOriginal = request.ValorOriginal;
         entity.ValorActual = request.ValorActual;
+        entity.Observaciones = NormalizeObservaciones(request.Observaciones);
         entity.Estado = PolizaEstadoDerivadoHelper.EstadoPersistido(expiracionUtc, DateTimeOffset.UtcNow);
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -161,6 +164,7 @@ public class PolizaService(AppDatabase context)
                 FechaExpiracion = p.FechaExpiracion,
                 ValorOriginal = p.ValorOriginal,
                 ValorActual = p.ValorActual,
+                Observaciones = p.Observaciones,
                 Estado = EstadoPolizaDerivado.Vigente
             })
             .FirstOrDefaultAsync();
@@ -176,6 +180,13 @@ public class PolizaService(AppDatabase context)
     /// Npgsql solo escribe <c>timestamptz</c> con <see cref="DateTimeOffset"/> en offset UTC (0).
     /// </summary>
     private static DateTimeOffset AUtc(DateTimeOffset dto) => dto.ToUniversalTime();
+
+    private static string? NormalizeObservaciones(string? observaciones)
+    {
+        if (string.IsNullOrWhiteSpace(observaciones))
+            return null;
+        return observaciones.Trim();
+    }
 
     private async Task ValidarFkAsync(Guid empresaId, Guid ramoId)
     {

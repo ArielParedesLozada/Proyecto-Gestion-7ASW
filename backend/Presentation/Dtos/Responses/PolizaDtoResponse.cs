@@ -15,5 +15,6 @@ public class PolizaDtoResponse
     public decimal ValorActual { get; set; }
     public DateTimeOffset FechaEmision { get; set; }
     public DateTimeOffset FechaExpiracion { get; set; }
+    public string? Observaciones { get; set; }
     public EstadoPolizaDerivado Estado { get; set; }
 }

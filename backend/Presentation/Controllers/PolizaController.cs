@@ -97,6 +97,7 @@ public class PolizaController(PolizaService polizaService, PolizaExcelImportServ
         ValorActual = p.ValorActual,
         FechaEmision = p.FechaEmision,
         FechaExpiracion = p.FechaExpiracion,
+        Observaciones = p.Observaciones,
         Estado = p.Estado
     };
 }
