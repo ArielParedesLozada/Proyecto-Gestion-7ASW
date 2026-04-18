@@ -75,6 +75,39 @@ export class AuthService {
       );
   }
 
+  /**
+   * Cambio obligatorio (JWT con must_change_password = true).
+   * Devuelve el mismo cuerpo que el login y renueva token + sesión local.
+   */
+  changeMandatoryPassword(body: {
+    oldPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+  }): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.baseUrl}${API_CONFIG.ENDPOINTS.AUTH.CHANGE_PASSWORD}`, {
+        oldPassword: body.oldPassword,
+        newPassword: body.newPassword,
+        confirmNewPassword: body.confirmNewPassword,
+      })
+      .pipe(
+        tap((response) => {
+          this.storageService.setToken(response.token);
+          const user: AuthUser = {
+            username: response.username,
+            role: response.role,
+            email: response.email ?? '',
+            mustChangePassword: response.mustChangePassword ?? false,
+          };
+          this.storageService.setUser(user);
+        }),
+        catchError((error) => {
+          console.error('Error en /auth/change-password:', error.error);
+          return throwError(() => this.handleError(error));
+        }),
+      );
+  }
+
   private handleError(error: any): string {
     if (error.error?.message) {
       return error.error.message;

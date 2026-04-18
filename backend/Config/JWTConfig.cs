@@ -21,7 +21,10 @@ public static class JWTConfig
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = issuer,
                     ValidAudience = audience,
-                    IssuerSigningKey = new RsaSecurityKey(KeyLoader.LoadRsaKey(publicKeyFile))
+                    IssuerSigningKey = new RsaSecurityKey(KeyLoader.LoadRsaKey(publicKeyFile)),
+                    // El token emite ClaimTypes.Name; sin esto, User.Identity.Name queda vacío y endpoints devuelven 401.
+                    NameClaimType = ClaimTypes.Name,
+                    RoleClaimType = ClaimTypes.Role,
                 };
             });
         services.AddAuthorizationBuilder()

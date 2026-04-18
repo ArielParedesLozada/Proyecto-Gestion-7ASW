@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -20,7 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -28,6 +28,18 @@ export class LoginComponent {
   password = signal<string>('');
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
+
+  ngOnInit(): void {
+    if (!this.authService.isAuthenticated()) {
+      return;
+    }
+    const u = this.authService.getCurrentUser();
+    if (u?.mustChangePassword) {
+      void this.router.navigate(['/mandatory-change-password'], { replaceUrl: true });
+      return;
+    }
+    void this.router.navigate(['/dashboard'], { replaceUrl: true });
+  }
 
   onSubmit(): void {
     const usernameValue = this.username().trim();
@@ -45,12 +57,13 @@ export class LoginComponent {
       username: usernameValue,
       password: passwordValue
     }).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading.set(false);
-        // Redirigir a la página principal después del login exitoso
-        this.router.navigate(['/dashboard']).catch(err => {
-          console.error('Error al redirigir:', err);
-        });
+        if (response.mustChangePassword) {
+          void this.router.navigate(['/mandatory-change-password'], { replaceUrl: true });
+          return;
+        }
+        void this.router.navigate(['/dashboard'], { replaceUrl: true });
       },
       error: (error: string) => {
         this.isLoading.set(false);
