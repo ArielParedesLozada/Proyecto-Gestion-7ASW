@@ -7,6 +7,7 @@ import { HeaderUserMenuComponent } from '../../components/header-user-menu/heade
 import { PolizasToolbar } from './polizas-toolbar/polizas-toolbar';
 import { PolizasTable } from './polizas-table/polizas-table';
 import { PolizaEstado, PolizaListRow } from './models/poliza-list.model';
+import { sortPolizasByExpiracionAsc } from './utils/poliza-list-orden.util';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog/polizas-excel-import-dialog';
@@ -37,7 +38,7 @@ export class PolizasPage {
   readonly filteredRows = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     const est = this.estadoFiltro();
-    return this.allRows().filter((row) => {
+    const filtered = this.allRows().filter((row) => {
       if (est !== 'todos' && row.estado !== est) {
         return false;
       }
@@ -52,6 +53,7 @@ export class PolizasPage {
         row.aseguradora.toLowerCase().includes(q)
       );
     });
+    return sortPolizasByExpiracionAsc(filtered);
   });
 
   readonly totalFiltered = computed(() => this.filteredRows().length);
