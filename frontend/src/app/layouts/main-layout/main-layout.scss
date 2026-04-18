@@ -11,7 +11,7 @@ $content-bg: #f5f7fb;
   height: 100vh;
   font-family: 'Roboto', sans-serif;   // Roboto — igual que el login
   font-size: 1rem;                     // base normal, NO más zoom 1.5x
-  transition: all 0.3s ease;
+  /* Evitar `transition: all` (repinta todo el shell al cambiar el outlet). */
   overflow: hidden;
 }
 
@@ -109,7 +109,7 @@ $content-bg: #f5f7fb;
   color: rgba(255,255,255,0.88);
   font-size: 0.88rem;
   font-weight: 400;
-  transition: background 0.18s, color 0.18s;
+  /* Sin transición en color/fondo del ítem activo para evitar titileo al actualizar la ruta. */
   white-space: nowrap;
 
   &:hover {

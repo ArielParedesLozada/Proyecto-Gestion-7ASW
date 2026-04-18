@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, inject, LOCALE_ID, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { Table } from '../../components/table/table';
 import { ApiService } from '../../services/api.service';
 import { Poliza, PolizaItemSet } from '../../interfaces/poliza.interface';
@@ -19,7 +18,7 @@ export interface PolizaTableRow {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MainLayout, Table, MatIconModule],
+  imports: [Table, MatIconModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

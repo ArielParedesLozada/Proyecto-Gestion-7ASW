@@ -12,7 +12,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { merge, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import {
   emisionDiaPermitidoEnCalendario,
@@ -30,7 +29,6 @@ import { NotificationService } from '../../shared/services/notification.service'
   imports: [
     DatePipe,
     ReactiveFormsModule,
-    MainLayout,
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,

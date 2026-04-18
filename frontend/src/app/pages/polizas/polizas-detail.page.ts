@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -16,7 +15,6 @@ import { NotificationService } from '../../shared/services/notification.service'
   imports: [
     DatePipe,
     DecimalPipe,
-    MainLayout,
     MatIconModule,
     MatButtonModule,
     PolizaStatusBadge,

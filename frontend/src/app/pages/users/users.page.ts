@@ -2,7 +2,6 @@ import { Component, computed, effect, inject, signal, untracked } from '@angular
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { finalize } from 'rxjs/operators';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +16,6 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-users-page',
   imports: [
-    MainLayout,
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,

@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { finalize, merge } from 'rxjs';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import {
   emisionDiaPermitidoEnCalendario,
   emisionNoFuturaValidator,
@@ -26,7 +25,6 @@ import { NotificationService } from '../../shared/services/notification.service'
 @Component({
   selector: 'app-polizas-nueva-page',
   imports: [
-    MainLayout,
     RouterLink,
     ReactiveFormsModule,
     MatIconModule,

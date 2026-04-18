@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,7 +14,6 @@ import { NotificationService } from '../../shared/services/notification.service'
 @Component({
   selector: 'app-ramos-page',
   imports: [
-    MainLayout,
     RamosTable,
     MatIconModule,
     MatButtonModule,

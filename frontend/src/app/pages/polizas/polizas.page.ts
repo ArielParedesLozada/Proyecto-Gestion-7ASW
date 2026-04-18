@@ -2,7 +2,6 @@ import { Component, computed, effect, ElementRef, inject, signal, untracked, vie
 import { Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { PolizasToolbar } from './polizas-toolbar/polizas-toolbar';
 import { PolizasTable } from './polizas-table/polizas-table';
@@ -13,7 +12,7 @@ import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog
 
 @Component({
   selector: 'app-polizas-page',
-  imports: [MainLayout, PolizasToolbar, PolizasTable, MatIconModule],
+  imports: [PolizasToolbar, PolizasTable, MatIconModule],
   templateUrl: './polizas.page.html',
   styleUrl: './polizas.page.scss',
 })
