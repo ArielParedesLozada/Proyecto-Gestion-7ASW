@@ -2,8 +2,9 @@ import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { Router } from '@angular/router';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { AuthService } from '../../services/auth.service';
+import { LogoutConfirmService } from '../../services/logout-confirm.service';
 
 @Component({
   selector: 'app-header-user-menu',
@@ -15,7 +16,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class HeaderUserMenuComponent {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly logoutConfirm = inject(LogoutConfirmService);
 
   profileTitle(): string {
     return this.auth.isAdmin() ? 'Administrador del sistema' : 'Usuario del sistema';
@@ -25,8 +26,8 @@ export class HeaderUserMenuComponent {
     return this.auth.isAdmin() ? 'Nivel: Administrador' : 'Nivel: Usuario';
   }
 
-  logout(): void {
-    this.auth.logout();
-    void this.router.navigate(['/login']);
+  requestLogout(trigger: MatMenuTrigger): void {
+    trigger.closeMenu();
+    this.logoutConfirm.confirmAndLogout();
   }
 }

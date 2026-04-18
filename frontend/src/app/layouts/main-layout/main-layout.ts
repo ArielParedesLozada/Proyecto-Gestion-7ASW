@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Button } from "../../components/button/button";
 import { AuthService } from '../../services/auth.service';
+import { LogoutConfirmService } from '../../services/logout-confirm.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -13,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class MainLayout {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly logoutConfirm = inject(LogoutConfirmService);
   readonly user = this.auth.getCurrentUser();
   isCollapsed = signal(false);
 
@@ -21,8 +22,7 @@ export class MainLayout {
     this.isCollapsed.update(v => !v);
   }
   logout(): void {
-    this.auth.logout();
-    void this.router.navigate(['/login']);
+    this.logoutConfirm.confirmAndLogout();
   }
   canShowAdminStuff() {
     return this.auth.isAdmin();
