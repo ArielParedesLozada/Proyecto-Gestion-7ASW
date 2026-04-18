@@ -69,3 +69,27 @@ export function formatDiasRestantesDesdeIso(fechaIso: string): string {
   }
   return `En ${n} días`;
 }
+
+/** Clave para estilo visual de urgencia (columna «días restantes»). Coherente con {@link diasRestantesDesdeIso} y `row.estado`. */
+export type PolizaDiasUrgenciaVisual = 'critico' | 'inminente' | 'alerta' | 'ok' | 'neutral';
+
+/**
+ * Prioridad: vencida → hoy/mañana → por vencer (umbral API) → vigente tranquilo.
+ * No altera lógica de negocio; solo guía visual.
+ */
+export function polizaDiasRestantesUrgenciaKey(row: PolizaListRow): PolizaDiasUrgenciaVisual {
+  const n = diasRestantesDesdeIso(row.fechaExpiracion);
+  if (Number.isNaN(n)) {
+    return 'neutral';
+  }
+  if (row.estado === 'expirado' || n < 0) {
+    return 'critico';
+  }
+  if (n === 0 || n === 1) {
+    return 'inminente';
+  }
+  if (row.estado === 'porVencer') {
+    return 'alerta';
+  }
+  return 'ok';
+}

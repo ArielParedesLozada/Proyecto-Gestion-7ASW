@@ -8,7 +8,7 @@ import { LocalPaginatorComponent } from '../../../shared/components/local-pagina
 import { SicopTableCellClampComponent } from '../../../shared/components/sicop-table-cell-clamp/sicop-table-cell-clamp.component';
 import { PolizaListRow } from '../models/poliza-list.model';
 import { PolizaStatusBadge } from '../poliza-status-badge/poliza-status-badge';
-import { formatDiasRestantesDesdeIso } from '../utils/poliza-list-orden.util';
+import { formatDiasRestantesDesdeIso, polizaDiasRestantesUrgenciaKey } from '../utils/poliza-list-orden.util';
 
 @Component({
   selector: 'app-polizas-table',
@@ -63,6 +63,9 @@ export class PolizasTable {
   ver = output<PolizaListRow>();
   editar = output<PolizaListRow>();
   renovar = output<PolizaListRow>();
+
+  /** Referencia estable para plantilla: color/urgencia según fila. */
+  readonly diasRestantesUrgenciaKey = polizaDiasRestantesUrgenciaKey;
 
   diasRestantesEtiqueta(row: PolizaListRow): string {
     return formatDiasRestantesDesdeIso(row.fechaExpiracion);
