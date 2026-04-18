@@ -114,6 +114,10 @@
   max-width: 200px;
 }
 
+.polizas-table tbody td.polizas-table__cell-clamp--ramo {
+  max-width: 220px;
+}
+
 /* Solo columna Ramo: un poco más de ancho para nombres largos (p. ej. “Cumplimiento al Manejo Ambiental”). */
 .polizas-table thead th.polizas-table__col-ramo,
 .polizas-table tbody td.polizas-table__col-ramo {

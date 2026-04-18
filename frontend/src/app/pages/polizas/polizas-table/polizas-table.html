@@ -53,7 +53,9 @@
             <td class="polizas-table__cell-clamp polizas-table__cell-clamp--obra">
               <app-sicop-table-cell-clamp [text]="row.obra" [maxLines]="3" />
             </td>
-            <td class="polizas-table__col-ramo">{{ row.ramo }}</td>
+            <td class="polizas-table__col-ramo polizas-table__cell-clamp polizas-table__cell-clamp--ramo">
+              <app-sicop-table-cell-clamp [text]="row.ramo" [maxLines]="2" />
+            </td>
             @if (variant() === 'full') {
               <td class="polizas-table__cell-clamp polizas-table__cell-clamp--aseguradora">
                 <app-sicop-table-cell-clamp [text]="row.aseguradora" [maxLines]="2" />
