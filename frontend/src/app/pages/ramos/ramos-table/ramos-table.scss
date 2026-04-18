@@ -45,6 +45,13 @@
   padding: 0.75rem 0.75rem;
   border-bottom: 1px solid #eef0f4;
   color: #1f2937;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.ramos-table tbody td:last-child {
   vertical-align: middle;
 }
 
@@ -55,12 +62,12 @@
 .ramos-table__nombre {
   font-weight: 700;
   color: #111827;
-  max-width: 220px;
+  max-width: min(220px, 100%);
 }
 
 .ramos-table__desc {
   color: #4b5563;
-  max-width: 420px;
+  max-width: min(420px, 100%);
 }
 
 .ramos-table__col-actions {

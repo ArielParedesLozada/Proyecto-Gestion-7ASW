@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
+import { SicopTableCellClampComponent } from '../../../shared/components/sicop-table-cell-clamp/sicop-table-cell-clamp.component';
 import { PolizaListRow } from '../models/poliza-list.model';
 import { PolizaStatusBadge } from '../poliza-status-badge/poliza-status-badge';
 import { diasRestantesDesdeIso } from '../utils/poliza-list-orden.util';
@@ -19,6 +20,7 @@ import { diasRestantesDesdeIso } from '../utils/poliza-list-orden.util';
     MatButtonModule,
     PolizaStatusBadge,
     LocalPaginatorComponent,
+    SicopTableCellClampComponent,
   ],
   templateUrl: './polizas-table.html',
   styleUrl: './polizas-table.scss',

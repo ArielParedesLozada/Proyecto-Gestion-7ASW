@@ -13,6 +13,7 @@ import { NotificationService } from '../../shared/services/notification.service'
 import { UserService } from '../../services/user.service';
 import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { AuthService } from '../../services/auth.service';
+import { USER_MAX } from '../../shared/constants/form-field-limits';
 
 @Component({
   selector: 'app-users-page',
@@ -48,11 +49,13 @@ export class UsersPage {
   readonly saving = signal(false);
 
   readonly userForm = this.fb.group({
-    username: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.maxLength(USER_MAX.username)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(USER_MAX.email)]],
     role: ['USER' as AppUserRole, [Validators.required]],
     password: [''],
   });
+
+  readonly userMax = USER_MAX;
 
   readonly allRows = signal<UserListRow[]>([]);
 
@@ -196,6 +199,15 @@ export class UsersPage {
     }
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
+      const c = this.userForm.controls;
+      if (c.username.hasError('maxlength')) {
+        this.notify.warn(`El usuario no puede superar los ${USER_MAX.username} caracteres.`);
+        return;
+      }
+      if (c.email.hasError('maxlength')) {
+        this.notify.warn(`El correo no puede superar los ${USER_MAX.email} caracteres.`);
+        return;
+      }
       this.notify.warn('Revisa los campos obligatorios antes de guardar.');
       return;
     }

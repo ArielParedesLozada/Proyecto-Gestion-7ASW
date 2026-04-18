@@ -11,6 +11,7 @@ import { RamosTable } from './ramos-table/ramos-table';
 import { RamoListRow } from './models/ramo-list.model';
 import { RamoCreateRequest, RamoService } from '../../services/ramo.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { RAMO_MAX } from '../../shared/constants/form-field-limits';
 
 @Component({
   selector: 'app-ramos-page',
@@ -37,10 +38,12 @@ export class RamosPage {
   readonly ramoEditandoId = signal<string | null>(null);
 
   readonly ramoForm = this.fb.group({
-    nombre: ['', [Validators.required]],
-    descripcion: ['', [Validators.required]],
+    nombre: ['', [Validators.required, Validators.maxLength(RAMO_MAX.nombre)]],
+    descripcion: ['', [Validators.required, Validators.maxLength(RAMO_MAX.descripcion)]],
     cambioValor: [false as boolean],
   });
+
+  readonly ramoMax = RAMO_MAX;
 
   readonly rows = signal<RamoListRow[]>([]);
 
@@ -111,6 +114,15 @@ export class RamosPage {
   onSubmitRamo(): void {
     if (this.ramoForm.invalid) {
       this.ramoForm.markAllAsTouched();
+      const c = this.ramoForm.controls;
+      if (c.nombre.hasError('maxlength')) {
+        this.notify.warn(`El nombre no puede superar los ${RAMO_MAX.nombre} caracteres.`);
+        return;
+      }
+      if (c.descripcion.hasError('maxlength')) {
+        this.notify.warn(`La descripción no puede superar los ${RAMO_MAX.descripcion} caracteres.`);
+        return;
+      }
       this.notify.warn('Completa el nombre y la descripción antes de guardar.');
       return;
     }

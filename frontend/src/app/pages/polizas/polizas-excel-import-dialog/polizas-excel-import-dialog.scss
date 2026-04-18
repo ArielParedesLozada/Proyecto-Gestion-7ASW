@@ -443,9 +443,12 @@
 
 .cell-obra,
 .cell-mensajes {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .cell-obra {

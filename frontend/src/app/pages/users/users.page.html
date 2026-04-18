@@ -32,9 +32,13 @@
                 formControlName="username"
                 placeholder="Nombre de usuario"
                 autocomplete="username"
+                [maxlength]="userMax.username"
               />
-              @if (userForm.controls.username.invalid && userForm.controls.username.touched) {
+              <mat-hint align="end">{{ userForm.controls.username.value?.length ?? 0 }} / {{ userMax.username }}</mat-hint>
+              @if (userForm.controls.username.hasError('required') && userForm.controls.username.touched) {
                 <mat-error>Campo obligatorio</mat-error>
+              } @else if (userForm.controls.username.hasError('maxlength') && userForm.controls.username.touched) {
+                <mat-error>El usuario no puede superar los {{ userMax.username }} caracteres.</mat-error>
               }
             </mat-form-field>
 
@@ -46,11 +50,15 @@
                 formControlName="email"
                 placeholder="correo@dominio.com"
                 autocomplete="email"
+                [maxlength]="userMax.email"
               />
+              <mat-hint align="end">{{ userForm.controls.email.value?.length ?? 0 }} / {{ userMax.email }}</mat-hint>
               @if (userForm.controls.email.hasError('required') && userForm.controls.email.touched) {
                 <mat-error>Campo obligatorio</mat-error>
               } @else if (userForm.controls.email.hasError('email') && userForm.controls.email.touched) {
                 <mat-error>Correo no válido</mat-error>
+              } @else if (userForm.controls.email.hasError('maxlength') && userForm.controls.email.touched) {
+                <mat-error>El correo no puede superar los {{ userMax.email }} caracteres.</mat-error>
               }
             </mat-form-field>
           </div>

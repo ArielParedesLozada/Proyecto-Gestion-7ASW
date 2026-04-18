@@ -28,7 +28,7 @@
           <th>Número</th>
           <th>Contratista</th>
           <th>Obra</th>
-          <th>Ramo</th>
+          <th class="polizas-table__col-ramo">Ramo</th>
           @if (variant() === 'full') {
             <th>Aseguradora</th>
           }
@@ -47,11 +47,17 @@
         @for (row of rows(); track row.id) {
           <tr>
             <td class="polizas-table__mono">{{ row.numero }}</td>
-            <td>{{ row.contratista }}</td>
-            <td>{{ row.obra }}</td>
-            <td>{{ row.ramo }}</td>
+            <td class="polizas-table__cell-clamp polizas-table__cell-clamp--contratista">
+              <app-sicop-table-cell-clamp [text]="row.contratista" [maxLines]="2" />
+            </td>
+            <td class="polizas-table__cell-clamp polizas-table__cell-clamp--obra">
+              <app-sicop-table-cell-clamp [text]="row.obra" [maxLines]="3" />
+            </td>
+            <td class="polizas-table__col-ramo">{{ row.ramo }}</td>
             @if (variant() === 'full') {
-              <td>{{ row.aseguradora }}</td>
+              <td class="polizas-table__cell-clamp polizas-table__cell-clamp--aseguradora">
+                <app-sicop-table-cell-clamp [text]="row.aseguradora" [maxLines]="2" />
+              </td>
             }
             <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
             @if (variant() === 'dashboard') {

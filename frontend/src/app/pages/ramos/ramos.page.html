@@ -27,9 +27,18 @@
           <div class="form-row form-row--1">
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
               <mat-label>Nombre</mat-label>
-              <input matInput formControlName="nombre" placeholder="Nombre del ramo" autocomplete="off" />
-              @if (ramoForm.controls.nombre.invalid && ramoForm.controls.nombre.touched) {
+              <input
+                matInput
+                formControlName="nombre"
+                placeholder="Nombre del ramo"
+                autocomplete="off"
+                [maxlength]="ramoMax.nombre"
+              />
+              <mat-hint align="end">{{ ramoForm.controls.nombre.value?.length ?? 0 }} / {{ ramoMax.nombre }}</mat-hint>
+              @if (ramoForm.controls.nombre.hasError('required') && ramoForm.controls.nombre.touched) {
                 <mat-error>Campo obligatorio</mat-error>
+              } @else if (ramoForm.controls.nombre.hasError('maxlength') && ramoForm.controls.nombre.touched) {
+                <mat-error>El nombre no puede superar los {{ ramoMax.nombre }} caracteres.</mat-error>
               }
             </mat-form-field>
           </div>
@@ -42,9 +51,13 @@
                 formControlName="descripcion"
                 placeholder="Descripción del ramo"
                 rows="3"
+                [maxlength]="ramoMax.descripcion"
               ></textarea>
-              @if (ramoForm.controls.descripcion.invalid && ramoForm.controls.descripcion.touched) {
+              <mat-hint align="end">{{ ramoForm.controls.descripcion.value?.length ?? 0 }} / {{ ramoMax.descripcion }}</mat-hint>
+              @if (ramoForm.controls.descripcion.hasError('required') && ramoForm.controls.descripcion.touched) {
                 <mat-error>Campo obligatorio</mat-error>
+              } @else if (ramoForm.controls.descripcion.hasError('maxlength') && ramoForm.controls.descripcion.touched) {
+                <mat-error>La descripción no puede superar los {{ ramoMax.descripcion }} caracteres.</mat-error>
               }
             </mat-form-field>
           </div>

@@ -64,6 +64,13 @@
     .mat-mdc-select-min-line:empty::before {
       color: #9ca3af;
     }
+
+    textarea.mat-mdc-input-element,
+    input.mat-mdc-input-element:not([type='number']):not([type='date']) {
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      word-break: break-word;
+    }
   }
 }
 
@@ -83,6 +90,8 @@
   color: #111827;
   margin: 0 0 1.25rem;
   letter-spacing: -0.01em;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .form-grid {

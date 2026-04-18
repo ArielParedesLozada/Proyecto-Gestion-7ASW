@@ -4,6 +4,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .page-title {
@@ -11,12 +13,16 @@
   font-weight: 700;
   color: #1a1a2e;
   margin: 0 0 0.2rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .page-subtitle {
   font-size: 0.88rem;
   color: #6b7280;
   margin: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .user-avatar {
@@ -48,6 +54,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: box-shadow 0.2s, transform 0.15s;
+  min-width: 0;
 
   &:hover {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
@@ -87,17 +94,23 @@
 }
 
 .card-body {
+  min-width: 0;
+
   h3 {
     font-size: 0.95rem;
     font-weight: 600;
     color: #1a1a2e;
     margin: 0 0 0.2rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 
   p {
     font-size: 0.82rem;
     color: #6b7280;
     margin: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 }
 
