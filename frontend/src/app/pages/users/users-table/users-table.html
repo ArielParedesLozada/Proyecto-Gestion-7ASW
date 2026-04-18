@@ -1,0 +1,55 @@
+<div class="users-card">
+  <h2 class="users-card__title">Listado de Usuarios</h2>
+
+  <div class="table-scroll">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Email</th>
+          <th class="users-table__col-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr>
+            <td class="users-table__username">{{ row.username }}</td>
+            <td>
+              <span class="users-table__role" [class.users-table__role--admin]="row.role === 'ADMIN'">{{
+                rolEs(row.role)
+              }}</span>
+            </td>
+            <td class="users-table__email">{{ row.email }}</td>
+            <td>
+              <div class="users-table__actions">
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="action-btn"
+                  aria-label="Editar"
+                  (click)="onEditar(row)"
+                >
+                  <mat-icon>edit_square</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="users-table__empty">No hay usuarios que coincidan con los filtros.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="users-card__paginator">
+    <app-local-paginator
+      [length]="paginatorLength()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      (page)="pageChange.emit($event)"
+    />
+  </div>
+</div>
