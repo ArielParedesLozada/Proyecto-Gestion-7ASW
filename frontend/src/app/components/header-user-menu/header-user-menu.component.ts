@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -9,7 +8,7 @@ import { LogoutConfirmService } from '../../services/logout-confirm.service';
 @Component({
   selector: 'app-header-user-menu',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatMenuModule],
+  imports: [MatIconModule, MatMenuModule],
   templateUrl: './header-user-menu.component.html',
   styleUrl: './header-user-menu.component.scss',
   encapsulation: ViewEncapsulation.None,

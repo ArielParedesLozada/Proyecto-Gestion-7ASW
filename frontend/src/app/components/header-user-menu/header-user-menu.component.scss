@@ -1,16 +1,35 @@
-/* Trigger: alineado con .polizas-header__profile (mismo tamaño y color SICOP). */
+/* Trigger: mismo patrón que .polizas-header__notif (sin mat-icon-button: el círculo hover queda centrado con el icono). */
 .sicop-header-user-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   padding: 0.2rem;
   line-height: 0;
   border-radius: 50%;
   cursor: pointer;
+  color: inherit;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #c1121f;
+    outline-offset: 2px;
+  }
 
   mat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 2.2rem;
     width: 2.2rem;
     height: 2.2rem;
+    line-height: 1;
     color: #c1121f;
   }
 
