@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { AuthUser, LoginRequest, LoginResponse, RegisterRequest, User } from '../interfaces/auth.interface';
+import { AuthUser, AuthUserProfile, LoginRequest, LoginResponse, RegisterRequest, User } from '../interfaces/auth.interface';
 import { StorageService } from '../shared/services/storage.service';
 import { API_CONFIG } from '../shared/constants/api.constants';
 
@@ -61,6 +61,18 @@ export class AuthService {
 
   getToken(): string | null {
     return this.storageService.getToken();
+  }
+
+  /** Usuario en sesión con `id` (para comparar con filas del listado de usuarios). */
+  getMe(): Observable<AuthUserProfile> {
+    return this.http
+      .get<AuthUserProfile>(`${this.baseUrl}${API_CONFIG.ENDPOINTS.AUTH.ME}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error en /auth/me:', error);
+          return throwError(() => this.handleError(error));
+        }),
+      );
   }
 
   private handleError(error: any): string {

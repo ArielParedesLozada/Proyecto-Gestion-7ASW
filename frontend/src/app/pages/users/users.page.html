@@ -90,6 +90,9 @@
                   <mat-option value="ADMIN">Administrador</mat-option>
                   <mat-option value="USER">Usuario</mat-option>
                 </mat-select>
+                @if (isEditingSelf()) {
+                  <mat-hint>No es posible modificar el rol del usuario actualmente autenticado.</mat-hint>
+                }
               </mat-form-field>
             </div>
           }

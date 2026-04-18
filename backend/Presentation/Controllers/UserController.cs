@@ -59,7 +59,8 @@ public class UserController(UserService userService) : ControllerBase
         var username = userRequest.Username;
         var password = userRequest.Password;
         var role = userRequest.Role;
-        var user = await _userService.UpdateUser(id, username, password, role);
+        var email = userRequest.Email;
+        var user = await _userService.UpdateUser(id, username, password, role, email, User.Identity?.Name);
         return Ok(Map(user));
     }
     [HttpDelete("{id}")]
