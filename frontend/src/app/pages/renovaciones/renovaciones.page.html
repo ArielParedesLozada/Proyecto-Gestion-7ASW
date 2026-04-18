@@ -1,0 +1,129 @@
+<app-main-layout>
+  <header class="polizas-header renovaciones-header">
+    <div class="renovaciones-header__intro">
+      <h1 class="page-title">Renovaciones</h1>
+      <p class="page-subtitle">Gestión de renovaciones de pólizas</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+      </button>
+      <mat-icon class="polizas-header__profile" aria-hidden="true">account_circle</mat-icon>
+    </div>
+  </header>
+
+  @if (formularioModo() !== 'oculto') {
+    <form
+      [formGroup]="renovacionForm"
+      (ngSubmit)="onSubmitRenovacion()"
+      class="renovaciones-registro-form"
+      novalidate
+    >
+      <div class="form-card renovaciones-registro-card">
+        <h2 class="form-card__title">Registrar Renovación</h2>
+
+        <div class="form-grid">
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Póliza</mat-label>
+              <mat-select formControlName="polizaId" placeholder="Seleccione una póliza">
+                @for (p of polizasDisponibles(); track p.id) {
+                  <mat-option [value]="p.id">
+                    {{ textoOpcionPoliza(p) }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (renovacionForm.controls.polizaId.invalid && renovacionForm.controls.polizaId.touched) {
+                <mat-error>Seleccione una póliza</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Nueva Fecha de Expiración</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerExp"
+                formControlName="nuevaFechaExpiracion"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerExp"></mat-datepicker-toggle>
+              <mat-datepicker #pickerExp></mat-datepicker>
+              @if (
+                renovacionForm.controls.nuevaFechaExpiracion.invalid &&
+                renovacionForm.controls.nuevaFechaExpiracion.touched
+              ) {
+                <mat-error>La fecha es obligatoria</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Nuevo Valor (USD)</mat-label>
+              <input matInput type="number" formControlName="nuevoValorUsd" placeholder="0.00" step="0.01" min="0.01" />
+              @if (renovacionForm.controls.nuevoValorUsd.hasError('required') && renovacionForm.controls.nuevoValorUsd.touched) {
+                <mat-error>Campo obligatorio</mat-error>
+              } @else if (renovacionForm.controls.nuevoValorUsd.hasError('min') && renovacionForm.controls.nuevoValorUsd.touched) {
+                <mat-error>Ingrese un valor mayor a 0</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Observaciones</mat-label>
+              <textarea
+                matInput
+                formControlName="observaciones"
+                placeholder="Motivo, referencia interna o notas adicionales (opcional)"
+                rows="3"
+              ></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" mat-flat-button class="btn-registrar">Registrar Renovación</button>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (formularioModo() === 'oculto') {
+    <div class="toolbar-card">
+      <div class="toolbar-card__left">
+        <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+          <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+          <input
+            matInput
+            placeholder="Buscar por póliza, contratista u obra..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
+        </mat-form-field>
+
+        <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar filtros
+        </button>
+      </div>
+      <div class="toolbar-card__right">
+        <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="abrirFormularioCrear()">
+          <mat-icon>add</mat-icon>
+          Nueva Renovación
+        </button>
+      </div>
+    </div>
+  }
+
+  <app-renovaciones-table
+    [rows]="pagedHistorial()"
+    [paginatorLength]="totalFiltrado()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize"
+    (pageChange)="onPage($event)"
+    (ver)="onVer($event)"
+  />
+</app-main-layout>

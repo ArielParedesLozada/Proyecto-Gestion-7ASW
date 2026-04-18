@@ -13,6 +13,7 @@ import { EmpresasNuevaPage } from './pages/empresas/empresas-nueva.page';
 import { EmpresasDetailPage } from './pages/empresas/empresas-detail.page';
 import { EmpresasEditPage } from './pages/empresas/empresas-edit.page';
 import { RamosPage } from './pages/ramos/ramos.page';
+import { RenovacionesPage } from './pages/renovaciones/renovaciones.page';
 import { UsersPage } from './pages/users/users.page';
 
 export const routes: Routes = [
@@ -81,6 +82,11 @@ export const routes: Routes = [
     path: 'ramos',
     component: RamosPage,
     canActivate: [authGuard]
+  },
+  {
+    path: 'renovaciones',
+    component: RenovacionesPage,
+    canActivate: [authGuard],
   },
   {
     path: 'users',

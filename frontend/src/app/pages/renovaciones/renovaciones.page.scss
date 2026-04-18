@@ -1,0 +1,119 @@
+@use '../polizas/polizas-admin-header';
+@use '../polizas/polizas-toolbar/polizas-toolbar';
+
+.renovaciones-header {
+  align-items: flex-start;
+}
+
+.renovaciones-header__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.renovaciones-registro-form {
+  display: block;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+
+  ::ng-deep .mat-mdc-form-field-required-marker,
+  .mat-mdc-form-field-required-marker {
+    color: #c1121f;
+  }
+
+  ::ng-deep {
+    .mat-mdc-floating-label {
+      font-weight: 600;
+      font-size: 0.8125rem;
+      letter-spacing: 0.02em;
+      color: #1f2937 !important;
+    }
+
+    .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+      color: #111827 !important;
+    }
+
+    input.mat-mdc-input-element::placeholder,
+    textarea.mat-mdc-input-element::placeholder {
+      color: #9ca3af;
+      opacity: 1;
+    }
+  }
+}
+
+.renovaciones-registro-card.form-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1.35rem 1.75rem 1.35rem;
+}
+
+.form-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.form-row--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid #eef0f4;
+}
+
+.btn-cancelar {
+  border-radius: 10px !important;
+  padding: 0 1.25rem !important;
+  font-weight: 600 !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.btn-registrar {
+  border-radius: 10px !important;
+  padding: 0 1.35rem !important;
+  font-weight: 600 !important;
+  background: #c1121f !important;
+  color: #fff !important;
+}
+
+::ng-deep .renovaciones-registro-form .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .renovaciones-registro-form .mat-mdc-text-field-wrapper,
+::ng-deep .renovaciones-registro-form .mat-mdc-select {
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .form-row--2 {
+    grid-template-columns: 1fr;
+  }
+}
