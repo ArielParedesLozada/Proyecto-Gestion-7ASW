@@ -76,28 +76,30 @@
         </mat-select>
       </mat-form-field>
 
-      <div class="toolbar__count">
-        <strong>Filas visibles:</strong>
-        {{ filasFiltradas().length }}
-        @if (filtro() !== 'todas') {
-          <span class="toolbar__count-hint">de {{ data.preview.totalRows }} totales</span>
-        }
-      </div>
+      <div class="toolbar__right">
+        <div class="toolbar__count">
+          <strong>Filas visibles:</strong>
+          {{ filasFiltradas().length }}
+          @if (filtro() !== 'todas') {
+            <span class="toolbar__count-hint">de {{ data.preview.totalRows }} totales</span>
+          }
+        </div>
 
-      <div class="toolbar__exports">
-        <span class="toolbar__exports-label">Exportar CSV:</span>
-        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvErrores()">
-          <mat-icon>download</mat-icon>
-          Errores
-        </button>
-        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIncompletas()">
-          <mat-icon>download</mat-icon>
-          Incompletas
-        </button>
-        <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIgnoradas()">
-          <mat-icon>download</mat-icon>
-          Ignoradas
-        </button>
+        <div class="toolbar__exports">
+          <span class="toolbar__exports-label">Exportar CSV:</span>
+          <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvErrores()">
+            <mat-icon>download</mat-icon>
+            Errores
+          </button>
+          <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIncompletas()">
+            <mat-icon>download</mat-icon>
+            Incompletas
+          </button>
+          <button type="button" mat-stroked-button class="btn-export" (click)="exportarCsvIgnoradas()">
+            <mat-icon>download</mat-icon>
+            Ignoradas
+          </button>
+        </div>
       </div>
     </div>
   </section>

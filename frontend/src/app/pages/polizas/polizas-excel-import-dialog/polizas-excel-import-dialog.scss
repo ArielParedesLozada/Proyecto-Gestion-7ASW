@@ -209,14 +209,25 @@
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.7rem;
-  margin-bottom: 0.55rem;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
 }
 
 .toolbar__filter {
-  min-width: 200px;
+  min-width: 228px;
+  max-width: 260px;
+  flex: 0 0 auto;
+}
+
+.toolbar__right {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   max-width: 100%;
 }
 
@@ -229,7 +240,7 @@
 .toolbar__count {
   font-size: 0.86rem;
   color: #111827;
-  padding-bottom: 0.35rem;
+  white-space: nowrap;
 }
 
 .toolbar__count-hint {
@@ -240,10 +251,10 @@
 
 .toolbar__exports {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.35rem;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .toolbar__exports-label {
@@ -265,12 +276,30 @@
   border-radius: 8px;
   border-color: #d0d7e2 !important;
   background: #fff;
+  white-space: nowrap;
 }
 
 .btn-export mat-icon {
   width: 14px;
   height: 14px;
   font-size: 14px;
+}
+
+@media (max-width: 980px) {
+  .toolbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .toolbar__filter {
+    max-width: 100%;
+  }
+
+  .toolbar__right {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
 
 .hint {
