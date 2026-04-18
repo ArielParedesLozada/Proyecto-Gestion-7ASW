@@ -1,5 +1,6 @@
 import { Component, computed, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +12,7 @@ import { sortPolizasByExpiracionAsc } from './utils/poliza-list-orden.util';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog/polizas-excel-import-dialog';
+import { polizaEstadoFromQueryParam } from './utils/poliza-estado-query.util';
 
 @Component({
   selector: 'app-polizas-page',
@@ -20,6 +22,7 @@ import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog
 })
 export class PolizasPage {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly polizaService = inject(PolizaService);
   private readonly notify = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
@@ -66,6 +69,10 @@ export class PolizasPage {
   });
 
   constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.estadoFiltro.set(polizaEstadoFromQueryParam(pm.get('estado')));
+    });
+
     this.recargarPolizas();
 
     effect(() => {
@@ -89,8 +96,24 @@ export class PolizasPage {
 
   limpiarFiltros(): void {
     this.searchQuery.set('');
-    this.estadoFiltro.set('todos');
     this.pageIndex.set(0);
+    this.estadoFiltro.set('todos');
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { estado: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  onEstadoFiltroFromUser(value: PolizaEstado | 'todos'): void {
+    this.estadoFiltro.set(value);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: value === 'todos' ? { estado: null } : { estado: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   onCargarExcel(): void {

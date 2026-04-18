@@ -8,7 +8,7 @@ import { LocalPaginatorComponent } from '../../../shared/components/local-pagina
 import { SicopTableCellClampComponent } from '../../../shared/components/sicop-table-cell-clamp/sicop-table-cell-clamp.component';
 import { PolizaListRow } from '../models/poliza-list.model';
 import { PolizaStatusBadge } from '../poliza-status-badge/poliza-status-badge';
-import { diasRestantesDesdeIso } from '../utils/poliza-list-orden.util';
+import { formatDiasRestantesDesdeIso } from '../utils/poliza-list-orden.util';
 
 @Component({
   selector: 'app-polizas-table',
@@ -64,8 +64,8 @@ export class PolizasTable {
   editar = output<PolizaListRow>();
   renovar = output<PolizaListRow>();
 
-  diasRestantes(row: PolizaListRow): number {
-    return diasRestantesDesdeIso(row.fechaExpiracion);
+  diasRestantesEtiqueta(row: PolizaListRow): string {
+    return formatDiasRestantesDesdeIso(row.fechaExpiracion);
   }
 
   onVer(row: PolizaListRow): void {

@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizasTable } from '../polizas/polizas-table/polizas-table';
@@ -13,7 +13,7 @@ export const DASHBOARD_POLIZAS_LIMIT = 10;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PolizasTable, MatIconModule, HeaderUserMenuComponent],
+  imports: [PolizasTable, MatIconModule, HeaderUserMenuComponent, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -28,6 +28,27 @@ export class Dashboard {
   readonly dashboardRows = computed(() =>
     sortPolizasForDashboard(this.allRows()).slice(0, DASHBOARD_POLIZAS_LIMIT),
   );
+
+  /** Totales reales por estado derivado (no limitados a las 10 filas del dashboard). */
+  readonly resumenPorEstado = computed(() => {
+    let expirado = 0;
+    let porVencer = 0;
+    let vigente = 0;
+    for (const row of this.allRows()) {
+      switch (row.estado) {
+        case 'expirado':
+          expirado++;
+          break;
+        case 'porVencer':
+          porVencer++;
+          break;
+        default:
+          vigente++;
+          break;
+      }
+    }
+    return { expirado, porVencer, vigente };
+  });
 
   constructor() {
     this.cargarPolizas();

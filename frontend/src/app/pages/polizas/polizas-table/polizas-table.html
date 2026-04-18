@@ -63,7 +63,7 @@
             }
             <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
             @if (variant() === 'dashboard') {
-              <td class="polizas-table__dias">{{ diasRestantes(row) }} días</td>
+              <td class="polizas-table__dias">{{ diasRestantesEtiqueta(row) }}</td>
             }
             @if (variant() === 'full') {
               <td class="polizas-table__valor">${{ row.valor | number: '1.0-0' }}</td>

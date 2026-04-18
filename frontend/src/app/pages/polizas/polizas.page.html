@@ -16,7 +16,7 @@
     [searchQuery]="searchQuery()"
     [estadoFiltro]="estadoFiltro()"
     (searchQueryChange)="searchQuery.set($event)"
-    (estadoFiltroChange)="estadoFiltro.set($event)"
+    (estadoFiltroChange)="onEstadoFiltroFromUser($event)"
     (cargarExcel)="onCargarExcel()"
     (nuevaPoliza)="onNuevaPoliza()"
     (limpiarFiltros)="limpiarFiltros()"
