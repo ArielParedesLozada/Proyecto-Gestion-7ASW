@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { RamosTable } from './ramos-table/ramos-table';
 import { RamoListRow } from './models/ramo-list.model';
 import { RamoCreateRequest, RamoService } from '../../services/ramo.service';
@@ -22,6 +23,7 @@ import { NotificationService } from '../../shared/services/notification.service'
     MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './ramos.page.html',
   styleUrl: './ramos.page.scss',

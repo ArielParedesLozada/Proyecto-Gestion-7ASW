@@ -16,6 +16,7 @@ import {
 } from './utils/poliza-emision-validators';
 import { sincronizarFechaExpiracionPoliza } from './utils/poliza-fecha-expiracion.util';
 import { calcularEstadoDesdeFechaExpiracion } from './utils/poliza-estado-derivado.util';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { EmpresaService } from '../../services/empresa.service';
 import { PolizaService } from '../../services/poliza.service';
@@ -34,6 +35,7 @@ import { NotificationService } from '../../shared/services/notification.service'
     MatSelectModule,
     MatDatepickerModule,
     PolizaStatusBadge,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './polizas-nueva.page.html',
   styleUrl: './polizas-nueva.page.scss',

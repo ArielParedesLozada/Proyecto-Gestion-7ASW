@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizasToolbar } from './polizas-toolbar/polizas-toolbar';
 import { PolizasTable } from './polizas-table/polizas-table';
 import { PolizaEstado, PolizaListRow } from './models/poliza-list.model';
@@ -12,7 +13,7 @@ import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog
 
 @Component({
   selector: 'app-polizas-page',
-  imports: [PolizasToolbar, PolizasTable, MatIconModule],
+  imports: [PolizasToolbar, PolizasTable, MatIconModule, HeaderUserMenuComponent],
   templateUrl: './polizas.page.html',
   styleUrl: './polizas.page.scss',
 })

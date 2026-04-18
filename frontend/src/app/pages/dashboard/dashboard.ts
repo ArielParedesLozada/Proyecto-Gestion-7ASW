@@ -5,6 +5,7 @@ import { Poliza, PolizaItemSet } from '../../interfaces/poliza.interface';
 import { API_CONFIG } from '../../shared/constants/api.constants';
 import { formatDate } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 
 export interface PolizaTableRow {
   id: string
@@ -18,7 +19,7 @@ export interface PolizaTableRow {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Table, MatIconModule],
+  imports: [Table, MatIconModule, HeaderUserMenuComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

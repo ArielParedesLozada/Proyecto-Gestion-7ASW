@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { EmpresasTable } from './empresas-table/empresas-table';
 import { EmpresaListRow } from './models/empresa-list.model';
 import { EmpresaCreateRequest, EmpresaService } from '../../services/empresa.service';
@@ -20,6 +21,7 @@ import { NotificationService } from '../../shared/services/notification.service'
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './empresas.page.html',
   styleUrl: './empresas.page.scss',

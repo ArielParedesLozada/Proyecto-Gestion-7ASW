@@ -11,6 +11,7 @@ import { UsersTable } from './users-table/users-table';
 import { AppUserRole, ROL_FILTRO_OPTIONS, UserListRow, UserRolFiltro, roleLabelEs } from './models/user-list.model';
 import { NotificationService } from '../../shared/services/notification.service';
 import { UserService } from '../../services/user.service';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -24,6 +25,7 @@ import { AuthService } from '../../services/auth.service';
     FormsModule,
     ReactiveFormsModule,
     UsersTable,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './users.page.html',
   styleUrl: './users.page.scss',

@@ -1,0 +1,30 @@
+<button
+  type="button"
+  mat-icon-button
+  [matMenuTriggerFor]="userMenu"
+  #menuTrigger="matMenuTrigger"
+  class="sicop-header-user-menu__trigger"
+  aria-label="Menú de usuario"
+  aria-haspopup="menu"
+>
+  <mat-icon>account_circle</mat-icon>
+</button>
+
+<mat-menu #userMenu="matMenu" xPosition="before" yPosition="below" class="sicop-user-menu-panel">
+  <div class="sicop-user-menu-card" (click)="$event.stopPropagation()">
+    <div class="sicop-user-menu-card__header">
+      <div class="sicop-user-menu-card__title">{{ profileTitle() }}</div>
+      <div class="sicop-user-menu-card__subtitle">{{ profileLevel() }}</div>
+    </div>
+    <div class="sicop-user-menu-card__divider" aria-hidden="true"></div>
+    <div class="sicop-user-menu-card__avatar">
+      <mat-icon>account_circle</mat-icon>
+    </div>
+    <div class="sicop-user-menu-card__footer">
+      <button type="button" class="sicop-user-menu-card__logout" (click)="logout(); menuTrigger.closeMenu()">
+        <mat-icon>logout</mat-icon>
+        Cerrar Sesión
+      </button>
+    </div>
+  </div>
+</mat-menu>
