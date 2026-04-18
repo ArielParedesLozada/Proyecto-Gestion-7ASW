@@ -103,6 +103,10 @@ ul {
 }
 
 // ── Dialogo importación Excel (`MatDialog` + panelClass) ─────────────────────────
+.sicop-excel-import-dialog .mat-mdc-dialog-container {
+  max-width: min(1240px, 98vw) !important;
+}
+
 .sicop-excel-import-dialog .mat-mdc-dialog-surface {
   border-radius: 16px !important;
   box-shadow:
@@ -110,5 +114,15 @@ ul {
     0 2px 8px rgba(15, 23, 42, 0.12) !important;
   border: 1px solid #e6e8ec;
   overflow: hidden;
+}
+
+/* Tooltip overlay: vista previa importación Excel (texto largo) */
+.mat-mdc-tooltip-panel.sicop-excel-preview-tooltip .mdc-tooltip__surface {
+  max-width: min(560px, 92vw);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
