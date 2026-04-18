@@ -1,5 +1,4 @@
-<app-main-layout>
-  <header class="polizas-header empresas-header">
+<header class="polizas-header empresas-header">
     <div class="empresas-header__intro">
       <h1 class="page-title">Empresas</h1>
       <p class="page-subtitle">Gestión de empresas contratistas</p>
@@ -9,7 +8,7 @@
         <mat-icon>notifications</mat-icon>
         <span class="polizas-header__notif-dot" aria-hidden="true"></span>
       </button>
-      <mat-icon class="polizas-header__profile" aria-hidden="true">account_circle</mat-icon>
+      <app-header-user-menu />
     </div>
   </header>
 
@@ -111,4 +110,3 @@
     (pageChange)="onPage($event)"
     (editar)="onEditar($event)"
   />
-</app-main-layout>

@@ -1,5 +1,25 @@
-<div class="polizas-card">
-  <h2 class="polizas-card__title">Listado de Pólizas</h2>
+<div
+  class="polizas-card"
+  [class.polizas-card--dashboard]="variant() === 'dashboard'"
+  [class.polizas-card--no-paginator]="!showPaginator()"
+>
+  @if (variant() === 'dashboard') {
+    <header class="polizas-card__dash-head">
+      <div>
+        <h2 id="dashboard-polizas-title" class="polizas-card__title polizas-card__title--dash">
+          {{ tableTitle() }}
+        </h2>
+        @if (tableSubtitle(); as sub) {
+          <p class="polizas-card__subtitle">{{ sub }}</p>
+        }
+      </div>
+      @if (verTodasLink(); as link) {
+        <a [routerLink]="link" class="polizas-card__dash-link">Ver todas</a>
+      }
+    </header>
+  } @else if (showTableTitle()) {
+    <h2 class="polizas-card__title">{{ tableTitle() }}</h2>
+  }
 
   <div class="table-scroll">
     <table class="polizas-table">
@@ -8,10 +28,17 @@
           <th>Número</th>
           <th>Contratista</th>
           <th>Obra</th>
-          <th>Ramo</th>
-          <th>Aseguradora</th>
+          <th class="polizas-table__col-ramo">Ramo</th>
+          @if (variant() === 'full') {
+            <th>Aseguradora</th>
+          }
           <th>Vencimiento</th>
-          <th>Valor</th>
+          @if (variant() === 'dashboard') {
+            <th>Días restantes</th>
+          }
+          @if (variant() === 'full') {
+            <th>Valor</th>
+          }
           <th>Estado</th>
           <th class="polizas-table__col-actions">Acciones</th>
         </tr>
@@ -20,17 +47,35 @@
         @for (row of rows(); track row.id) {
           <tr>
             <td class="polizas-table__mono">{{ row.numero }}</td>
-            <td>{{ row.contratista }}</td>
-            <td>{{ row.obra }}</td>
-            <td>{{ row.ramo }}</td>
-            <td>{{ row.aseguradora }}</td>
+            <td class="polizas-table__cell-clamp polizas-table__cell-clamp--contratista">
+              <app-sicop-table-cell-clamp [text]="row.contratista" [maxLines]="2" />
+            </td>
+            <td class="polizas-table__cell-clamp polizas-table__cell-clamp--obra">
+              <app-sicop-table-cell-clamp [text]="row.obra" [maxLines]="3" />
+            </td>
+            <td class="polizas-table__col-ramo polizas-table__cell-clamp polizas-table__cell-clamp--ramo">
+              <app-sicop-table-cell-clamp [text]="row.ramo" [maxLines]="2" />
+            </td>
+            @if (variant() === 'full') {
+              <td class="polizas-table__cell-clamp polizas-table__cell-clamp--aseguradora">
+                <app-sicop-table-cell-clamp [text]="row.aseguradora" [maxLines]="2" />
+              </td>
+            }
             <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
-            <td class="polizas-table__valor">${{ row.valor | number: '1.0-0' }}</td>
+            @if (variant() === 'dashboard') {
+              <td
+                class="polizas-table__dias"
+                [attr.data-dias-urgencia]="diasRestantesUrgenciaKey(row)"
+              >{{ diasRestantesEtiqueta(row) }}</td>
+            }
+            @if (variant() === 'full') {
+              <td class="polizas-table__valor">${{ row.valor | number: '1.0-0' }}</td>
+            }
             <td>
               <app-poliza-status-badge [estado]="row.estado" />
             </td>
             <td>
-              <div class="polizas-table__actions">
+              <div class="polizas-table__actions" [class.polizas-table__actions--solo-ver]="variant() === 'dashboard'">
                 <button
                   type="button"
                   mat-icon-button
@@ -40,31 +85,33 @@
                 >
                   <mat-icon>visibility</mat-icon>
                 </button>
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="action-btn"
-                  aria-label="Editar"
-                  (click)="onEditar(row)"
-                >
-                  <mat-icon>edit_square</mat-icon>
-                </button>
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="action-btn"
-                  aria-label="Renovar"
-                  (click)="onRenovar(row)"
-                >
-                  <mat-icon>autorenew</mat-icon>
-                </button>
+                @if (variant() === 'full') {
+                  <button
+                    type="button"
+                    mat-icon-button
+                    class="action-btn"
+                    aria-label="Editar"
+                    (click)="onEditar(row)"
+                  >
+                    <mat-icon>edit_square</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    class="action-btn"
+                    aria-label="Renovar"
+                    (click)="onRenovar(row)"
+                  >
+                    <mat-icon>autorenew</mat-icon>
+                  </button>
+                }
               </div>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="9" class="polizas-table__empty">
-              No hay pólizas que coincidan con los filtros.
+            <td [attr.colspan]="emptyColspan()" class="polizas-table__empty">
+              {{ resolvedEmptyMessage() }}
             </td>
           </tr>
         }
@@ -72,12 +119,14 @@
     </table>
   </div>
 
-  <div class="polizas-card__paginator">
-    <app-local-paginator
-      [length]="paginatorLength()"
-      [pageIndex]="pageIndex()"
-      [pageSize]="pageSize()"
-      (page)="pageChange.emit($event)"
-    />
-  </div>
+  @if (showPaginator()) {
+    <div class="polizas-card__paginator">
+      <app-local-paginator
+        [length]="paginatorLength()"
+        [pageIndex]="pageIndex()"
+        [pageSize]="pageSize()"
+        (page)="pageChange.emit($event)"
+      />
+    </div>
+  }
 </div>

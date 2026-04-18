@@ -1,5 +1,4 @@
-<app-main-layout>
-  <div class="poliza-edit">
+<div class="poliza-edit">
     <button type="button" class="back-link" (click)="onVolver()">
       <mat-icon>arrow_back</mat-icon>
       Volver a pólizas
@@ -23,18 +22,27 @@
               <input matInput formControlName="numero" readonly />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Contratista</mat-label>
-              <mat-select formControlName="contratista" placeholder="Seleccione empresa">
-                @for (e of empresas(); track e.id) {
-                  <mat-option [value]="e.id">{{ e.nombre }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+            <app-poliza-contratista-select
+              formControlName="contratista"
+              [empresas]="empresas()"
+              selectPlaceholder="Seleccione empresa"
+            />
 
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="field-wide">
               <mat-label>Obra</mat-label>
-              <input matInput formControlName="obra" placeholder="Descripción de la obra" />
+              <input
+                matInput
+                formControlName="obra"
+                placeholder="Descripción de la obra"
+                [maxlength]="polizaMax.obra"
+                autocomplete="off"
+              />
+              <mat-hint align="end">{{ form.controls.obra.value?.length ?? 0 }} / {{ polizaMax.obra }}</mat-hint>
+              @if (form.controls.obra.hasError('required') && form.controls.obra.touched) {
+                <mat-error>La obra es obligatoria.</mat-error>
+              } @else if (form.controls.obra.hasError('maxlength') && form.controls.obra.touched) {
+                <mat-error>La obra no puede superar los {{ polizaMax.obra }} caracteres.</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
@@ -52,9 +60,15 @@
                 matInput
                 formControlName="aseguradora"
                 placeholder="Nombre de la aseguradora"
-                maxlength="200"
+                [maxlength]="polizaMax.aseguradora"
                 autocomplete="off"
               />
+              <mat-hint align="end">{{ form.controls.aseguradora.value?.length ?? 0 }} / {{ polizaMax.aseguradora }}</mat-hint>
+              @if (form.controls.aseguradora.hasError('required') && form.controls.aseguradora.touched) {
+                <mat-error>La aseguradora es obligatoria.</mat-error>
+              } @else if (form.controls.aseguradora.hasError('maxlength') && form.controls.aseguradora.touched) {
+                <mat-error>La aseguradora no puede superar los {{ polizaMax.aseguradora }} caracteres.</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
@@ -110,7 +124,16 @@
 
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="field-full">
               <mat-label>Observaciones</mat-label>
-              <textarea matInput formControlName="observaciones" rows="4"></textarea>
+              <textarea
+                matInput
+                formControlName="observaciones"
+                rows="4"
+                [maxlength]="polizaMax.observaciones"
+              ></textarea>
+              <mat-hint align="end">{{ form.controls.observaciones.value?.length ?? 0 }} / {{ polizaMax.observaciones }}</mat-hint>
+              @if (form.controls.observaciones.hasError('maxlength') && form.controls.observaciones.touched) {
+                <mat-error>Las observaciones no pueden superar los {{ polizaMax.observaciones }} caracteres.</mat-error>
+              }
             </mat-form-field>
           </div>
 
@@ -133,4 +156,3 @@
       </section>
     }
   </div>
-</app-main-layout>

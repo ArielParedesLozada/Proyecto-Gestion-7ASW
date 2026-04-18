@@ -46,6 +46,13 @@
   padding: 0.75rem 0.75rem;
   border-bottom: 1px solid #eef0f4;
   color: #1f2937;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.empresas-table tbody td:last-child {
   vertical-align: middle;
 }
 

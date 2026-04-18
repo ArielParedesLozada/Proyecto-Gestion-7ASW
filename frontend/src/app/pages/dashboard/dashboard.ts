@@ -1,75 +1,82 @@
-import { AfterViewInit, Component, inject, LOCALE_ID, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
-import { Table } from '../../components/table/table';
-import { ApiService } from '../../services/api.service';
-import { Poliza, PolizaItemSet } from '../../interfaces/poliza.interface';
-import { API_CONFIG } from '../../shared/constants/api.constants';
-import { formatDate } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PolizasTable } from '../polizas/polizas-table/polizas-table';
+import { PolizaListRow } from '../polizas/models/poliza-list.model';
+import { sortPolizasForDashboard } from '../polizas/utils/poliza-list-orden.util';
+import { PolizaService } from '../../services/poliza.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
-export interface PolizaTableRow {
-  id: string
-  numero: string
-  contratista: string
-  obra: string
-  ramo: string
-  fechaExpiracion: string
-  diasRestantes: number
-}
+/** Máximo de filas en la vista ejecutiva del Dashboard (tras ordenar por prioridad). */
+export const DASHBOARD_POLIZAS_LIMIT = 10;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MainLayout, Table, MatIconModule],
+  imports: [PolizasTable, MatIconModule, HeaderUserMenuComponent, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit, AfterViewInit {
-  private readonly apiService = inject(ApiService)
-  private readonly locale = inject(LOCALE_ID)
+export class Dashboard {
+  private readonly router = inject(Router);
+  private readonly polizaService = inject(PolizaService);
+  private readonly notify = inject(NotificationService);
 
-  // @ViewChild('estadoTpl') estadoTpl!: TemplateRef<any>;
-  // @ViewChild('accionesTpl') accionesTpl!: TemplateRef<any>;
+  private readonly allRows = signal<PolizaListRow[]>([]);
 
-  columns = signal<any[]>([]);
-  data: PolizaTableRow[] = []
+  /** Orden: expiradas → por vencer → vigentes; luego fecha exp. asc.; solo las primeras N. */
+  readonly dashboardRows = computed(() =>
+    sortPolizasForDashboard(this.allRows()).slice(0, DASHBOARD_POLIZAS_LIMIT),
+  );
 
-  ngOnInit(): void {
-    const url = `${API_CONFIG.ENDPOINTS.POLIZAS.POLIZAS}?page=1&pageSize=100`;
-    this.apiService.get<PolizaItemSet>(url).subscribe({
-      next: (response) => {
-        this.data = response.items.map((p) => ({
-          id: p.id,
-          contratista: p.contratista,
-          numero: p.numero,
-          obra: p.obra,
-          ramo: p.ramo,
-          fechaExpiracion: formatDate(p.fechaExpiracion, 'dd/MM/yyyy', this.locale),
-          diasRestantes: this.calcularDias(p.fechaExpiracion),
-        }));
-      },
-      error: () => {
-        this.data = [];
+  /** Totales reales por estado derivado (no limitados a las 10 filas del dashboard). */
+  readonly resumenPorEstado = computed(() => {
+    let expirado = 0;
+    let porVencer = 0;
+    let vigente = 0;
+    for (const row of this.allRows()) {
+      switch (row.estado) {
+        case 'expirado':
+          expirado++;
+          break;
+        case 'porVencer':
+          porVencer++;
+          break;
+        default:
+          vigente++;
+          break;
+      }
+    }
+    return { expirado, porVencer, vigente };
+  });
+
+  constructor() {
+    this.cargarPolizas();
+  }
+
+  onVerPoliza(row: PolizaListRow): void {
+    void this.router.navigate(['/polizas', row.id]);
+  }
+
+  irNuevaPoliza(): void {
+    void this.router.navigate(['/polizas/nueva']);
+  }
+
+  irReportes(): void {
+    void this.router.navigate(['/reportes']);
+  }
+
+  irRenovaciones(): void {
+    void this.router.navigate(['/renovaciones']);
+  }
+
+  private cargarPolizas(): void {
+    this.polizaService.getList().subscribe({
+      next: (data) => this.allRows.set(data),
+      error: (err: unknown) => {
+        this.allRows.set([]);
+        this.notify.fromHttpError(err);
       },
     });
-  }
-
-  ngAfterViewInit() {
-    this.columns.set([
-      { key: 'numero', label: 'Número' },
-      { key: 'contratista', label: 'Contratista' },
-      { key: 'obra', label: 'Obra' },
-      { key: 'ramo', label: 'Ramo' },
-      { key: 'fechaExpiracion', label: 'Fecha Expiración' },
-      { key: 'diasRestantes', label: 'Días Restantes' },
-      // { key: 'estado', label: 'Estado', template: this.estadoTpl },
-      // { key: 'acciones', label: 'Acciones', template: this.accionesTpl }
-    ])
-  }
-
-  private calcularDias(fecha: string): number {
-    const hoy = new Date();
-    const exp = new Date(fecha)
-    const diff = exp.getTime() - hoy.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 }

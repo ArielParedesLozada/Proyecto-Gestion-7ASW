@@ -19,6 +19,15 @@ export interface AuthUser {
   role: string;
 }
 
+/** Perfil desde `GET /auth/me` (camelCase API). */
+export interface AuthUserProfile {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  mustChangePassword: boolean;
+}
+
 export interface RegisterRequest {
   email: string;
   password: string;

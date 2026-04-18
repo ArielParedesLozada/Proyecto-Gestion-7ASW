@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { RenovacionCreatePayload, RenovacionHistorialRow, RenovacionPolizaOption } from '../../interfaces/renovacion.interface';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RENOVACIONES_HISTORIAL_MOCK, RENOVACIONES_POLIZAS_MOCK } from './data/renovaciones-mock.data';
@@ -19,7 +18,6 @@ import { toIsoDateOnlyLocal } from './utils/renovacion-date.util';
 @Component({
   selector: 'app-renovaciones-page',
   imports: [
-    MainLayout,
     RenovacionesTable,
     MatIconModule,
     MatButtonModule,

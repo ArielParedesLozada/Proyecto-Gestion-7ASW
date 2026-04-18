@@ -10,23 +10,24 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { finalize, merge } from 'rxjs';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import {
   emisionDiaPermitidoEnCalendario,
   emisionNoFuturaValidator,
 } from './utils/poliza-emision-validators';
 import { sincronizarFechaExpiracionPoliza } from './utils/poliza-fecha-expiracion.util';
 import { calcularEstadoDesdeFechaExpiracion } from './utils/poliza-estado-derivado.util';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PolizaContratistaSelectComponent } from './poliza-contratista-select/poliza-contratista-select.component';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { EmpresaService } from '../../services/empresa.service';
 import { PolizaService } from '../../services/poliza.service';
 import { RamoService } from '../../services/ramo.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { POLIZA_MAX, polizaMensajeMaxLength } from './utils/poliza-form-limits';
 
 @Component({
   selector: 'app-polizas-nueva-page',
   imports: [
-    MainLayout,
     RouterLink,
     ReactiveFormsModule,
     MatIconModule,
@@ -35,7 +36,9 @@ import { NotificationService } from '../../shared/services/notification.service'
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
+    PolizaContratistaSelectComponent,
     PolizaStatusBadge,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './polizas-nueva.page.html',
   styleUrl: './polizas-nueva.page.scss',
@@ -64,17 +67,19 @@ export class PolizasNuevaPage {
   readonly estadoVistaPrevia = computed(() => calcularEstadoDesdeFechaExpiracion(this.fechaExpPreview()));
 
   readonly form = this.fb.group({
-    numero: ['', Validators.required],
+    numero: ['', [Validators.required, Validators.maxLength(POLIZA_MAX.numero)]],
     contratista: ['', Validators.required],
-    obra: ['', Validators.required],
+    obra: ['', [Validators.required, Validators.maxLength(POLIZA_MAX.obra)]],
     ramo: ['', Validators.required],
-    aseguradora: ['', Validators.required],
+    aseguradora: ['', [Validators.required, Validators.maxLength(POLIZA_MAX.aseguradora)]],
     fechaEmision: [null as Date | null, [Validators.required, emisionNoFuturaValidator()]],
     fechaExpiracion: [null as Date | null],
     valorOriginal: ['', Validators.required],
     valorActual: ['', Validators.required],
-    observaciones: [''],
+    observaciones: ['', Validators.maxLength(POLIZA_MAX.observaciones)],
   });
+
+  readonly polizaMax = POLIZA_MAX;
 
   get maxFechaEmision(): Date {
     const d = new Date();
@@ -118,6 +123,23 @@ export class PolizasNuevaPage {
     }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      const ctrl = this.form.controls;
+      if (ctrl.numero.hasError('maxlength')) {
+        this.notify.warn(polizaMensajeMaxLength('numero'));
+        return;
+      }
+      if (ctrl.obra.hasError('maxlength')) {
+        this.notify.warn(polizaMensajeMaxLength('obra'));
+        return;
+      }
+      if (ctrl.aseguradora.hasError('maxlength')) {
+        this.notify.warn(polizaMensajeMaxLength('aseguradora'));
+        return;
+      }
+      if (ctrl.observaciones.hasError('maxlength')) {
+        this.notify.warn(polizaMensajeMaxLength('observaciones'));
+        return;
+      }
       this.notify.warn('Completa los campos obligatorios antes de registrar.');
       return;
     }
