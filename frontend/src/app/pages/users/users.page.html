@@ -1,0 +1,168 @@
+<header class="polizas-header users-header">
+    <div>
+      <h1 class="page-title">Usuarios</h1>
+      <p class="page-subtitle">Gestión de usuarios del sistema</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+      </button>
+      <app-header-user-menu />
+    </div>
+  </header>
+
+  @if (formularioModo() !== 'oculto') {
+    <form [formGroup]="userForm" (ngSubmit)="onSubmitUsuario()" class="users-registro-form" novalidate>
+      <div class="form-card users-registro-card">
+        <h2 class="form-card__title">
+          @if (formularioModo() === 'crear') {
+            Registrar Usuario
+          } @else {
+            Editar Usuario
+          }
+        </h2>
+
+        <div class="form-grid">
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Usuario</mat-label>
+              <input
+                matInput
+                formControlName="username"
+                placeholder="Nombre de usuario"
+                autocomplete="username"
+                [maxlength]="userMax.username"
+              />
+              <mat-hint align="end">{{ userForm.controls.username.value?.length ?? 0 }} / {{ userMax.username }}</mat-hint>
+              @if (userForm.controls.username.hasError('required') && userForm.controls.username.touched) {
+                <mat-error>Campo obligatorio</mat-error>
+              } @else if (userForm.controls.username.hasError('maxlength') && userForm.controls.username.touched) {
+                <mat-error>El usuario no puede superar los {{ userMax.username }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="correo@dominio.com"
+                autocomplete="email"
+                [maxlength]="userMax.email"
+              />
+              <mat-hint align="end">{{ userForm.controls.email.value?.length ?? 0 }} / {{ userMax.email }}</mat-hint>
+              @if (userForm.controls.email.hasError('required') && userForm.controls.email.touched) {
+                <mat-error>Campo obligatorio</mat-error>
+              } @else if (userForm.controls.email.hasError('email') && userForm.controls.email.touched) {
+                <mat-error>Correo no válido</mat-error>
+              } @else if (userForm.controls.email.hasError('maxlength') && userForm.controls.email.touched) {
+                <mat-error>El correo no puede superar los {{ userMax.email }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          @if (formularioModo() === 'crear') {
+            <div class="form-row form-row--2">
+              <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                <mat-label>Contraseña</mat-label>
+                <input
+                  matInput
+                  type="password"
+                  formControlName="password"
+                  placeholder="Mínimo 4 caracteres (mock)"
+                  autocomplete="new-password"
+                />
+                @if (userForm.controls.password.hasError('required') && userForm.controls.password.touched) {
+                  <mat-error>Campo obligatorio</mat-error>
+                } @else if (userForm.controls.password.hasError('minlength') && userForm.controls.password.touched) {
+                  <mat-error>Mínimo 4 caracteres</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                <mat-label>Rol</mat-label>
+                <mat-select formControlName="role">
+                  <mat-option value="ADMIN">Administrador</mat-option>
+                  <mat-option value="USER">Usuario</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          } @else {
+            <div class="form-row form-row--1">
+              <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                <mat-label>Rol</mat-label>
+                <mat-select formControlName="role">
+                  <mat-option value="ADMIN">Administrador</mat-option>
+                  <mat-option value="USER">Usuario</mat-option>
+                </mat-select>
+                @if (isEditingSelf()) {
+                  <mat-hint>No es posible modificar el rol del usuario actualmente autenticado.</mat-hint>
+                }
+              </mat-form-field>
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" mat-flat-button class="btn-registrar">
+            @if (formularioModo() === 'crear') {
+              Registrar Usuario
+            } @else {
+              Guardar cambios
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (formularioModo() === 'oculto') {
+    <div class="toolbar-card">
+      <div class="toolbar-card__left">
+        <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+          <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+          <input
+            matInput
+            placeholder="Buscar por usuario, correo o rol..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="toolbar__select" subscriptSizing="dynamic">
+          <mat-label>Rol</mat-label>
+          <mat-select [ngModel]="rolFiltro()" (ngModelChange)="rolFiltro.set($event)" panelClass="polizas-select-panel">
+            @for (opt of filtroRolOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar filtros
+        </button>
+      </div>
+
+      <div class="toolbar-card__right">
+        <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="abrirFormularioCrear()">
+          <mat-icon>add</mat-icon>
+          Nuevo Usuario
+        </button>
+      </div>
+    </div>
+  }
+
+  <app-users-table
+    [rows]="pagedRows()"
+    [paginatorLength]="totalFiltered()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize"
+    (pageChange)="onPage($event)"
+    (editar)="onEditar($event)"
+  />

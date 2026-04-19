@@ -18,12 +18,22 @@
     <!-- MENU -->
     <nav class="menu">
 
-      <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="menu-item"
+      >
         <mat-icon class="icon">dashboard</mat-icon>
         @if (!isCollapsed()) { <span>Dashboard</span> }
       </a>
 
-      <a routerLink="/polizas" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/polizas"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
         <mat-icon class="icon">description</mat-icon>
         @if (!isCollapsed()) { <span>Pólizas</span> }
       </a>
@@ -44,18 +54,33 @@
       </a>
 
       @if (canShowAdminStuff()) {
-        <a routerLink="/users" routerLinkActive="active" class="menu-item">
+        <a
+          routerLink="/users"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="menu-item"
+        >
           <mat-icon class="icon">manage_accounts</mat-icon>
           @if (!isCollapsed()) { <span>Usuarios</span> }
         </a>
       }
 
-      <a routerLink="/empresas" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/empresas"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="menu-item"
+      >
         <mat-icon class="icon">business</mat-icon>
         @if (!isCollapsed()) { <span>Empresas</span> }
       </a>
 
-      <a routerLink="/ramos" routerLinkActive="active" class="menu-item">
+      <a
+        routerLink="/ramos"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="menu-item"
+      >
         <mat-icon class="icon">label</mat-icon>
         @if (!isCollapsed()) { <span>Ramos</span> }
       </a>
@@ -79,9 +104,9 @@
 
   </aside>
 
-  <!-- CONTENIDO -->
+  <!-- CONTENIDO: un solo layout persistente (evita parpadeo del menú al navegar). -->
   <div class="content">
-    <ng-content></ng-content>
+    <router-outlet />
   </div>
 
 </div>

@@ -1,62 +1,100 @@
-<app-main-layout>
+<!-- HEADER -->
+<div class="dashboard-header">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bienvenido al Sistema de Control de Pólizas</p>
+  </div>
+  <div class="user-avatar">
+    <app-header-user-menu />
+  </div>
+</div>
 
-  <!-- HEADER -->
-  <div class="dashboard-header">
-    <div>
-      <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle">Bienvenido al Sistema de Control de Pólizas</p>
+<!-- CARDS -->
+<div class="dashboard-cards">
+  <div class="card" role="button" tabindex="0" (click)="irNuevaPoliza()" (keydown.enter)="irNuevaPoliza()">
+    <div class="card-icon card-icon--primary">
+      <mat-icon>add_circle</mat-icon>
     </div>
-    <div class="user-avatar">
-      <mat-icon>account_circle</mat-icon>
+    <div class="card-body">
+      <h3>Nueva Póliza</h3>
+      <p>Registrar póliza</p>
     </div>
   </div>
 
-  <!-- CARDS -->
-  <div class="dashboard-cards">
-
-    <div class="card">
-      <div class="card-icon card-icon--primary">
-        <mat-icon>add_circle</mat-icon>
-      </div>
-      <div class="card-body">
-        <h3>Nueva Póliza</h3>
-        <p>Registrar póliza</p>
-      </div>
+  <div class="card" role="button" tabindex="0" (click)="irReportes()" (keydown.enter)="irReportes()">
+    <div class="card-icon card-icon--info">
+      <mat-icon>bar_chart</mat-icon>
     </div>
-
-    <div class="card">
-      <div class="card-icon card-icon--info">
-        <mat-icon>bar_chart</mat-icon>
-      </div>
-      <div class="card-body">
-        <h3>Reportes</h3>
-        <p>Generar reportes</p>
-      </div>
+    <div class="card-body">
+      <h3>Reportes</h3>
+      <p>Generar reportes</p>
     </div>
-
-    <div class="card">
-      <div class="card-icon card-icon--success">
-        <mat-icon>autorenew</mat-icon>
-      </div>
-      <div class="card-body">
-        <h3>Renovaciones</h3>
-        <p>Gestionar renovaciones</p>
-      </div>
-    </div>
-
   </div>
 
-  <!-- TABLE -->
-  <app-table [columns]="columns()" [data]="data"></app-table>
+  <div class="card" role="button" tabindex="0" (click)="irRenovaciones()" (keydown.enter)="irRenovaciones()">
+    <div class="card-icon card-icon--success">
+      <mat-icon>autorenew</mat-icon>
+    </div>
+    <div class="card-body">
+      <h3>Renovaciones</h3>
+      <p>Gestionar renovaciones</p>
+    </div>
+  </div>
+</div>
 
-  <!-- TEMPLATE: ESTADO -->
-  <ng-template #estadoTpl let-row>
-    <span class="badge">{{ row.estado }}</span>
-  </ng-template>
+<section class="dashboard-polizas" aria-labelledby="dashboard-polizas-title">
+  <div class="dashboard-polizas__resumen" role="group" aria-label="Totales de pólizas por estado">
+    <a
+      class="dashboard-polizas__chip dashboard-polizas__chip--expirado"
+      [routerLink]="['/polizas']"
+      [queryParams]="{ estado: 'expirado' }"
+      [attr.aria-label]="
+        'Expiradas: ' + resumenPorEstado().expirado + '. Abrir listado de pólizas filtrado por expiradas.'
+      "
+    >
+      <div class="dashboard-polizas__chip-head">
+        <mat-icon class="dashboard-polizas__chip-icon" aria-hidden="true">error_outline</mat-icon>
+        <span class="dashboard-polizas__chip-label">Expiradas</span>
+      </div>
+      <span class="dashboard-polizas__chip-value">{{ resumenPorEstado().expirado }}</span>
+    </a>
+    <a
+      class="dashboard-polizas__chip dashboard-polizas__chip--por-vencer"
+      [routerLink]="['/polizas']"
+      [queryParams]="{ estado: 'porVencer' }"
+      [attr.aria-label]="
+        'Por vencer: ' + resumenPorEstado().porVencer + '. Abrir listado de pólizas filtrado por por vencer.'
+      "
+    >
+      <div class="dashboard-polizas__chip-head">
+        <mat-icon class="dashboard-polizas__chip-icon" aria-hidden="true">schedule</mat-icon>
+        <span class="dashboard-polizas__chip-label">Por vencer</span>
+      </div>
+      <span class="dashboard-polizas__chip-value">{{ resumenPorEstado().porVencer }}</span>
+    </a>
+    <a
+      class="dashboard-polizas__chip dashboard-polizas__chip--vigente"
+      [routerLink]="['/polizas']"
+      [queryParams]="{ estado: 'vigente' }"
+      [attr.aria-label]="
+        'Vigentes: ' + resumenPorEstado().vigente + '. Abrir listado de pólizas filtrado por vigentes.'
+      "
+    >
+      <div class="dashboard-polizas__chip-head">
+        <mat-icon class="dashboard-polizas__chip-icon" aria-hidden="true">check_circle</mat-icon>
+        <span class="dashboard-polizas__chip-label">Vigentes</span>
+      </div>
+      <span class="dashboard-polizas__chip-value">{{ resumenPorEstado().vigente }}</span>
+    </a>
+  </div>
 
-  <!-- TEMPLATE: ACCIONES -->
-  <ng-template #accionesTpl let-row>
-    <a class="link">Ver Detalles</a>
-  </ng-template>
-
-</app-main-layout>
+  <app-polizas-table
+    variant="dashboard"
+    tableTitle="Pólizas próximas a vencer"
+    tableSubtitle="Seguimiento de vencimientos"
+    verTodasLink="/polizas"
+    [showPaginator]="false"
+    [rows]="dashboardRows()"
+    (ver)="onVerPoliza($event)"
+  />
+</section>

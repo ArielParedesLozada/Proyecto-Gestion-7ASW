@@ -11,7 +11,7 @@ $content-bg: #f5f7fb;
   height: 100vh;
   font-family: 'Roboto', sans-serif;   // Roboto — igual que el login
   font-size: 1rem;                     // base normal, NO más zoom 1.5x
-  transition: all 0.3s ease;
+  /* Evitar `transition: all` (repinta todo el shell al cambiar el outlet). */
   overflow: hidden;
 }
 
@@ -31,6 +31,22 @@ $content-bg: #f5f7fb;
 
 .layout.collapsed .sidebar {
   width: $sidebar-collapsed;
+
+  .sidebar-header img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .toggle-btn {
+    top: calc(0.5rem + 44px + 0.45rem + 1rem + 1px + 0.75rem + 4px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .menu {
+    padding-top: 2.5rem;
+  }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────
@@ -44,10 +60,10 @@ $content-bg: #f5f7fb;
   margin-bottom: 0.75rem;
 
   img {
-    width: 52px;
-    height: 52px;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
   }
 
@@ -64,7 +80,7 @@ $content-bg: #f5f7fb;
 .toggle-btn {
   position: absolute;
   top: 0.75rem;
-  right: -14px;
+  right: 6px;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 50%;
@@ -74,7 +90,7 @@ $content-bg: #f5f7fb;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
+  z-index: 20;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: box-shadow 0.2s;
 
@@ -109,7 +125,7 @@ $content-bg: #f5f7fb;
   color: rgba(255,255,255,0.88);
   font-size: 0.88rem;
   font-weight: 400;
-  transition: background 0.18s, color 0.18s;
+  /* Sin transición en color/fondo del ítem activo para evitar titileo al actualizar la ruta. */
   white-space: nowrap;
 
   &:hover {

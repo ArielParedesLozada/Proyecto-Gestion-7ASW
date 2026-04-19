@@ -1,0 +1,49 @@
+<div class="toolbar-card">
+  <div class="toolbar-card__left">
+    <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+      <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+      <input
+        matInput
+        placeholder="Buscar por número, contratista u obra..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchInput($event)"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="toolbar__select" subscriptSizing="dynamic">
+      <mat-select
+        [ngModel]="estadoFiltro()"
+        (ngModelChange)="onEstadoChange($event)"
+        panelClass="polizas-select-panel"
+      >
+        @for (opt of filtroOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="onLimpiarFiltros()">
+      <mat-icon>filter_alt_off</mat-icon>
+      Limpiar filtros
+    </button>
+  </div>
+
+  <div class="toolbar-card__right">
+    <button type="button" mat-flat-button class="toolbar__btn-excel" (click)="onCargarExcel()">
+      <img
+        class="toolbar__excel-img"
+        src="/img/ExcelLogo.png"
+        width="32"
+        height="32"
+        alt=""
+        aria-hidden="true"
+      />
+      Cargar por Excel
+    </button>
+
+    <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="onNueva()">
+      <mat-icon>add</mat-icon>
+      Nueva Póliza
+    </button>
+  </div>
+</div>

@@ -15,7 +15,8 @@ public static class UserSeeder
         }
         var admin = new User("adminpapu", BCrypt.Net.BCrypt.HashPassword(password ?? "Admin@123"), "ADMIN", "adminpapu@test.com")
         {
-            MustChangePassword = true
+            // false: la política JWT "ACCESS-GRANTED" solo permite API si must_change_password es false.
+            MustChangePassword = false
         };
         await db.Users.AddAsync(admin);
         await db.SaveChangesAsync();

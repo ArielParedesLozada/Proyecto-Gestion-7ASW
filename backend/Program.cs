@@ -6,6 +6,7 @@ using Backend.Domain.Services;
 using Backend.Infrastructure.Security;
 using Backend.Presentation.Middleware;
 using DotNetEnv;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -28,10 +29,18 @@ builder.Services
     .AddJWTConfig(JWT_ISSUER, JWT_AUDIENCE, JWT_PUBLIC_KEY_FILE)
     .AddMailer(builder.Configuration, MAIL_USER, MAIL_PSSWD)
     .AddAppServices(builder.Configuration); ;
+builder.Services.AddMemoryCache();
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
+{
+    o.MultipartBodyLengthLimit = 25_000_000;
+});
 builder.Services.AddScoped<ITokenGenerator>(sp =>
     new JwtTokenGenerator(JWT_PRIVATE_KEY_FILE, JWT_TIME, JWT_ISSUER, JWT_AUDIENCE)
 );
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(o =>
+{
+    o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 var app = builder.Build();
 
@@ -40,6 +49,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDatabase>();
     await db.Database.MigrateAsync();
     await UserSeeder.SeedAsync(db, ADMIN_PASSWORD);
+    // Usuarios creados antes con MustChangePassword=true quedan bloqueados por la política ACCESS-GRANTED.
+    await db.Database.ExecuteSqlRawAsync(
+        """UPDATE "users" SET "MustChangePassword" = false WHERE "Username" = 'adminpapu' AND "MustChangePassword" = true;""");
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,9 +59,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

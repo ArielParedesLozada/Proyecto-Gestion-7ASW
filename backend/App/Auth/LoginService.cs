@@ -23,7 +23,9 @@ public class LoginService(IRepository<User, Guid> userRepo, ITokenGenerator toke
         {
             Username = user.Username,
             Role = user.Role,
-            Token = token
+            Token = token,
+            Email = user.Email,
+            MustChangePassword = user.MustChangePassword
         };
     }
 }
