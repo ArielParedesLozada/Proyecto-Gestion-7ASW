@@ -1,0 +1,40 @@
+<mat-form-field
+  appearance="outline"
+  floatLabel="always"
+  subscriptSizing="dynamic"
+  class="sicop-poliza-contratista-field"
+>
+  <mat-label>Contratista</mat-label>
+  <mat-select
+    [formControl]="innerCtrl"
+    [placeholder]="selectPlaceholder()"
+    [panelClass]="panelClass"
+    (openedChange)="openedChange($event)"
+  >
+    <div class="sicop-poliza-contratista-panel__search" (click)="filterClick($event)">
+      <input
+        #searchInput
+        type="text"
+        class="sicop-poliza-contratista-panel__input"
+        [formControl]="filterCtrl"
+        placeholder="Buscar contratista..."
+        aria-label="Filtrar contratistas por nombre"
+        autocomplete="off"
+        (keydown)="filterKeydown($event)"
+        (click)="filterClick($event)"
+      />
+    </div>
+
+    @if (showPlaceholderOption() && !hasActiveFilter() && empresas().length > 0) {
+      <mat-option value="" disabled>{{ placeholderOptionLabel() }}</mat-option>
+    }
+
+    @if (filteredEmpresas().length === 0) {
+      <mat-option disabled class="sicop-poliza-contratista-panel__empty">No se encontraron contratistas</mat-option>
+    } @else {
+      @for (e of filteredEmpresas(); track e.id) {
+        <mat-option [value]="e.id">{{ e.nombre }}</mat-option>
+      }
+    }
+  </mat-select>
+</mat-form-field>

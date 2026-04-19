@@ -1,0 +1,38 @@
+<div class="sicop-logout-dialog">
+  <div class="sicop-logout-dialog__brand" aria-hidden="true">
+    <img
+      src="/img/Gobierno2.png"
+      alt=""
+      class="sicop-logout-dialog__logo"
+      width="72"
+      height="72"
+    />
+  </div>
+
+  <div class="sicop-logout-dialog__header">
+    <h2 mat-dialog-title class="sicop-logout-dialog__title">Confirmar cierre de sesión</h2>
+  </div>
+
+  <mat-dialog-content class="sicop-logout-dialog__content">
+    <p class="sicop-logout-dialog__message">¿Está seguro de que desea cerrar sesión?</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="sicop-logout-dialog__actions">
+    <button
+      type="button"
+      mat-stroked-button
+      mat-dialog-close
+      class="sicop-logout-dialog__btn sicop-logout-dialog__btn--secondary"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      [mat-dialog-close]="true"
+      class="sicop-logout-dialog__btn sicop-logout-dialog__btn--primary"
+    >
+      Cerrar sesión
+    </button>
+  </mat-dialog-actions>
+</div>

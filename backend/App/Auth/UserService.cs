@@ -34,12 +34,36 @@ public class UserService(IRepository<User, Guid> userRepo)
         var created = await _userRepo.CreateAsync(user);
         return created;
     }
-    public async Task<User> UpdateUser(Guid id, string username, string password, string role)
+    /// <param name="actingUsername">Usuario autenticado (claim Name); si edita su propio registro no puede cambiar su rol.</param>
+    public async Task<User> UpdateUser(
+        Guid id,
+        string? username,
+        string? password,
+        string? role,
+        string? email,
+        string? actingUsername)
     {
         var user = await _userRepo.GetByIdAsync(id) ?? throw new CustomError("User not found", 404);
+
+        if (!string.IsNullOrWhiteSpace(actingUsername))
+        {
+            var actor = await _userRepo.FirstOrDefaultAsync(u => u.Username == actingUsername);
+            if (actor != null
+                && actor.Id == id
+                && !string.IsNullOrWhiteSpace(role)
+                && !string.Equals(role, user.Role, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new CustomError("No puedes modificar tu propio rol.", 400);
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(username))
         {
             user.Username = username;
+        }
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            user.Email = email;
         }
         if (!string.IsNullOrWhiteSpace(password))
         {

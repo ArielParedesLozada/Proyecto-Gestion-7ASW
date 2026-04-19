@@ -1,0 +1,192 @@
+<div class="polizas-nueva">
+    <a routerLink="/polizas" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a pólizas
+    </a>
+
+    <header class="polizas-header">
+      <div>
+        <h1 class="page-title">Nueva Póliza</h1>
+        <p class="page-subtitle">Registrar nueva póliza contractual</p>
+      </div>
+      <div class="polizas-header__tools">
+        <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+          <mat-icon>notifications</mat-icon>
+          <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+        </button>
+        <app-header-user-menu />
+      </div>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="polizas-nueva-form" novalidate>
+      <div class="form-card">
+        <h2 class="form-card__title">Información de la Póliza</h2>
+
+        <div class="form-grid">
+          <!-- Fila 1 -->
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Número de Póliza</mat-label>
+              <input
+                matInput
+                formControlName="numero"
+                placeholder="POL-2026-XXX"
+                autocomplete="off"
+                [maxlength]="polizaMax.numero"
+              />
+              <mat-hint align="end">{{ form.controls.numero.value?.length ?? 0 }} / {{ polizaMax.numero }}</mat-hint>
+              @if (form.controls.numero.hasError('required') && form.controls.numero.touched) {
+                <mat-error>El número de póliza es obligatorio.</mat-error>
+              } @else if (form.controls.numero.hasError('maxlength') && form.controls.numero.touched) {
+                <mat-error>El número de póliza no puede superar los {{ polizaMax.numero }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+            <app-poliza-contratista-select
+              formControlName="contratista"
+              [empresas]="empresas()"
+              [showPlaceholderOption]="true"
+              selectPlaceholder="Seleccione empresa contratista"
+            />
+          </div>
+
+          <!-- Fila 2: obra ancho completo -->
+          <div class="form-row form-row--1">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Obra</mat-label>
+              <input
+                matInput
+                formControlName="obra"
+                placeholder="Descripción de la obra"
+                autocomplete="off"
+                [maxlength]="polizaMax.obra"
+              />
+              <mat-hint align="end">{{ form.controls.obra.value?.length ?? 0 }} / {{ polizaMax.obra }}</mat-hint>
+              @if (form.controls.obra.hasError('required') && form.controls.obra.touched) {
+                <mat-error>La obra es obligatoria.</mat-error>
+              } @else if (form.controls.obra.hasError('maxlength') && form.controls.obra.touched) {
+                <mat-error>La obra no puede superar los {{ polizaMax.obra }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Fila 3 -->
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Ramo</mat-label>
+              <mat-select formControlName="ramo" placeholder="Seleccione un ramo">
+                <mat-option value="" disabled>Seleccione un ramo</mat-option>
+                @for (r of ramos(); track r.id) {
+                  <mat-option [value]="r.id">{{ r.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Aseguradora *</mat-label>
+              <input
+                matInput
+                formControlName="aseguradora"
+                placeholder="Nombre de la aseguradora"
+                [maxlength]="polizaMax.aseguradora"
+                autocomplete="off"
+              />
+              <mat-hint align="end">{{ form.controls.aseguradora.value?.length ?? 0 }} / {{ polizaMax.aseguradora }}</mat-hint>
+              @if (form.controls.aseguradora.hasError('required') && form.controls.aseguradora.touched) {
+                <mat-error>La aseguradora es obligatoria.</mat-error>
+              } @else if (form.controls.aseguradora.hasError('maxlength') && form.controls.aseguradora.touched) {
+                <mat-error>La aseguradora no puede superar los {{ polizaMax.aseguradora }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Fila 4: fechas -->
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Fecha de Emisión</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerEmision"
+                [max]="maxFechaEmision"
+                [matDatepickerFilter]="emisionDateFilter"
+                formControlName="fechaEmision"
+                placeholder="dd/mm/aaaa"
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerEmision"></mat-datepicker-toggle>
+              <mat-datepicker #pickerEmision></mat-datepicker>
+              @if (form.controls.fechaEmision.hasError('required') && form.controls.fechaEmision.touched) {
+                <mat-error>La fecha de emisión es obligatoria.</mat-error>
+              }
+              @if (form.controls.fechaEmision.hasError('emisionFutura')) {
+                <mat-error>La fecha de emisión no puede ser posterior a la fecha actual.</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Fecha de Expiración</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerExp"
+                formControlName="fechaExpiracion"
+                readonly
+                placeholder="dd/mm/aaaa"
+                (keydown)="$event.preventDefault()"
+              />
+              <mat-datepicker #pickerExp></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <!-- Fila 5: valores -->
+          <div class="form-row form-row--2">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Valor Original (USD)</mat-label>
+              <input matInput type="number" formControlName="valorOriginal" placeholder="0.00" step="0.01" min="0" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Valor Actual (USD)</mat-label>
+              <input matInput type="number" formControlName="valorActual" placeholder="0.00" step="0.01" min="0" />
+            </mat-form-field>
+          </div>
+
+          <!-- Fila 6: estado derivado (solo lectura; lo confirma el servidor al guardar) -->
+          <div class="form-row form-row--estado">
+            <div class="form-field-estado-lectura">
+              <span class="form-field-estado-lectura__label">Estado</span>
+              <app-poliza-status-badge [estado]="estadoVistaPrevia()" />
+              <p class="form-field-estado-lectura__hint">Se calcula según la fecha de expiración (vigente / por vencer / expirado).</p>
+            </div>
+            <div class="form-row__spacer" aria-hidden="true"></div>
+          </div>
+
+          <!-- Fila 7: observaciones -->
+          <div class="form-row form-row--1">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Observaciones</mat-label>
+              <textarea
+                matInput
+                formControlName="observaciones"
+                placeholder="Información adicional..."
+                rows="4"
+                [maxlength]="polizaMax.observaciones"
+              ></textarea>
+              <mat-hint align="end">{{ form.controls.observaciones.value?.length ?? 0 }} / {{ polizaMax.observaciones }}</mat-hint>
+              @if (form.controls.observaciones.hasError('maxlength') && form.controls.observaciones.touched) {
+                <mat-error>Las observaciones no pueden superar los {{ polizaMax.observaciones }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancel()">Cancelar</button>
+          <button
+            type="submit"
+            mat-flat-button
+            color="primary"
+            class="btn-registrar"
+            [disabled]="saving()"
+          >
+            <mat-icon>note_add</mat-icon>
+            Registrar Póliza
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>

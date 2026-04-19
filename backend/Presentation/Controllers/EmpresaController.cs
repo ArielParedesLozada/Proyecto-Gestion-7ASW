@@ -26,7 +26,9 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     public async Task<ActionResult<EmpresaDtoResponse>> GetById(Guid id)
     {
         var empresa = await _empresaService.GetEmpresaById(id);
-        return Ok(Map(empresa!));
+        if (empresa == null)
+            return NotFound();
+        return Ok(Map(empresa));
     }
 
     [HttpPost]
@@ -42,7 +44,9 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     public async Task<ActionResult<EmpresaDtoResponse>> Update(Guid id, [FromBody] EmpresaRequest request)
     {
         var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre, request.Email);
-        return Ok(Map(empresa!));
+        if (empresa == null)
+            return NotFound();
+        return Ok(Map(empresa));
     }
 
     [HttpDelete("{id}")]

@@ -16,6 +16,7 @@ public class Poliza
     public DateTimeOffset FechaExpiracion { get; set; }
     public decimal ValorOriginal { get; set; }
     public decimal ValorActual { get; set; }
+    public string? Observaciones { get; set; }
     public EstadoPoliza Estado { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }

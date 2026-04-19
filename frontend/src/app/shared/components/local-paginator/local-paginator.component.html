@@ -1,0 +1,8 @@
+<mat-paginator
+  [length]="length()"
+  [pageIndex]="pageIndex()"
+  [pageSize]="pageSize()"
+  [hidePageSize]="true"
+  [showFirstLastButtons]="true"
+  (page)="page.emit($event)"
+/>

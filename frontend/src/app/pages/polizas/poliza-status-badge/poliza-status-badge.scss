@@ -1,0 +1,26 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-badge--vigente {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.status-badge--porVencer {
+  background: #fff8e1;
+  color: #b45309;
+}
+
+.status-badge--expirado {
+  background: #c1121f;
+  color: #ffffff;
+}

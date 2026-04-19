@@ -1,0 +1,189 @@
+@use 'polizas-admin-header';
+
+.poliza-edit {
+  width: 100%;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #6b7280;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 1rem;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  &:hover {
+    color: #c1121f;
+  }
+}
+
+.header-btn {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  min-height: 36px !important;
+  padding: 0 0.95rem !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+  background: #fff !important;
+
+  mat-icon {
+    margin-right: 0.28rem;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.header-btn--primary {
+  background: #c1121f !important;
+  color: #fff !important;
+  border-color: #c1121f !important;
+}
+
+.detail-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  margin-bottom: 0.95rem;
+  overflow: hidden;
+}
+
+.detail-card__title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #eef0f4;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.edit-form {
+  padding: 0.9rem 1rem 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+.field-wide,
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.field-half {
+  grid-column: 1 / 2;
+}
+
+.field-spacer {
+  min-height: 1px;
+}
+
+::ng-deep .edit-form .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .edit-form textarea.mat-mdc-input-element,
+::ng-deep .edit-form input.mat-mdc-input-element:not([type='number']):not([readonly]) {
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+::ng-deep .edit-form .mat-mdc-text-field-wrapper {
+  border-radius: 10px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eef0f4;
+}
+
+.btn-cancelar {
+  border-radius: 10px !important;
+  padding: 0 1.25rem !important;
+  font-weight: 600 !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+  min-height: 40px !important;
+}
+
+.btn-guardar {
+  border-radius: 10px !important;
+  padding: 0 1.2rem !important;
+  font-weight: 600 !important;
+  background: #c1121f !important;
+  color: #fff !important;
+  min-height: 40px !important;
+
+  mat-icon {
+    margin-right: 0.3rem;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.detail-card--empty {
+  padding: 1rem;
+}
+
+.empty-text {
+  color: #6b7280;
+  margin: 0 0 1rem;
+}
+
+.form-field-estado-lectura {
+  padding: 0.35rem 0 0.25rem;
+  align-self: start;
+
+  .form-field-estado-lectura__label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-field-estado-lectura__hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-half {
+    grid-column: auto;
+  }
+
+  .field-spacer {
+    display: none;
+  }
+}
