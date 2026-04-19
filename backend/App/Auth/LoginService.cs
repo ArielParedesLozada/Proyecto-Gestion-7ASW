@@ -11,12 +11,12 @@ public class LoginService(IRepository<User, Guid> userRepo, ITokenGenerator toke
     private readonly IRepository<User, Guid> _userRepo = userRepo;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
-    public async Task<LoginResult> Login(string username, string password)
+    public async Task<LoginResult> Login(string usernameOrEmail, string password)
     {
-        var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == username) ?? throw new CustomError("User not found", 404);
+        var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail) ?? throw new CustomError("Invalid credentials found", 404);
         if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
-            throw new CustomError("Wrong password", 400);
+            throw new CustomError("Invalid credentials", 400);
         }
         string token = _tokenGenerator.GenerateToken(user);
         return new LoginResult

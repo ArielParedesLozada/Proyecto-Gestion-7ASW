@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+
+// ── Custom red theme matching the app's brand ─────────────────────────────
+$primary: mat.m2-define-palette(mat.$m2-red-palette, 700, 400, 900);
+$accent:  mat.m2-define-palette(mat.$m2-gray-palette, 600);
+$warn:    mat.m2-define-palette(mat.$m2-red-palette, 900);
+
+$app-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary,
+    accent:  $accent,
+    warn:    $warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Roboto, sans-serif',
+  ),
+));
+
+@include mat.all-component-themes($app-theme);
+
+// ── Global resets ─────────────────────────────────────────────────────────
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}

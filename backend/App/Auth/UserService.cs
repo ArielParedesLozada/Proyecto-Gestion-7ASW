@@ -24,10 +24,10 @@ public class UserService(IRepository<User, Guid> userRepo)
         var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == username) ?? throw new CustomError("User not found", 404);
         return user;
     }
-    public async Task<User> CreateUser(string username, string password, string role)
+    public async Task<User> CreateUser(string username, string password, string role, string email)
     {
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-        var user = new User(username, hashedPassword, role)
+        var user = new User(username, hashedPassword, role, email)
         {
             MustChangePassword = true
         };

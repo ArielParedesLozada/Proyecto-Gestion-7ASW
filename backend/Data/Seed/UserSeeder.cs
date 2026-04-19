@@ -13,7 +13,7 @@ public static class UserSeeder
         {
             return;
         }
-        var admin = new User("adminpapu", BCrypt.Net.BCrypt.HashPassword(password ?? "Admin@123"), "ADMIN")
+        var admin = new User("adminpapu", BCrypt.Net.BCrypt.HashPassword(password ?? "Admin@123"), "ADMIN", "adminpapu@test.com")
         {
             MustChangePassword = true
         };

@@ -1,0 +1,58 @@
+<div class="login-container">
+  <!-- Sección izquierda con logo (1/3 del ancho) -->
+  <div class="login-left">
+    <div class="logo-container">
+      <img src="/img/Gobierno.png" alt="Logo" class="logo" />
+    </div>
+  </div>
+
+  <!-- Sección derecha con formulario (2/3 del ancho) -->
+  <div class="login-right">
+    <div class="login-form-container">
+      <h1 class="login-title">
+        <span class="title-line-1">Sistema de</span>
+        <span class="title-line-2">Control de Pólizas</span>
+      </h1>
+
+      <form (ngSubmit)="onSubmit()" class="login-form">
+
+        <!-- Usuario -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Usuario</mat-label>
+          <input matInput type="text" id="username" [value]="username()"
+            (input)="username.set($any($event.target).value); clearError()" placeholder="Ingrese su usuario"
+            autocomplete="username" required [disabled]="isLoading()" />
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <!-- Contraseña -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" id="password" [value]="password()"
+            (input)="password.set($any($event.target).value); clearError()" placeholder="Ingrese su contraseña"
+            autocomplete="current-password" required [disabled]="isLoading()" />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+
+        @if (errorMessage()) {
+        <div class="error-message">
+          <mat-icon>error_outline</mat-icon>
+          {{ errorMessage() }}
+        </div>
+        }
+
+        <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
+          @if (isLoading()) {
+          <span>Iniciando sesión...</span>
+          } @else {
+          <span>Iniciar sesión</span>
+          }
+        </button>
+      </form>
+
+      <div class="login-links">
+        <a routerLink="/forgot-password" class="link-red">¿Olvidaste tu contraseña?</a>
+      </div>
+    </div>
+  </div>
+</div>
