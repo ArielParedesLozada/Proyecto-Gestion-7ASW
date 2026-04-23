@@ -9,6 +9,8 @@ using DotNetEnv;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Hangfire;
+using Backend.Infrastructure.Jobs;
 
 Env.Load();
 
@@ -28,7 +30,8 @@ builder.Services
     .AddDatabase(CONNECTION_STRING)
     .AddJWTConfig(JWT_ISSUER, JWT_AUDIENCE, JWT_PUBLIC_KEY_FILE)
     .AddMailer(builder.Configuration, MAIL_USER, MAIL_PSSWD)
-    .AddAppServices(builder.Configuration); ;
+    .AddAppServices(builder.Configuration)
+    .AddHangFire(CONNECTION_STRING);
 builder.Services.AddMemoryCache();
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
 {
@@ -63,6 +66,14 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/hangfire");
+
+RecurringJob.AddOrUpdate<PolizaExpirationJob>(
+    "revision-polizas-diaria",
+    x => x.EjecutarRevisionDiaria(),
+    "* * * * *"
+);
 app.MapControllers();
 
 app.Run();
