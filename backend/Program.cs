@@ -69,11 +69,11 @@ app.UseAuthorization();
 
 app.UseHangfireDashboard("/hangfire");
 
-RecurringJob.AddOrUpdate<PolizaExpirationJob>(
-    "revision-polizas-diaria",
-    x => x.EjecutarRevisionDiaria(),
-    "* * * * *"
-);
+// RecurringJob.AddOrUpdate<PolizaExpirationJob>(
+//     "revision-polizas-diaria",
+//     x => x.EjecutarRevisionDiaria(),
+//     "* * * * *"
+// );
 app.MapControllers();
 
 app.Run();

@@ -5,7 +5,7 @@ namespace Backend.Domain.Models;
 public class Notificacion
 {
     public Guid Id { get; set; }
-    public Guid Poliza { get; set; }
+    public Guid PolizaId { get; set; }
     public Poliza PolizaNav { get; set; } = null!;
     public EstadoNotificacion Estado { get; set; }
     public TipoNotificacion Tipo { get; set; }
