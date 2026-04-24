@@ -7,24 +7,22 @@
         <tr>
           <th>Póliza</th>
           <th>Contratista</th>
-          <th>Obra</th>
           <th>Fecha Renovación</th>
-          <th>Vencimiento Anterior</th>
-          <th>Nuevo Vencimiento</th>
-          <th>Valor Nuevo</th>
+          <th>Fecha Expiración</th>
+          <th>Valor</th>
+          <th>Estado</th>
           <th class="renovaciones-table__col-actions">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @for (row of rows(); track row.id) {
           <tr>
-            <td class="renovaciones-table__poliza">{{ row.polizaNumero }}</td>
-            <td>{{ row.contratista }}</td>
-            <td>{{ row.obra }}</td>
+            <td class="renovaciones-table__poliza">{{ row.numeroPoliza }}</td>
+            <td>{{ row.contratistaNombre }}</td>
             <td>{{ row.fechaRenovacion | date: 'dd/MM/yyyy' }}</td>
-            <td>{{ row.vencimientoAnterior | date: 'dd/MM/yyyy' }}</td>
-            <td>{{ row.nuevoVencimiento | date: 'dd/MM/yyyy' }}</td>
-            <td class="renovaciones-table__valor">${{ row.valorNuevoUsd | number: '1.0-0' }}</td>
+            <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
+            <td class="renovaciones-table__valor">${{ row.valor | number: '1.0-0' }}</td>
+            <td>{{ row.estado }}</td>
             <td>
               <div class="renovaciones-table__actions">
                 <button

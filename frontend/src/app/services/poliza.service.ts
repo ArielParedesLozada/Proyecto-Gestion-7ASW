@@ -339,10 +339,7 @@ export class PolizaService {
       estado: mapApiEstadoToUi(d.estado),
       valorOriginal: d.valorOriginal,
       valorActual: d.valorActual,
-      observaciones: d.observaciones ?? '',
-      historialRenovaciones: [],
-      notificaciones: [],
-      auditoria: [],
+      observaciones: d.observaciones ?? ''
     };
   }
 }

@@ -93,21 +93,21 @@
           <table class="detail-table">
             <thead>
               <tr>
+                <th>Número de póliza</th>
                 <th>Fecha Renovación</th>
-                <th>Vencimiento Anterior</th>
-                <th>Nuevo Vencimiento</th>
-                <th>Valor Anterior</th>
-                <th>Usuario</th>
+                <th>Fecha de Expiración</th>
+                <th>Valor</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
-              @for (item of p.historialRenovaciones; track $index) {
+              @for (item of historialRenovaciones; track $index) {
                 <tr>
+                  <td>{{ item.numeroPoliza }}</td>
                   <td>{{ item.fechaRenovacion }}</td>
-                  <td>{{ item.vencimientoAnterior }}</td>
-                  <td>{{ item.nuevoVencimiento }}</td>
-                  <td>${{ item.valorAnterior | number: '1.0-0' }}</td>
-                  <td>{{ item.usuario }}</td>
+                  <td>{{ item.fechaExpiracion }}</td>
+                  <td>${{ item.valor | number: '1.0-0' }}</td>
+                  <td>{{ item.estado }}</td>
                 </tr>
               } @empty {
                 <tr>
@@ -133,13 +133,13 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of p.notificaciones; track $index) {
+              @for (item of notificaciones; track $index) {
                 <tr>
-                  <td>{{ item.fecha }}</td>
-                  <td>{{ item.tipo }}</td>
-                  <td>{{ item.accion }}</td>
-                  <td>{{ item.detalle }}</td>
-                  <td><span class="mini-badge">{{ item.estado }}</span></td>
+                  <td>{{ "item.fecha" }}</td>
+                  <td>{{ "item.tipo" }}</td>
+                  <td>{{ "item.accion" }}</td>
+                  <td>{{ "item.detalle" }}</td>
+                  <td><span class="mini-badge">{{ "item.estado" }}</span></td>
                 </tr>
               } @empty {
                 <tr>
@@ -164,12 +164,12 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of p.auditoria; track $index) {
+              @for (item of auditorias; track $index) {
                 <tr>
-                  <td>{{ item.fecha }}</td>
-                  <td>{{ item.usuario }}</td>
-                  <td>{{ item.accion }}</td>
-                  <td>{{ item.detalle }}</td>
+                  <td>{{ "item.fecha" }}</td>
+                  <td>{{ "item.usuario" }}</td>
+                  <td>{{ "item.accion" }}</td>
+                  <td>{{ "item.detalle" }}</td>
                 </tr>
               } @empty {
                 <tr>

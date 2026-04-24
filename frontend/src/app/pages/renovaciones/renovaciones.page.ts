@@ -48,9 +48,8 @@ export class RenovacionesPage {
     }
     return all.filter(
       (row) =>
-        row.polizaNumero.toLowerCase().includes(q) ||
-        row.contratista.toLowerCase().includes(q) ||
-        row.obra.toLowerCase().includes(q),
+        row.numeroPoliza.toLowerCase().includes(q) ||
+        row.contratistaNombre.toLowerCase().includes(q)
     );
   });
 

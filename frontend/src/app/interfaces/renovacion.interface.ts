@@ -18,16 +18,22 @@ export interface RenovacionPolizaOption {
 export interface RenovacionHistorialRow {
   id: string;
   polizaId: string;
-  polizaNumero: string;
-  contratista: string;
-  obra: string;
+  numeroPoliza: string;
+  contratistaNombre: string;
+  ramoNombre: string;
+  valor: number;
   fechaRenovacion: string;
-  vencimientoAnterior: string;
-  nuevoVencimiento: string;
-  valorNuevoUsd: number;
+  fechaExpiracion: string;
   /** Ciclo de la renovación en pantalla: solo pendiente de confirmación o ya confirmada. */
   estado: RenovacionEstado;
   observaciones: string | null;
+}
+
+export interface RenovacionesHistorialPaginated {
+  items: RenovacionHistorialRow[]
+  page: number
+  pageSize: number
+  total: number
 }
 
 export type RenovacionEstado = 'pendiente' | 'confirmada';

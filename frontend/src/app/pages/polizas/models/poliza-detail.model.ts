@@ -42,7 +42,4 @@ export interface PolizaDetail {
   valorOriginal: number;
   valorActual: number;
   observaciones: string;
-  historialRenovaciones: RenovacionHistorialItem[];
-  notificaciones: NotificacionPolizaItem[];
-  auditoria: AuditoriaPolizaItem[];
 }

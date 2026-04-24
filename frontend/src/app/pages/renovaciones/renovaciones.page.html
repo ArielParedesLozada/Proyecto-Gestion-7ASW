@@ -51,31 +51,23 @@
       <div class="detalle-grid">
         <div class="detalle-item">
           <span class="detalle-item__label">Número de póliza</span>
-          <strong>{{ detalle.polizaNumero }}</strong>
+          <strong>{{ detalle.numeroPoliza }}</strong>
         </div>
         <div class="detalle-item">
           <span class="detalle-item__label">Contratista / empresa</span>
-          <strong>{{ detalle.contratista }}</strong>
-        </div>
-        <div class="detalle-item">
-          <span class="detalle-item__label">Obra</span>
-          <strong>{{ detalle.obra }}</strong>
+          <strong>{{ detalle.contratistaNombre }}</strong>
         </div>
         <div class="detalle-item">
           <span class="detalle-item__label">Fecha de renovación</span>
           <strong>{{ detalle.fechaRenovacion | date: 'dd/MM/yyyy' }}</strong>
         </div>
         <div class="detalle-item">
-          <span class="detalle-item__label">Vencimiento anterior</span>
-          <strong>{{ detalle.vencimientoAnterior | date: 'dd/MM/yyyy' }}</strong>
+          <span class="detalle-item__label">Fecha de expiración</span>
+          <strong>{{ detalle.fechaExpiracion | date: 'dd/MM/yyyy' }}</strong>
         </div>
         <div class="detalle-item">
-          <span class="detalle-item__label">Nuevo vencimiento propuesto</span>
-          <strong>{{ detalle.nuevoVencimiento | date: 'dd/MM/yyyy' }}</strong>
-        </div>
-        <div class="detalle-item">
-          <span class="detalle-item__label">Valor nuevo</span>
-          <strong>${{ detalle.valorNuevoUsd | number: '1.0-0' }}</strong>
+          <span class="detalle-item__label">Valor</span>
+          <strong>${{ detalle.valor | number: '1.0-0' }}</strong>
         </div>
       </div>
 

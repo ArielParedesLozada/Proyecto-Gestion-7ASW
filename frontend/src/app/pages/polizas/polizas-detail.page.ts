@@ -10,6 +10,8 @@ import { HeaderUserMenuComponent } from '../../components/header-user-menu/heade
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { RenovacionService } from '../../services/renovacion.service';
+import { RenovacionHistorialRow } from '../../interfaces/renovacion.interface';
 
 @Component({
   selector: 'app-polizas-detail-page',
@@ -28,7 +30,40 @@ export class PolizasDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly polizaService = inject(PolizaService);
+  private readonly renovacionService = inject(RenovacionService)
   private readonly notify = inject(NotificationService);
+
+  historialRenovaciones: RenovacionHistorialRow[] = []
+  notificaciones = []
+  auditorias = []
+  constructor() {
+    this.route.paramMap.pipe(
+      map(params => params.get('id')),
+      switchMap(id =>
+        id
+          ? this.renovacionService.getByPolizaId(id)
+          : of({
+            items: [],
+            total: 0,
+            page: 1,
+            pageSize: 10
+          })
+      ),
+      catchError(err => {
+        this.notify.fromHttpError(err);
+        return of({
+          items: [],
+          total: 0,
+          page: 1,
+          pageSize: 10
+        });
+      })
+    )
+      .subscribe(result => {
+        console.log('Historial renovaciones:', result);
+        this.historialRenovaciones = result.items;
+      });
+  }
 
   readonly poliza = toSignal(
     this.route.paramMap.pipe(
@@ -36,11 +71,11 @@ export class PolizasDetailPage {
       switchMap((id) =>
         id
           ? this.polizaService.getById(id).pipe(
-              catchError((err) => {
-                this.notify.fromHttpError(err);
-                return of(null);
-              }),
-            )
+            catchError((err) => {
+              this.notify.fromHttpError(err);
+              return of(null);
+            }),
+          )
           : of(null),
       ),
     ),

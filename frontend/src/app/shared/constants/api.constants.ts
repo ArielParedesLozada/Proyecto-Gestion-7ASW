@@ -19,6 +19,9 @@ export const API_CONFIG = {
     /** Rutas previstas para renovaciones; alinear con el contrato real del backend. */
     RENOVACIONES: {
       HISTORIAL: '/renovaciones',
+      HISTORIAL_POLIZA: '/renovaciones/poliza',
+      VALIDAR: '/renovaciones/:id/validar',
+      RECHAZAR: '/renovaciones/:id/rechazar',
     },
   }
 } as const;
