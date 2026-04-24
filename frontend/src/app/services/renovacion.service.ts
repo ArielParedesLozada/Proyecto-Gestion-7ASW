@@ -26,6 +26,7 @@ export class RenovacionService {
 
   /**
    * Listado del historial para la vista admin.
+  * Si el endpoint no existe (404/501), lista vacía sin error al usuario.
    * Cuando el backend exponga otro contrato, mapear el DTO aquí a `RenovacionHistorialRow[]`.
    */
   getHistorialRenovaciones(): Observable<RenovacionHistorialRow[]> {

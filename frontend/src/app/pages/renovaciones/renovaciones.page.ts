@@ -8,7 +8,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { RenovacionHistorialRow } from '../../interfaces/renovacion.interface';
 import { RenovacionService } from '../../services/renovacion.service';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -17,7 +16,6 @@ import { RenovacionesTable } from './renovaciones-table/renovaciones-table';
 @Component({
   selector: 'app-renovaciones-page',
   imports: [
-    MainLayout,
     RenovacionesTable,
     MatIconModule,
     MatButtonModule,
