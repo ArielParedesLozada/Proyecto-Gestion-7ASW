@@ -1,0 +1,103 @@
+<div class="renovaciones-page">
+  <header class="polizas-header renovaciones-header">
+    <div class="renovaciones-header__intro">
+      <h1 class="page-title">Renovaciones</h1>
+      <p class="page-subtitle">Revisión y confirmación de renovaciones generadas automáticamente</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+      </button>
+      <mat-icon class="polizas-header__profile" aria-hidden="true">account_circle</mat-icon>
+    </div>
+  </header>
+
+  <div class="toolbar-card">
+    <div class="toolbar-card__left">
+      <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+        <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+        <input
+          matInput
+          placeholder="Buscar por póliza, contratista u obra..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+      </mat-form-field>
+
+      <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+        <mat-icon>filter_alt_off</mat-icon>
+        Limpiar filtros
+      </button>
+    </div>
+  </div>
+
+  @if (selectedRenovacion(); as detalle) {
+    <section class="detalle-card" aria-label="Detalle de renovación">
+      <header class="detalle-card__header">
+        <div>
+          <h2 class="detalle-card__title">Detalle de renovación</h2>
+          <p class="detalle-card__subtitle">Consulta de los datos registrados de la renovación.</p>
+        </div>
+        <span
+          class="detalle-estado-pill"
+          [class.detalle-estado-pill--pendiente]="detalle.estado === 'pendiente'"
+          [class.detalle-estado-pill--confirmada]="detalle.estado === 'confirmada'"
+        >
+          {{ detalle.estado === 'pendiente' ? 'Pendiente' : 'Confirmada' }}
+        </span>
+      </header>
+
+      <div class="detalle-grid">
+        <div class="detalle-item">
+          <span class="detalle-item__label">Número de póliza</span>
+          <strong>{{ detalle.polizaNumero }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Contratista / empresa</span>
+          <strong>{{ detalle.contratista }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Obra</span>
+          <strong>{{ detalle.obra }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Fecha de renovación</span>
+          <strong>{{ detalle.fechaRenovacion | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Vencimiento anterior</span>
+          <strong>{{ detalle.vencimientoAnterior | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Nuevo vencimiento propuesto</span>
+          <strong>{{ detalle.nuevoVencimiento | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-item__label">Valor nuevo</span>
+          <strong>${{ detalle.valorNuevoUsd | number: '1.0-0' }}</strong>
+        </div>
+      </div>
+
+      <div class="detalle-actions">
+        @if (detalleEsEditable()) {
+          <button type="button" mat-flat-button class="btn-confirmar" (click)="confirmarRenovacionDetalle()">
+            Confirmar renovación
+          </button>
+        }
+        <button type="button" mat-stroked-button class="btn-volver" (click)="onVolverListado()">
+          Volver
+        </button>
+      </div>
+    </section>
+  } @else {
+    <app-renovaciones-table
+      [rows]="pagedHistorial()"
+      [paginatorLength]="totalFiltrado()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize"
+      (pageChange)="onPage($event)"
+      (ver)="onVer($event)"
+    />
+  }
+</div>

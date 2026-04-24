@@ -13,6 +13,7 @@ import { PolizasEditPage } from './pages/polizas/polizas-edit.page';
 import { PolizasNuevaPage } from './pages/polizas/polizas-nueva.page';
 import { PolizasPage } from './pages/polizas/polizas.page';
 import { RamosPage } from './pages/ramos/ramos.page';
+import { RenovacionesPage } from './pages/renovaciones/renovaciones.page';
 import { ResetPassword } from './pages/reset-password/reset-password';
 import { UsersPage } from './pages/users/users.page';
 import { authGuard } from './shared/guards/auth-guard';
@@ -47,6 +48,7 @@ export const routes: Routes = [
       { path: 'empresas/:id', component: EmpresasDetailPage },
       { path: 'empresas', component: EmpresasPage },
       { path: 'ramos', component: RamosPage },
+      { path: 'renovaciones', component: RenovacionesPage },
       { path: 'users', component: UsersPage },
     ],
   },
