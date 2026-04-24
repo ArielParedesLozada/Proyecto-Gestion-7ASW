@@ -10,8 +10,7 @@ public class CreateRenovacionService(AppDatabase context)
     private readonly AppDatabase _context = context;
     public async Task CreateRenovacion()
     {
-        var targetDate =
-            DateTimeOffset.UtcNow.Date.AddDays(3);
+        var targetDate = DateTimeOffset.UtcNow.Date.AddDays(3);
 
         var polizas = await _context.Polizas
           .Include(p => p.RamoNav)

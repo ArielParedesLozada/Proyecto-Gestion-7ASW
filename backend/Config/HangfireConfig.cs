@@ -14,7 +14,7 @@ public static class HangfireConfig
             )
         );
         services.AddHangfireServer();
-        services.AddScoped<PolizaExpirationJob>();
+        services.AddScoped<CheckRenovacionesJob>();
         return services;
     }
 }

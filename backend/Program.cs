@@ -69,11 +69,11 @@ app.UseAuthorization();
 
 app.UseHangfireDashboard("/hangfire");
 
-// RecurringJob.AddOrUpdate<PolizaExpirationJob>(
-//     "revision-polizas-diaria",
-//     x => x.EjecutarRevisionDiaria(),
-//     "* * * * *"
-// );
+RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
+    "revision-polizas-diaria",
+    x => x.CheckRenovaciones(),
+    "* * * * *" // Solo para ruebas que se ejecute cada minuto. EN produccion, cambiar a Cron.Daily
+);
 app.MapControllers();
 
 app.Run();
