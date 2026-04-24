@@ -12,7 +12,11 @@ export const API_CONFIG = {
       EMPRESAS: '/empresas',
       RAMOS: '/ramos',
       POLIZAS: '/polizas',
-    }
+    },
+    /** Rutas previstas para renovaciones; alinear con el contrato real del backend. */
+    RENOVACIONES: {
+      HISTORIAL: '/renovaciones',
+    },
   }
 } as const;
 

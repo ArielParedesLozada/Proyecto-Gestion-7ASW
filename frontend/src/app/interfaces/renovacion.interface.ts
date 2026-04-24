@@ -25,8 +25,12 @@ export interface RenovacionHistorialRow {
   vencimientoAnterior: string;
   nuevoVencimiento: string;
   valorNuevoUsd: number;
+  /** Ciclo de la renovación en pantalla: solo pendiente de confirmación o ya confirmada. */
+  estado: RenovacionEstado;
   observaciones: string | null;
 }
+
+export type RenovacionEstado = 'pendiente' | 'confirmada';
 
 /** Cuerpo esperado para POST futuro al backend. */
 export interface RenovacionCreatePayload {

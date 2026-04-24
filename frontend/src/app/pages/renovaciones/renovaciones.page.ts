@@ -1,20 +1,18 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MainLayout } from '../../layouts/main-layout/main-layout';
-import { RenovacionCreatePayload, RenovacionHistorialRow, RenovacionPolizaOption } from '../../interfaces/renovacion.interface';
+import { RenovacionHistorialRow } from '../../interfaces/renovacion.interface';
+import { RenovacionService } from '../../services/renovacion.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { RENOVACIONES_HISTORIAL_MOCK, RENOVACIONES_POLIZAS_MOCK } from './data/renovaciones-mock.data';
 import { RenovacionesTable } from './renovaciones-table/renovaciones-table';
-import { toIsoDateOnlyLocal } from './utils/renovacion-date.util';
 
 @Component({
   selector: 'app-renovaciones-page',
@@ -25,35 +23,20 @@ import { toIsoDateOnlyLocal } from './utils/renovacion-date.util';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
+    DatePipe,
+    DecimalPipe,
     FormsModule,
-    ReactiveFormsModule,
   ],
   templateUrl: './renovaciones.page.html',
   styleUrl: './renovaciones.page.scss',
-  providers: [
-    provideNativeDateAdapter(),
-    { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
-  ],
 })
 export class RenovacionesPage {
-  private readonly fb = inject(FormBuilder);
-  private readonly router = inject(Router);
   private readonly notify = inject(NotificationService);
+  private readonly renovacionesApi = inject(RenovacionService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  /** Oculto | crear: mismo patrón que Empresas/Ramos (toolbar solo en listado). */
-  readonly formularioModo = signal<'oculto' | 'crear'>('oculto');
-
-  readonly polizasDisponibles = signal<RenovacionPolizaOption[]>([...RENOVACIONES_POLIZAS_MOCK]);
-  readonly historial = signal<RenovacionHistorialRow[]>([...RENOVACIONES_HISTORIAL_MOCK]);
-
-  readonly renovacionForm = this.fb.group({
-    polizaId: ['', [Validators.required]],
-    nuevaFechaExpiracion: [null as Date | null, [Validators.required]],
-    nuevoValorUsd: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    observaciones: [''],
-  });
+  readonly historial = signal<RenovacionHistorialRow[]>([]);
+  readonly selectedRenovacionId = signal<string | null>(null);
 
   readonly searchQuery = signal('');
   readonly pageSize = 10;
@@ -74,6 +57,10 @@ export class RenovacionesPage {
   });
 
   readonly totalFiltrado = computed(() => this.filteredHistorial().length);
+  readonly selectedRenovacion = computed(() =>
+    this.historial().find((row) => row.id === this.selectedRenovacionId()) ?? null,
+  );
+  readonly detalleEsEditable = computed(() => this.selectedRenovacion()?.estado === 'pendiente');
 
   readonly pagedHistorial = computed(() => {
     const all = this.filteredHistorial();
@@ -82,6 +69,17 @@ export class RenovacionesPage {
   });
 
   constructor() {
+    this.renovacionesApi
+      .getHistorialRenovaciones()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (rows) => this.historial.set(Array.isArray(rows) ? rows : []),
+        error: (err) => {
+          this.historial.set([]);
+          this.notify.fromHttpError(err);
+        },
+      });
+
     effect(() => {
       this.searchQuery();
       untracked(() => this.pageIndex.set(0));
@@ -105,92 +103,37 @@ export class RenovacionesPage {
     this.pageIndex.set(0);
   }
 
-  abrirFormularioCrear(): void {
-    this.formularioModo.set('crear');
-    this.renovacionForm.reset({
-      polizaId: '',
-      nuevaFechaExpiracion: null,
-      nuevoValorUsd: null,
-      observaciones: '',
-    });
-  }
-
-  onCancelarFormulario(): void {
-    this.formularioModo.set('oculto');
-    this.renovacionForm.reset({
-      polizaId: '',
-      nuevaFechaExpiracion: null,
-      nuevoValorUsd: null,
-      observaciones: '',
-    });
-  }
-
-  onSubmitRenovacion(): void {
-    if (this.renovacionForm.invalid) {
-      this.renovacionForm.markAllAsTouched();
-      this.notify.warn('Completa póliza, nueva fecha de expiración y valor antes de registrar.');
-      return;
-    }
-    const { polizaId, nuevaFechaExpiracion, nuevoValorUsd, observaciones } = this.renovacionForm.getRawValue();
-    const valorNumerico = Number(nuevoValorUsd);
-    if (!polizaId || !nuevaFechaExpiracion || nuevoValorUsd == null || Number.isNaN(valorNumerico)) {
-      return;
-    }
-    if (valorNumerico < 0.01) {
-      this.renovacionForm.controls.nuevoValorUsd.markAsTouched();
-      this.notify.warn('Ingrese un valor mayor a 0.');
-      return;
-    }
-
-    const poliza = this.polizasDisponibles().find((p) => p.id === polizaId);
-    if (!poliza) {
-      this.notify.error('La póliza seleccionada ya no está disponible.');
-      return;
-    }
-
-    const nuevoVencimientoIso = toIsoDateOnlyLocal(nuevaFechaExpiracion);
-    const vencimientoAnterior = poliza.fechaExpiracionActual;
-    const fechaRenovacionIso = toIsoDateOnlyLocal(new Date());
-
-    const payload: RenovacionCreatePayload = {
-      poliza_id: polizaId,
-      fecha_expiracion: nuevoVencimientoIso,
-      valor: valorNumerico,
-      observaciones: observaciones?.trim() ? observaciones.trim() : null,
-    };
-
-    const nuevaFila: RenovacionHistorialRow = {
-      id: `ren-${Date.now()}`,
-      polizaId: poliza.id,
-      polizaNumero: poliza.numero,
-      contratista: poliza.contratista,
-      obra: poliza.obra,
-      fechaRenovacion: fechaRenovacionIso,
-      vencimientoAnterior,
-      nuevoVencimiento: nuevoVencimientoIso,
-      valorNuevoUsd: payload.valor,
-      observaciones: payload.observaciones ?? null,
-    };
-
-    this.historial.update((rows) => [nuevaFila, ...rows]);
-    this.polizasDisponibles.update((list) =>
-      list.map((p) =>
-        p.id === polizaId
-          ? { ...p, fechaExpiracionActual: nuevoVencimientoIso, valorActualUsd: valorNumerico }
-          : p,
-      ),
-    );
-
-    this.notify.success('Renovación registrada (vista previa local).');
-    this.onCancelarFormulario();
-  }
-
-  /** Misma navegación que el listado de pólizas (`polizas.page.ts` → `/polizas/:id`). */
   onVer(row: RenovacionHistorialRow): void {
-    void this.router.navigate(['/polizas', row.polizaId]);
+    this.selectedRenovacionId.set(row.id);
   }
 
-  textoOpcionPoliza(p: RenovacionPolizaOption): string {
-    return `${p.numero} — ${p.contratista}`;
+  onVolverListado(): void {
+    this.selectedRenovacionId.set(null);
+  }
+
+  confirmarRenovacionDetalle(): void {
+    const selectedId = this.selectedRenovacionId();
+    if (!selectedId) {
+      return;
+    }
+    this.renovacionesApi
+      .confirmarRenovacion(selectedId)
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.historial.update((rows) =>
+            rows.map((row) =>
+              row.id === selectedId
+                ? {
+                    ...row,
+                    estado: 'confirmada',
+                  }
+                : row,
+            ),
+          );
+          this.notify.success('Renovación confirmada.');
+        },
+        error: (err) => this.notify.fromHttpError(err),
+      });
   }
 }
