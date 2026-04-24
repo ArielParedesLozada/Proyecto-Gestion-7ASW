@@ -60,8 +60,9 @@
 
 .dialog-body {
   padding-top: 0.05rem;
-  max-height: min(70vh, 640px);
-  overflow: auto;
+  max-height: min(82vh, 760px);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .meta-card {
@@ -321,54 +322,93 @@
   font-weight: 500;
 }
 
-.table-wrap {
-  overflow: auto;
+/* Panel: pista de scroll + área de tabla con scroll (sticky header dentro) */
+.preview-table-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 0.2rem;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  margin-top: 0.2rem;
+  overflow: hidden;
   background: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.7),
     0 2px 10px rgba(15, 23, 42, 0.05);
+  max-height: min(54vh, 520px);
+  min-height: 220px;
 }
 
 .table-scroll-hint {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.34rem 0.62rem;
-  border-bottom: 1px solid #edf1f5;
-  background: #f8fafc;
-  color: #94a3b8;
-  font-size: 0.76rem;
+  align-items: flex-start;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.78rem;
   font-weight: 500;
+  line-height: 1.35;
+}
+
+.table-scroll-hint__text {
+  flex: 1;
+  min-width: 0;
 }
 
 .table-scroll-hint mat-icon {
-  width: 14px;
-  height: 14px;
-  font-size: 14px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  margin-top: 0.06rem;
+  color: #94a3b8;
 }
 
-.preview-table {
+.table-wrap--preview {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  min-width: 1180px;
-  font-size: 0.8rem;
+  max-width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+/* Tabla ancha tipo ERP: scroll horizontal en .table-wrap, sin comprimir columnas */
+.preview-table {
+  width: max(100%, 1520px);
+  min-width: 1520px;
+  table-layout: auto;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
 }
 
 .preview-table .mat-mdc-header-row {
-  height: 40px;
-  background: #f8fafc;
+  height: auto;
+  min-height: 2.25rem;
+  background: #f3f4f6;
 }
 
 .preview-table .mat-mdc-header-cell {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #475569;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0.5rem 0.62rem;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1.2;
+  background-color: #f3f4f6;
 }
 
 .preview-table .mat-mdc-row {
@@ -376,95 +416,122 @@
 }
 
 .preview-table .mat-mdc-cell {
-  padding: 0.52rem 0.62rem;
-  border-bottom: 1px solid #eef2f7;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eef0f4;
   vertical-align: middle;
   color: #1f2937;
   line-height: 1.35;
+  word-break: normal;
+  overflow-wrap: normal;
   transition: background-color 120ms ease-in-out;
 }
 
 .preview-table .mat-mdc-row:nth-child(even) .mat-mdc-cell {
-  background: #fcfdff;
+  background: #fafbfc;
 }
 
 .preview-table .mat-mdc-row:hover .mat-mdc-cell {
-  background: #f8fafc;
+  background: #f3f4f6;
 }
 
+/* Anchos mínimos por columna (px) — lectura horizontal tipo auditoría */
 .preview-table .mat-column-excelRow {
-  width: 68px;
+  width: 3.25rem;
+  min-width: 3.25rem;
+  max-width: 3.5rem;
   text-align: center;
 }
 
 .preview-table .mat-column-sheetName {
-  min-width: 105px;
+  min-width: 7.5rem;
+  max-width: 9.5rem;
 }
 
 .preview-table .mat-column-numeroPoliza {
-  min-width: 130px;
+  min-width: 7.5rem;
+  max-width: 9rem;
 }
 
 .preview-table .mat-column-contratista {
-  min-width: 170px;
-  max-width: 170px;
+  min-width: 11rem;
+  width: 14rem;
 }
 
 .preview-table .mat-column-obra {
-  min-width: 220px;
-  max-width: 220px;
+  min-width: 13rem;
+  width: 17rem;
 }
 
 .preview-table .mat-column-ramo {
-  min-width: 145px;
+  min-width: 8.5rem;
+  max-width: 11rem;
 }
 
 .preview-table .mat-column-aseguradora {
-  min-width: 165px;
+  min-width: 10rem;
+  width: 12rem;
 }
 
 .preview-table .mat-column-fechaEmision,
 .preview-table .mat-column-fechaExpiracion {
-  width: 120px;
+  min-width: 6.75rem;
+  max-width: 7.5rem;
 }
 
 .preview-table .mat-column-estadoAnalisis {
-  min-width: 145px;
+  min-width: 9.5rem;
+  max-width: 12rem;
 }
 
 .preview-table .mat-column-empresaResolucion {
-  min-width: 150px;
+  min-width: 8.5rem;
+  max-width: 11rem;
 }
 
 .preview-table .mat-column-mensajes {
-  min-width: 280px;
-  max-width: 280px;
+  min-width: 17rem;
+  width: 20rem;
 }
 
-.cell-obra,
-.cell-mensajes {
+/* Columnas compactas: una línea */
+.preview-col-tight {
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Columnas medias: palabras completas; solo parte palabras muy largas */
+.preview-col-medium {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+.preview-cell-medium-text {
+  display: block;
+  max-width: 100%;
+  line-height: 1.35;
+}
+
+/* Columnas largas: una línea + ellipsis + tooltip */
+.preview-ellipsis {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.cell-obra {
-  max-width: 220px;
+.preview-ellipsis--ok {
+  color: #166534;
 }
 
-.cell-mensajes {
-  max-width: 280px;
-}
-
-.msg-list {
-  margin: 0;
-  padding-left: 1.1rem;
+.preview-ellipsis--error {
   color: #b91c1c;
 }
 
-.msg-ok {
-  color: #166534;
-  font-size: 0.82rem;
+.preview-col-mensajes .preview-ellipsis {
+  font-variant-numeric: normal;
 }
 
 .dialog-actions {

@@ -1,7 +1,7 @@
 import { PolizaEstado } from '../models/poliza-list.model';
 
 /** Debe coincidir con `PolizaEstadoDerivadoHelper.DiasUmbralPorVencer` en el backend. */
-export const DIAS_UMBRAL_POR_VENCER = 10;
+export const DIAS_UMBRAL_POR_VENCER = 3;
 
 /**
  * Vista previa local del estado (misma regla que el API). El valor oficial viene del backend al guardar/cargar.

@@ -1,21 +1,21 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { RamosTable } from './ramos-table/ramos-table';
 import { RamoListRow } from './models/ramo-list.model';
 import { RamoCreateRequest, RamoService } from '../../services/ramo.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { RAMO_MAX } from '../../shared/constants/form-field-limits';
 
 @Component({
   selector: 'app-ramos-page',
   imports: [
-    MainLayout,
     RamosTable,
     MatIconModule,
     MatButtonModule,
@@ -24,6 +24,7 @@ import { NotificationService } from '../../shared/services/notification.service'
     MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
+    HeaderUserMenuComponent,
   ],
   templateUrl: './ramos.page.html',
   styleUrl: './ramos.page.scss',
@@ -37,10 +38,12 @@ export class RamosPage {
   readonly ramoEditandoId = signal<string | null>(null);
 
   readonly ramoForm = this.fb.group({
-    nombre: ['', [Validators.required]],
-    descripcion: ['', [Validators.required]],
+    nombre: ['', [Validators.required, Validators.maxLength(RAMO_MAX.nombre)]],
+    descripcion: ['', [Validators.required, Validators.maxLength(RAMO_MAX.descripcion)]],
     cambioValor: [false as boolean],
   });
+
+  readonly ramoMax = RAMO_MAX;
 
   readonly rows = signal<RamoListRow[]>([]);
 
@@ -111,6 +114,15 @@ export class RamosPage {
   onSubmitRamo(): void {
     if (this.ramoForm.invalid) {
       this.ramoForm.markAllAsTouched();
+      const c = this.ramoForm.controls;
+      if (c.nombre.hasError('maxlength')) {
+        this.notify.warn(`El nombre no puede superar los ${RAMO_MAX.nombre} caracteres.`);
+        return;
+      }
+      if (c.descripcion.hasError('maxlength')) {
+        this.notify.warn(`La descripción no puede superar los ${RAMO_MAX.descripcion} caracteres.`);
+        return;
+      }
       this.notify.warn('Completa el nombre y la descripción antes de guardar.');
       return;
     }

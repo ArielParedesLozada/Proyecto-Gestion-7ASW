@@ -1,24 +1,28 @@
 import { Component, computed, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizasToolbar } from './polizas-toolbar/polizas-toolbar';
 import { PolizasTable } from './polizas-table/polizas-table';
 import { PolizaEstado, PolizaListRow } from './models/poliza-list.model';
+import { sortPolizasByExpiracionAsc } from './utils/poliza-list-orden.util';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog/polizas-excel-import-dialog';
+import { polizaEstadoFromQueryParam } from './utils/poliza-estado-query.util';
 
 @Component({
   selector: 'app-polizas-page',
-  imports: [MainLayout, PolizasToolbar, PolizasTable, MatIconModule],
+  imports: [PolizasToolbar, PolizasTable, MatIconModule, HeaderUserMenuComponent],
   templateUrl: './polizas.page.html',
   styleUrl: './polizas.page.scss',
 })
 export class PolizasPage {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly polizaService = inject(PolizaService);
   private readonly notify = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
@@ -37,7 +41,7 @@ export class PolizasPage {
   readonly filteredRows = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     const est = this.estadoFiltro();
-    return this.allRows().filter((row) => {
+    const filtered = this.allRows().filter((row) => {
       if (est !== 'todos' && row.estado !== est) {
         return false;
       }
@@ -52,6 +56,7 @@ export class PolizasPage {
         row.aseguradora.toLowerCase().includes(q)
       );
     });
+    return sortPolizasByExpiracionAsc(filtered);
   });
 
   readonly totalFiltered = computed(() => this.filteredRows().length);
@@ -64,6 +69,10 @@ export class PolizasPage {
   });
 
   constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.estadoFiltro.set(polizaEstadoFromQueryParam(pm.get('estado')));
+    });
+
     this.recargarPolizas();
 
     effect(() => {
@@ -87,8 +96,24 @@ export class PolizasPage {
 
   limpiarFiltros(): void {
     this.searchQuery.set('');
-    this.estadoFiltro.set('todos');
     this.pageIndex.set(0);
+    this.estadoFiltro.set('todos');
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { estado: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  onEstadoFiltroFromUser(value: PolizaEstado | 'todos'): void {
+    this.estadoFiltro.set(value);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: value === 'todos' ? { estado: null } : { estado: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   onCargarExcel(): void {

@@ -5,6 +5,14 @@
   box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
   padding: 1.1rem 1.25rem 0;
   overflow: hidden;
+
+  &--dashboard .polizas-table {
+    min-width: 720px;
+  }
+
+  &--no-paginator {
+    padding-bottom: 1.1rem;
+  }
 }
 
 .polizas-card__title {
@@ -13,6 +21,37 @@
   color: #111827;
   margin: 0 0 1rem;
   letter-spacing: -0.01em;
+}
+
+.polizas-card__title--dash {
+  margin: 0 0 0.15rem;
+}
+
+.polizas-card__dash-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+}
+
+.polizas-card__subtitle {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.polizas-card__dash-link {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c1121f;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .table-scroll {
@@ -44,7 +83,47 @@
   padding: 0.75rem 0.75rem;
   border-bottom: 1px solid #eef0f4;
   color: #1f2937;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.polizas-table tbody td:last-child {
   vertical-align: middle;
+}
+
+/* Celdas con `app-sicop-table-cell-clamp`: altura acotada + tooltip; sin forzar el mismo wrap que el resto de celdas. */
+.polizas-table tbody td.polizas-table__cell-clamp {
+  vertical-align: middle;
+  overflow: hidden;
+  max-width: 260px;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.polizas-table tbody td.polizas-table__cell-clamp--contratista {
+  max-width: 200px;
+}
+
+.polizas-table tbody td.polizas-table__cell-clamp--obra {
+  max-width: 280px;
+}
+
+.polizas-table tbody td.polizas-table__cell-clamp--aseguradora {
+  max-width: 200px;
+}
+
+.polizas-table tbody td.polizas-table__cell-clamp--ramo {
+  max-width: 220px;
+}
+
+/* Solo columna Ramo: un poco más de ancho para nombres largos (p. ej. “Cumplimiento al Manejo Ambiental”). */
+.polizas-table thead th.polizas-table__col-ramo,
+.polizas-table tbody td.polizas-table__col-ramo {
+  min-width: 7rem;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .polizas-table tbody tr:hover {
@@ -65,6 +144,52 @@
 .polizas-table__col-actions {
   text-align: center;
   width: 168px;
+}
+
+.polizas-table__actions--solo-ver {
+  justify-content: center;
+}
+
+.polizas-card--dashboard .polizas-table__col-actions {
+  width: 72px;
+}
+
+/* Mayor especificidad que `.polizas-table tbody td` (color base #1f2937) para que apliquen tonos de urgencia. */
+.polizas-table tbody td.polizas-table__dias {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  max-width: 11rem;
+  color: #4b5563;
+  font-weight: 500;
+
+  &[data-dias-urgencia='critico'] {
+    color: #9f1823;
+    font-weight: 600;
+  }
+
+  &[data-dias-urgencia='inminente'] {
+    color: #a16207;
+    font-weight: 600;
+  }
+
+  &[data-dias-urgencia='alerta'] {
+    color: #926c15;
+    font-weight: 500;
+  }
+
+  &[data-dias-urgencia='ok'] {
+    color: #3d6b40;
+    font-weight: 500;
+  }
+
+  &[data-dias-urgencia='neutral'] {
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+.polizas-card--dashboard .polizas-table tbody td.polizas-table__dias {
+  white-space: normal;
 }
 
 .polizas-table__actions {

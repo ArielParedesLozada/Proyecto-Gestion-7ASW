@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PolizaImportPreview, PolizaImportPreviewRow } from '../models/poliza-import.model';
 import { PolizaService } from '../../../services/poliza.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -48,6 +49,7 @@ function coincideFiltro(row: PolizaImportPreviewRow, filtro: FiltroCategoriaImpo
     MatTableModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatTooltipModule,
   ],
   templateUrl: './polizas-excel-import-dialog.html',
   styleUrl: './polizas-excel-import-dialog.scss',
@@ -168,6 +170,29 @@ export class PolizasExcelImportDialogComponent {
       return '';
     }
     return row.mensajes.join(' | ');
+  }
+
+  /** Una línea para celda truncada (vista previa). */
+  mensajesLineaVista(row: PolizaImportPreviewRow): string {
+    if (row.mensajes?.length) {
+      return row.mensajes.join(' · ');
+    }
+    if (this.filaEsImportable(row)) {
+      return 'Sin observaciones; lista para importar.';
+    }
+    return '—';
+  }
+
+  /** Texto completo para tooltip de la columna mensajes. */
+  mensajesLineaTooltip(row: PolizaImportPreviewRow): string {
+    const d = this.mensajesDetalle(row);
+    if (d) {
+      return d;
+    }
+    if (this.filaEsImportable(row)) {
+      return 'Sin observaciones; lista para importar.';
+    }
+    return '';
   }
 
   exportarCsvErrores(): void {

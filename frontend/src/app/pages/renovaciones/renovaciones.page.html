@@ -1,4 +1,4 @@
-<app-main-layout>
+<div class="renovaciones-page">
   <header class="polizas-header renovaciones-header">
     <div class="renovaciones-header__intro">
       <h1 class="page-title">Renovaciones</h1>
@@ -43,10 +43,6 @@
           class="detalle-estado-pill"
           [class.detalle-estado-pill--pendiente]="detalle.estado === 'pendiente'"
           [class.detalle-estado-pill--confirmada]="detalle.estado === 'confirmada'"
-          role="status"
-          [attr.aria-label]="
-            'Estado de la renovación: ' + (detalle.estado === 'pendiente' ? 'Pendiente' : 'Confirmada')
-          "
         >
           {{ detalle.estado === 'pendiente' ? 'Pendiente' : 'Confirmada' }}
         </span>
@@ -104,4 +100,4 @@
       (ver)="onVer($event)"
     />
   }
-</app-main-layout>
+</div>

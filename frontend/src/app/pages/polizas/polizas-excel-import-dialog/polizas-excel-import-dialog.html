@@ -114,76 +114,142 @@
     </p>
   }
 
-  <div class="table-wrap" role="region" aria-label="Tabla de vista previa de importación">
+  <div class="preview-table-panel" role="region" aria-label="Tabla de vista previa de importación">
     <div class="table-scroll-hint">
       <mat-icon>swap_horiz</mat-icon>
-      Desliza horizontalmente para ver todas las columnas
+      <span class="table-scroll-hint__text">
+        Hay más columnas a la derecha: desplázate horizontalmente con la barra inferior de la tabla cuando la necesites.
+      </span>
     </div>
-    <table mat-table [dataSource]="filasFiltradas()" class="preview-table">
+    <div class="table-wrap table-wrap--preview">
+      <table mat-table [dataSource]="filasFiltradas()" class="preview-table">
       <ng-container matColumnDef="excelRow">
         <th mat-header-cell *matHeaderCellDef>Fila</th>
-        <td mat-cell *matCellDef="let row">{{ row.excelRow }}</td>
+        <td mat-cell *matCellDef="let row" class="preview-col-tight">{{ row.excelRow }}</td>
       </ng-container>
       <ng-container matColumnDef="sheetName">
         <th mat-header-cell *matHeaderCellDef>Hoja</th>
-        <td mat-cell *matCellDef="let row">{{ row.sheetName }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-medium"
+          [matTooltip]="row.sheetName"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-cell-medium-text">{{ row.sheetName }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="numeroPoliza">
         <th mat-header-cell *matHeaderCellDef>Nº póliza</th>
-        <td mat-cell *matCellDef="let row" [attr.title]="row.numeroPoliza">{{ row.numeroPoliza }}</td>
+        <td mat-cell *matCellDef="let row" class="preview-col-tight">{{ row.numeroPoliza }}</td>
       </ng-container>
       <ng-container matColumnDef="contratista">
         <th mat-header-cell *matHeaderCellDef>Contratista</th>
-        <td mat-cell *matCellDef="let row" [attr.title]="row.contratista">{{ row.contratista }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-truncate"
+          [matTooltip]="row.contratista"
+          [matTooltipDisabled]="!row.contratista"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-ellipsis">{{ row.contratista }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="obra">
         <th mat-header-cell *matHeaderCellDef>Obra</th>
-        <td mat-cell *matCellDef="let row" class="cell-obra" [attr.title]="row.obra || '—'">{{ row.obra || '—' }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-truncate"
+          [matTooltip]="row.obra || ''"
+          [matTooltipDisabled]="!row.obra?.trim()"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-ellipsis">{{ row.obra || '—' }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="ramo">
         <th mat-header-cell *matHeaderCellDef>Ramo</th>
-        <td mat-cell *matCellDef="let row">{{ row.ramo }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-medium"
+          [matTooltip]="row.ramo"
+          [matTooltipDisabled]="!row.ramo"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-cell-medium-text">{{ row.ramo }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="aseguradora">
         <th mat-header-cell *matHeaderCellDef>Aseguradora</th>
-        <td mat-cell *matCellDef="let row">{{ row.aseguradora }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-truncate"
+          [matTooltip]="row.aseguradora"
+          [matTooltipDisabled]="!row.aseguradora"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-ellipsis">{{ row.aseguradora }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="fechaEmision">
         <th mat-header-cell *matHeaderCellDef>Emisión</th>
-        <td mat-cell *matCellDef="let row">{{ row.fechaEmision ?? '—' }}</td>
+        <td mat-cell *matCellDef="let row" class="preview-col-tight">{{ row.fechaEmision ?? '—' }}</td>
       </ng-container>
       <ng-container matColumnDef="fechaExpiracion">
         <th mat-header-cell *matHeaderCellDef>Vigencia hasta</th>
-        <td mat-cell *matCellDef="let row">{{ row.fechaExpiracion ?? '—' }}</td>
+        <td mat-cell *matCellDef="let row" class="preview-col-tight">{{ row.fechaExpiracion ?? '—' }}</td>
       </ng-container>
       <ng-container matColumnDef="estadoAnalisis">
         <th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let row">{{ estadoLabel(row.estadoAnalisis) }}</td>
+        <td mat-cell *matCellDef="let row" class="preview-col-tight">{{ estadoLabel(row.estadoAnalisis) }}</td>
       </ng-container>
       <ng-container matColumnDef="empresaResolucion">
         <th mat-header-cell *matHeaderCellDef>Empresa</th>
-        <td mat-cell *matCellDef="let row">{{ empresaLabel(row.empresaResolucion) }}</td>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-medium"
+          [matTooltip]="empresaLabel(row.empresaResolucion)"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span class="preview-cell-medium-text">{{ empresaLabel(row.empresaResolucion) }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="mensajes">
         <th mat-header-cell *matHeaderCellDef>Mensajes / motivo</th>
-        <td mat-cell *matCellDef="let row" class="cell-mensajes" [attr.title]="mensajesDetalle(row)">
-          @if (row.mensajes?.length) {
-            <ul class="msg-list">
-              @for (m of row.mensajes; track $index) {
-                <li>{{ m }}</li>
-              }
-            </ul>
-          } @else if (filaEsImportable(row)) {
-            <span class="msg-ok">Sin observaciones; lista para importar.</span>
-          } @else {
-            —
-          }
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="preview-col-truncate preview-col-mensajes"
+          [matTooltip]="mensajesLineaTooltip(row)"
+          [matTooltipDisabled]="!mensajesLineaTooltip(row)"
+          matTooltipShowDelay="250"
+          matTooltipClass="sicop-excel-preview-tooltip"
+        >
+          <span
+            class="preview-ellipsis"
+            [class.preview-ellipsis--ok]="filaEsImportable(row) && !row.mensajes?.length"
+            [class.preview-ellipsis--error]="!!row.mensajes?.length"
+          >
+            {{ mensajesLineaVista(row) }}
+          </span>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+    </div>
   </div>
 </mat-dialog-content>
 

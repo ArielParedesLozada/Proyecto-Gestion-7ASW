@@ -8,7 +8,7 @@ public static class PolizaEstadoDerivadoHelper
     private static readonly TimeSpan OffsetNegocioColombia = TimeSpan.FromHours(-5);
 
     /// <summary>Días hasta expiración (inclusive) para considerar "por vencer".</summary>
-    public const int DiasUmbralPorVencer = 10;
+    public const int DiasUmbralPorVencer = 3;
 
     /// <summary>Fecha civil del negocio (calendario Colombia) para un instante almacenado.</summary>
     public static DateTime FechaCalendarioNegocio(DateTimeOffset instante) =>
@@ -16,7 +16,7 @@ public static class PolizaEstadoDerivadoHelper
 
     /// <summary>
     /// Compara solo la parte fecha (UTC). Expirado si la fecha de expiración es anterior al día de hoy.
-    /// Si no expiró: por vencer si quedan 10 días o menos hasta la expiración; si no, vigente.
+    /// Si no expiró: por vencer si quedan 3 días o menos hasta la expiración; si no, vigente.
     /// </summary>
     public static EstadoPolizaDerivado Calcular(DateTimeOffset fechaExpiracionUtc, DateTimeOffset ahoraUtc)
     {

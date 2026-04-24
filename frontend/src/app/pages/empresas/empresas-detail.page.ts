@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { MatIconModule } from '@angular/material/icon';
 
 /** Vista de detalle; se completará con datos del servicio al integrar la API. */
 @Component({
   selector: 'app-empresas-detail-page',
-  imports: [MainLayout, RouterLink, MatIconModule],
+  imports: [RouterLink, MatIconModule, HeaderUserMenuComponent],
   templateUrl: './empresas-detail.page.html',
   styleUrl: './empresas-detail.page.scss',
 })

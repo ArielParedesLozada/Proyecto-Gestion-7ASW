@@ -67,6 +67,8 @@
   margin: 0;
   padding: 0.9rem 1rem;
   border-bottom: 1px solid #eef0f4;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .edit-form {
@@ -94,6 +96,13 @@
 
 ::ng-deep .edit-form .mat-mdc-form-field {
   width: 100%;
+}
+
+::ng-deep .edit-form textarea.mat-mdc-input-element,
+::ng-deep .edit-form input.mat-mdc-input-element:not([type='number']):not([readonly]) {
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 ::ng-deep .edit-form .mat-mdc-text-field-wrapper {
