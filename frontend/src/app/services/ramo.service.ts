@@ -85,6 +85,7 @@ export class RamoService {
 
   private mapPeriodicidadToTimeSpan(periodicidad: string): string {
     switch (periodicidad) {
+      case 'day': return '1.00:00:00';
       case 'week': return '7.00:00:00';
       case 'month': return '30.00:00:00';
       case 'year': return '365.00:00:00';

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace backend.Data.Migrations
 {
     [DbContext(typeof(AppDatabase))]
-    [Migration("20260423144303_RenovacionesTable")]
-    partial class RenovacionesTable
+    [Migration("20260425055448_RenovacionesMigration")]
+    partial class RenovacionesMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,6 +227,9 @@ namespace backend.Data.Migrations
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<TimeSpan>("PeriodicidadRenovacion")
+                        .HasColumnType("interval");
 
                     b.HasKey("Id");
 
