@@ -33,6 +33,7 @@ export interface PolizaDetail {
   contratistaId: string;
   ramo: string;
   ramoId: string;
+  cambiaValor: boolean;
   obra: string;
   aseguradora: string;
   fechaEmision: string;

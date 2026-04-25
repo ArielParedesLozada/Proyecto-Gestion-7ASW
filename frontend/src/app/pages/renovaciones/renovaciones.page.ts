@@ -12,6 +12,7 @@ import { RenovacionHistorialRow } from '../../interfaces/renovacion.interface';
 import { RenovacionService } from '../../services/renovacion.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RenovacionesTable } from './renovaciones-table/renovaciones-table';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-renovaciones-page',
@@ -21,8 +22,6 @@ import { RenovacionesTable } from './renovaciones-table/renovaciones-table';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    DatePipe,
-    DecimalPipe,
     FormsModule,
   ],
   templateUrl: './renovaciones.page.html',
@@ -32,6 +31,7 @@ export class RenovacionesPage {
   private readonly notify = inject(NotificationService);
   private readonly renovacionesApi = inject(RenovacionService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly historial = signal<RenovacionHistorialRow[]>([]);
   readonly selectedRenovacionId = signal<string | null>(null);
@@ -54,11 +54,6 @@ export class RenovacionesPage {
   });
 
   readonly totalFiltrado = computed(() => this.filteredHistorial().length);
-  readonly selectedRenovacion = computed(() =>
-    this.historial().find((row) => row.id === this.selectedRenovacionId()) ?? null,
-  );
-  readonly detalleEsEditable = computed(() => this.selectedRenovacion()?.estado === 'pendiente');
-
   readonly pagedHistorial = computed(() => {
     const all = this.filteredHistorial();
     const start = this.pageIndex() * this.pageSize;
@@ -101,12 +96,11 @@ export class RenovacionesPage {
   }
 
   onVer(row: RenovacionHistorialRow): void {
-    this.selectedRenovacionId.set(row.id);
+    void this.router.navigate(
+      ['/renovaciones', row.id]
+    );
   }
 
-  onVolverListado(): void {
-    this.selectedRenovacionId.set(null);
-  }
 
   confirmarRenovacionDetalle(): void {
     const selectedId = this.selectedRenovacionId();
@@ -122,9 +116,9 @@ export class RenovacionesPage {
             rows.map((row) =>
               row.id === selectedId
                 ? {
-                    ...row,
-                    estado: 'confirmada',
-                  }
+                  ...row,
+                  estado: 'confirmada',
+                }
                 : row,
             ),
           );

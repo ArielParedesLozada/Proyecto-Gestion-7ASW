@@ -18,6 +18,7 @@ import { ResetPassword } from './pages/reset-password/reset-password';
 import { UsersPage } from './pages/users/users.page';
 import { authGuard } from './shared/guards/auth-guard';
 import { mandatoryPasswordGuard } from './shared/guards/mandatory-password.guard';
+import { RenovacionDetailPage } from './pages/renovaciones/renovacion-detail/renovacion-detail.page';
 
 /**
  * Rutas públicas (sin MainLayout).
@@ -48,6 +49,7 @@ export const routes: Routes = [
       { path: 'empresas/:id', component: EmpresasDetailPage },
       { path: 'empresas', component: EmpresasPage },
       { path: 'ramos', component: RamosPage },
+      { path: 'renovaciones/:id', component: RenovacionDetailPage },
       { path: 'renovaciones', component: RenovacionesPage },
       { path: 'users', component: UsersPage },
     ],

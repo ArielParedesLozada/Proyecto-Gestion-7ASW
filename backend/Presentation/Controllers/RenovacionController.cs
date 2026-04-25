@@ -44,14 +44,12 @@ public class RenovacionController(
 
     [HttpGet("{id:guid}")]
     [Authorize(Policy = "ACCESS-GRANTED")]
-    public async Task<ActionResult<RenovacionRes>>
-        GetById(Guid id)
+    public async Task<ActionResult<RenovacionRes>> GetById(Guid id)
     {
         var renovacion = await _renovacionService.ObtenerPorIdAsync(id);
         return Ok(renovacion);
     }
 
-    // POST /renovaciones/{id}/validar
     [HttpPost("{id:guid}/validar")]
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult> Validar(Guid id, [FromBody] ValidateRenovacionRequest request
@@ -77,6 +75,15 @@ public class RenovacionController(
             renovacionId = renovacion.Id
         });
     }
+    
+    [HttpGet("poliza/{polizaId:guid}/latest")]
+    [Authorize(Policy = "ACCESS-GRANTED")]
+    public async Task<ActionResult> ObtenerUltimaPorVencer(Guid polizaId)
+    {
+        var result = await _renovacionService.ObtenerUltimaPorVencerPorPolizaAsync(polizaId);
+        return Ok(result);
+    }
+
     [HttpGet("poliza/{polizaId:guid}")]
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult> GetByPolizaId(

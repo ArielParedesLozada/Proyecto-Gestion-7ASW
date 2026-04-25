@@ -18,10 +18,14 @@ export const API_CONFIG = {
     },
     /** Rutas previstas para renovaciones; alinear con el contrato real del backend. */
     RENOVACIONES: {
-      HISTORIAL: '/renovaciones',
-      HISTORIAL_POLIZA: '/renovaciones/poliza',
-      VALIDAR: '/renovaciones/:id/validar',
-      RECHAZAR: '/renovaciones/:id/rechazar',
+      TODAS: '/renovaciones',
+      UNA: (id: string) => `/renovaciones/${encodeURIComponent(id)}`,
+      POLIZAS: {
+        HISTORIAL: (polizaId: string) => `/renovaciones/poliza/${encodeURIComponent(polizaId)}`,
+        LATEST: (polizaId: string) => `/renovaciones/poliza/${encodeURIComponent(polizaId)}/latest`
+      },
+      CONFIRMAR: (id: string) => `/renovaciones/${encodeURIComponent(id)}/validar`,
+      RECHAZAR: (id: string) => `/renovaciones/${encodeURIComponent(id)}/rechazar`,
     },
   }
 } as const;
