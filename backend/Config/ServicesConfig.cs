@@ -1,5 +1,6 @@
 using Backend.App.Auth;
 using Backend.App.Polizas;
+using Backend.App.Renovaciones;
 using Backend.Data.Repository;
 using Backend.Domain.Models;
 using Backend.Domain.Services;
@@ -29,6 +30,10 @@ public static class ServicesConfig
         services.AddScoped<PolizaService>();
         services.AddScoped<PolizaExcelImportService>();
         services.AddScoped<PolizaPdfService>();
+        services.AddScoped<CreateRenovacionService>();
+        services.AddScoped<ExpireRenovationService>();
+        services.AddScoped<RenovacionService>();
+        services.AddScoped<ValidateRenovacionService>();
         return services;
     }
 }
