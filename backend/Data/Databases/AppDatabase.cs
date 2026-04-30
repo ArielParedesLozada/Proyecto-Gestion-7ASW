@@ -9,6 +9,7 @@ public class AppDatabase : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Empresa> Empresas { get; set; }
+    public DbSet<Aseguradora> Aseguradoras { get; set; }
     public DbSet<Ramo> Ramos { get; set; }
     public DbSet<Poliza> Polizas { get; set; }
     public DbSet<Renovacion> Renovaciones { get; set; }
@@ -38,15 +39,19 @@ public class AppDatabase : DbContext
             entity.ToTable("ramos");
             entity.HasKey(r => r.Id);
             entity.HasIndex(r => r.Id);
-            entity.Property(r => r.PeriodicidadRenovacion)
-                .HasColumnType("interval");
+        });
+        modelBuilder.Entity<Aseguradora>(entity =>
+        {
+            entity.ToTable("aseguradoras");
+            entity.HasKey(a => a.Id);
+            entity.HasIndex(a => a.Id);
+            entity.HasIndex(a => a.Email).IsUnique();
         });
         modelBuilder.Entity<Empresa>(entity =>
         {
             entity.ToTable("empresas");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Id);
-            entity.HasIndex(e => e.Email).IsUnique();
         });
         modelBuilder.Entity<Poliza>(entity =>
         {
@@ -63,6 +68,12 @@ public class AppDatabase : DbContext
             entity.HasOne<Ramo>(p => p.RamoNav)
                 .WithMany()
                 .HasForeignKey(p => p.Ramo)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(p => p.PeriodicidadRenovacion)
+                .HasColumnType("interval");
+            entity.HasOne<Aseguradora>(p => p.AseguradoraNav)
+                .WithMany()
+                .HasForeignKey(p => p.AseguradoraId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
         modelBuilder.Entity<Renovacion>(entity =>

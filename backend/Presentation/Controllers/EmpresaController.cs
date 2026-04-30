@@ -43,7 +43,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<EmpresaDtoResponse>> Update(Guid id, [FromBody] EmpresaRequest request)
     {
-        var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre, request.Email);
+        var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre);
         if (empresa == null)
             return NotFound();
         return Ok(Map(empresa));
@@ -60,7 +60,6 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     private static EmpresaDtoResponse Map(Empresa e) => new()
     {
         Id = e.Id,
-        Nombre = e.Nombre,
-        Email = e.Email
+        Nombre = e.Nombre
     };
 }

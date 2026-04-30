@@ -48,9 +48,10 @@ public class PolizaController(
     public async Task<ActionResult<PagedDtoResponse<PolizaDtoResponse>>> GetPaged(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        [FromQuery] Guid? ramoId = null)
     {
-        var (items, total) = await _polizaService.ObtenerPaginadoAsync(page, pageSize, search);
+        var (items, total) = await _polizaService.ObtenerPaginadoAsync(page, pageSize, search, ramoId);
 
         return Ok(new PagedDtoResponse<PolizaDtoResponse>
         {
@@ -104,7 +105,9 @@ public class PolizaController(
         Id = p.Id,
         Numero = p.Numero,
         Obra = p.Obra,
-        Aseguradora = p.Aseguradora,
+        AseguradoraId = p.AseguradoraId,
+        AseguradoraNombre = p.AseguradoraNombre,
+        PeriodicidadRenovacion = p.PeriodicidadRenovacion,
         ContratistaId = p.ContratistaId,
         Contratista = p.ContratistaNombre,
         RamoId = p.RamoId,

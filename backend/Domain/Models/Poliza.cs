@@ -11,7 +11,9 @@ public class Poliza
     public string Obra { get; set; }
     public Guid Ramo { get; set; }
     public Ramo RamoNav { get; set; } = null!;
-    public string Aseguradora { get; set; }
+    public Guid AseguradoraId { get; set; }
+    public Aseguradora AseguradoraNav { get; set; } = null!;
+    public TimeSpan PeriodicidadRenovacion { get; set; }
     public DateTimeOffset FechaEmision { get; set; }
     public DateTimeOffset FechaExpiracion { get; set; }
     public decimal ValorOriginal { get; set; }

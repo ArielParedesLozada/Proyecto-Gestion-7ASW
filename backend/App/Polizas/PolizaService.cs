@@ -18,7 +18,7 @@ public class PolizaService(AppDatabase context)
         var emisionUtc = AUtc(request.FechaEmision);
         var expiracionUtc = AUtc(request.FechaExpiracion);
         PolizaFechaValidacion.ValidarEmisionYExpiracion(emisionUtc, expiracionUtc);
-        await ValidarFkAsync(request.Contratista, request.Ramo);
+        await ValidarFkAsync(request.Contratista, request.Ramo, request.AseguradoraId);
 
         var valorActual = request.ValorActual > 0 ? request.ValorActual : request.ValorOriginal;
 
@@ -29,7 +29,8 @@ public class PolizaService(AppDatabase context)
             Contratista = request.Contratista,
             Obra = request.Obra.Trim(),
             Ramo = request.Ramo,
-            Aseguradora = request.Aseguradora.Trim(),
+            AseguradoraId = request.AseguradoraId,
+            PeriodicidadRenovacion = expiracionUtc - emisionUtc,
             FechaEmision = emisionUtc,
             FechaExpiracion = expiracionUtc,
             ValorOriginal = request.ValorOriginal,
@@ -58,7 +59,8 @@ public class PolizaService(AppDatabase context)
     public async Task<(IEnumerable<PolizaRes>, int)> ObtenerPaginadoAsync(
         int page,
         int pageSize,
-        string? search)
+        string? search,
+        Guid? ramoId = null)
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
@@ -71,9 +73,15 @@ public class PolizaService(AppDatabase context)
             query = query.Where(p =>
                 p.Numero.Contains(s) ||
                 p.Obra.Contains(s) ||
-                p.Aseguradora.Contains(s) ||
+                p.AseguradoraNav.Nombre.Contains(s) ||
                 p.ContratistaNav.Nombre.Contains(s) ||
                 p.RamoNav.Nombre.Contains(s));
+        }
+
+        // Filtro por ramo (punto 9 de especificaciones)
+        if (ramoId.HasValue && ramoId.Value != Guid.Empty)
+        {
+            query = query.Where(p => p.Ramo == ramoId.Value);
         }
 
         var total = await query.CountAsync();
@@ -87,7 +95,9 @@ public class PolizaService(AppDatabase context)
                 Id = p.Id,
                 Numero = p.Numero,
                 Obra = p.Obra,
-                Aseguradora = p.Aseguradora,
+                AseguradoraId = p.AseguradoraId,
+                AseguradoraNombre = p.AseguradoraNav.Nombre,
+                PeriodicidadRenovacion = p.PeriodicidadRenovacion,
                 ContratistaId = p.Contratista,
                 ContratistaNombre = p.ContratistaNav.Nombre,
                 RamoId = p.Ramo,
@@ -115,7 +125,9 @@ public class PolizaService(AppDatabase context)
         var emisionUtc = AUtc(request.FechaEmision);
         var expiracionUtc = AUtc(request.FechaExpiracion);
         PolizaFechaValidacion.ValidarEmisionYExpiracion(emisionUtc, expiracionUtc);
-        await ValidarFkAsync(request.Contratista, request.Ramo);
+
+        // CORREGIDO: Usar AseguradoraId en lugar de Aseguradora (string)
+        await ValidarFkAsync(request.Contratista, request.Ramo, request.AseguradoraId);
 
         var entity = await _context.Polizas.FirstOrDefaultAsync(p => p.Id == id);
         if (entity == null)
@@ -124,7 +136,8 @@ public class PolizaService(AppDatabase context)
         entity.Contratista = request.Contratista;
         entity.Obra = request.Obra.Trim();
         entity.Ramo = request.Ramo;
-        entity.Aseguradora = request.Aseguradora.Trim();
+        entity.AseguradoraId = request.AseguradoraId; // CORREGIDO
+        entity.PeriodicidadRenovacion = expiracionUtc - emisionUtc;
         entity.FechaEmision = emisionUtc;
         entity.FechaExpiracion = expiracionUtc;
         entity.ValorOriginal = request.ValorOriginal;
@@ -155,7 +168,9 @@ public class PolizaService(AppDatabase context)
                 Id = p.Id,
                 Numero = p.Numero,
                 Obra = p.Obra,
-                Aseguradora = p.Aseguradora,
+                AseguradoraId = p.AseguradoraId,
+                AseguradoraNombre = p.AseguradoraNav.Nombre,
+                PeriodicidadRenovacion = p.PeriodicidadRenovacion,
                 ContratistaId = p.Contratista,
                 ContratistaNombre = p.ContratistaNav.Nombre,
                 RamoId = p.Ramo,
@@ -177,9 +192,6 @@ public class PolizaService(AppDatabase context)
         return row;
     }
 
-    /// <summary>
-    /// Npgsql solo escribe <c>timestamptz</c> con <see cref="DateTimeOffset"/> en offset UTC (0).
-    /// </summary>
     private static DateTimeOffset AUtc(DateTimeOffset dto) => dto.ToUniversalTime();
 
     private static string? NormalizeObservaciones(string? observaciones)
@@ -189,17 +201,16 @@ public class PolizaService(AppDatabase context)
         return observaciones.Trim();
     }
 
-    private async Task ValidarFkAsync(Guid empresaId, Guid ramoId)
+    private async Task ValidarFkAsync(Guid empresaId, Guid ramoId, Guid aseguradoraId)
     {
         if (!await _context.Empresas.AnyAsync(e => e.Id == empresaId))
             throw new CustomError("El contratista indicado no existe.", 400);
         if (!await _context.Ramos.AnyAsync(r => r.Id == ramoId))
             throw new CustomError("El ramo indicado no existe.", 400);
+        if (!await _context.Aseguradoras.AnyAsync(a => a.Id == aseguradoraId))
+            throw new CustomError("La aseguradora indicada no existe.", 400);
     }
 
-    /// <summary>
-    /// Npgsql puede anidar PostgresException; no basta con comprobar solo InnerException directo.
-    /// </summary>
     private static void ThrowIfPolizaSaveFailed(DbUpdateException ex)
     {
         var pg = FindPostgresException(ex);

@@ -31,7 +31,7 @@ public class ValidateRenovacionService(AppDatabase context)
         }
         renovacion.Estado = EstadoRenovacion.Vigente;
         poliza.Estado = EstadoPoliza.Vigente;
-        poliza.FechaExpiracion = poliza.FechaExpiracion.Add(ramo.PeriodicidadRenovacion);
+        poliza.FechaExpiracion = poliza.FechaExpiracion.Add(poliza.PeriodicidadRenovacion);
         await _context.SaveChangesAsync();
         return renovacion;
     }

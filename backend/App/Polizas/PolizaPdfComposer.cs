@@ -156,7 +156,7 @@ public static class PolizaPdfComposer
             ("Contratista", poliza.ContratistaNombre),
             ("Obra / proyecto", poliza.Obra),
             ("Ramo", poliza.RamoNombre),
-            ("Aseguradora", poliza.Aseguradora),
+            ("Aseguradora", poliza.AseguradoraNombre), // Aqui hay un error: 'PolizaRes' does not contain a definition for 'Aseguradora' and no accessible extension method 'Aseguradora' accepting a first argument of type 'PolizaRes' could be found (are you missing a using directive or an assembly reference?)
             ("Fecha de emisión", FechaCivil(poliza.FechaEmision)),
             ("Fecha de expiración", FechaCivil(poliza.FechaExpiracion)),
             ("Estado", EstadoTexto(poliza.Estado)),

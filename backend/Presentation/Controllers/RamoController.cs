@@ -43,8 +43,7 @@ public class RamoController : ControllerBase
         var ramo = await _ramoService.CreateRamo(
             request.Nombre,
             request.CambiaValor,
-            request.Descripcion,
-            request.PeriodicidadRenovacion
+            request.Descripcion
         );
 
         return Ok(Map(ramo));
@@ -58,8 +57,7 @@ public class RamoController : ControllerBase
             id,
             request.Nombre,
             request.CambiaValor,
-            request.Descripcion,
-            request.PeriodicidadRenovacion
+            request.Descripcion
         );
 
         if (ramo == null)
@@ -81,6 +79,5 @@ public class RamoController : ControllerBase
         Nombre = r.Nombre,
         CambiaValor = r.CambiaValor,
         Descripcion = r.Descripcion,
-        Periodicidad = r.PeriodicidadRenovacion
     };
 }
