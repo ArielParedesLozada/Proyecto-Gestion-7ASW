@@ -322,7 +322,8 @@ export class PolizaService {
       numero: d.numero,
       contratista: d.contratista,           // ← nombre del contratista
       obra: d.obra,
-      ramo: d.ramo,                         // ← nombre del ramo
+      ramo: d.ramo,
+      ramoId: d.ramoId,                    // ← nombre del ramo
       aseguradora: d.aseguradoraNombre,     // ← CORREGIDO: usar aseguradoraNombre
       fechaExpiracion: d.fechaExpiracion,
       valor: d.valorActual,

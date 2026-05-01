@@ -69,8 +69,8 @@ export class PolizasNuevaPage {
   private readonly aseguradoraService = inject(AseguradoraService); // NUEVO
   private readonly notify = inject(NotificationService);
 
-  readonly empresas = toSignal(this.empresaService.getList(), { initialValue: [] });
-  readonly aseguradoras = toSignal(this.aseguradoraService.getList(), { initialValue: [] }); // NUEVO
+  readonly empresas = toSignal(this.empresaService.getListSimple(), { initialValue: [] }); /// ERROR AQUI 
+  readonly aseguradoras = toSignal(this.aseguradoraService.getListSimple(), { initialValue: [] }); /// ERROR AQUI 
   readonly ramos = toSignal(this.ramoService.getList(), { initialValue: [] });
 
   readonly saving = signal(false);

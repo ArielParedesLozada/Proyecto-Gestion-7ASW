@@ -15,8 +15,11 @@
   <app-polizas-toolbar
     [searchQuery]="searchQuery()"
     [estadoFiltro]="estadoFiltro()"
+    [ramoFiltro]="ramoFiltro()"
+    [ramos]="ramos()"
     (searchQueryChange)="searchQuery.set($event)"
     (estadoFiltroChange)="onEstadoFiltroFromUser($event)"
+    (ramoFiltroChange)="ramoFiltro.set($event)"
     (cargarExcel)="onCargarExcel()"
     (nuevaPoliza)="onNuevaPoliza()"
     (limpiarFiltros)="limpiarFiltros()"

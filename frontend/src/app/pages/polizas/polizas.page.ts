@@ -1,5 +1,5 @@
 import { Component, computed, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -13,6 +13,7 @@ import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog/polizas-excel-import-dialog';
 import { polizaEstadoFromQueryParam } from './utils/poliza-estado-query.util';
+import { RamoService } from '../../services/ramo.service';
 
 @Component({
   selector: 'app-polizas-page',
@@ -25,29 +26,39 @@ export class PolizasPage {
   private readonly route = inject(ActivatedRoute);
   private readonly polizaService = inject(PolizaService);
   private readonly notify = inject(NotificationService);
+  private readonly ramoService = inject(RamoService);
   private readonly dialog = inject(MatDialog);
-
+  
   private readonly excelFileInput = viewChild<ElementRef<HTMLInputElement>>('excelFileInput');
-
+  
   private readonly allRows = signal<PolizaListRow[]>([]);
-
+  
   /** Tamaño de página fijo (local; luego se puede alinear con el backend). */
   readonly pageSize = 10;
-
+  
+  readonly ramos = toSignal(this.ramoService.getList(), { initialValue: [] });
   readonly searchQuery = signal('');
   readonly estadoFiltro = signal<PolizaEstado | 'todos'>('todos');
+  readonly ramoFiltro = signal<string | 'todos'>('todos');
   readonly pageIndex = signal(0);
 
   readonly filteredRows = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     const est = this.estadoFiltro();
+    const ramo = this.ramoFiltro()
     const filtered = this.allRows().filter((row) => {
       if (est !== 'todos' && row.estado !== est) {
         return false;
       }
+
+      if (ramo !== 'todos' && row.ramoId !== ramo) {
+        return false;
+      }
+
       if (!q) {
         return true;
       }
+
       return (
         row.numero.toLowerCase().includes(q) ||
         row.contratista.toLowerCase().includes(q) ||
@@ -78,6 +89,7 @@ export class PolizasPage {
     effect(() => {
       this.searchQuery();
       this.estadoFiltro();
+      this.ramoFiltro();
       untracked(() => this.pageIndex.set(0));
     });
 
@@ -98,6 +110,7 @@ export class PolizasPage {
     this.searchQuery.set('');
     this.pageIndex.set(0);
     this.estadoFiltro.set('todos');
+    this.ramoFiltro.set('todos')
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { estado: null },

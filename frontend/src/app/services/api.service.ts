@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { API_CONFIG } from '../shared/constants/api.constants';
 
@@ -11,6 +11,19 @@ export class ApiService {
 
   get<T>(endpoint: string) {
     return this.http.get<T>(`${this.baseUrl}${endpoint}`);
+  }
+
+  getWithParams<T>(endpoint: string, options?: { params?: Record<string, any> }) {
+    let params = new HttpParams()
+    if (options?.params) {
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          params = params.set(key, value)
+        }
+      })
+    }
+
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params })
   }
 
   /** Descarga binaria (p. ej. PDF). */

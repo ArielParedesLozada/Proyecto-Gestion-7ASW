@@ -1,9 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { EmpresasDetailPage } from './pages/empresas/empresas-detail.page';
-import { EmpresasEditPage } from './pages/empresas/empresas-edit.page';
-import { EmpresasNuevaPage } from './pages/empresas/empresas-nueva.page';
 import { EmpresasPage } from './pages/empresas/empresas.page';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { LoginComponent } from './pages/login/login.component';
@@ -19,6 +16,7 @@ import { UsersPage } from './pages/users/users.page';
 import { authGuard } from './shared/guards/auth-guard';
 import { mandatoryPasswordGuard } from './shared/guards/mandatory-password.guard';
 import { RenovacionDetailPage } from './pages/renovaciones/renovacion-detail/renovacion-detail.page';
+import { AseguradorasPage } from './pages/aseguradoras/aseguradoras.page';
 
 /**
  * Rutas públicas (sin MainLayout).
@@ -44,10 +42,8 @@ export const routes: Routes = [
       { path: 'polizas/:id/editar', component: PolizasEditPage },
       { path: 'polizas/:id', component: PolizasDetailPage },
       { path: 'polizas', component: PolizasPage },
-      { path: 'empresas/nueva', component: EmpresasNuevaPage },
-      { path: 'empresas/:id/editar', component: EmpresasEditPage },
-      { path: 'empresas/:id', component: EmpresasDetailPage },
       { path: 'empresas', component: EmpresasPage },
+      { path: 'aseguradoras', component: AseguradorasPage },
       { path: 'ramos', component: RamosPage },
       { path: 'renovaciones/:id', component: RenovacionDetailPage },
       { path: 'renovaciones', component: RenovacionesPage },

@@ -41,7 +41,6 @@ export class RamosPage {
     nombre: ['', [Validators.required, Validators.maxLength(RAMO_MAX.nombre)]],
     descripcion: ['', [Validators.required, Validators.maxLength(RAMO_MAX.descripcion)]],
     cambioValor: [false as boolean],
-    periodicidad: ['month', Validators.required],
   });
 
   readonly ramoMax = RAMO_MAX;
