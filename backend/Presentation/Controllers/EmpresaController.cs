@@ -15,10 +15,22 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
 
     [HttpGet]
     [Authorize(Policy = "ACCESS-GRANTED")]
-    public async Task<ActionResult<IEnumerable<EmpresaDtoResponse>>> GetAll()
+    public async Task<ActionResult<PagedResponse<EmpresaDtoResponse>>> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
     {
-        var empresas = await _empresaService.GetAllEmpresas();
-        return Ok(empresas.Select(Map));
+        var result = await _empresaService.GetAllEmpresas(page, pageSize, search);
+
+        var response = new PagedResponse<EmpresaDtoResponse>
+        {
+            Items = result.Items.Select(Map),
+            Total = result.Total,
+            Page = result.Page,
+            PageSize = result.PageSize
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("{id}")]

@@ -1,12 +1,16 @@
+using Backend.App.Dtos;
+using Backend.Data.Databases;
 using Backend.Data.Repository;
 using Backend.Domain.Errors;
 using Backend.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.App.Polizas;
 
-public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo)
+public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo, AppDatabase database)
 {
     private readonly IRepository<Aseguradora, Guid> _aseguradoraRepo = aseguradoraRepo;
+    private readonly AppDatabase _database = database;
 
     private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
 
@@ -34,10 +38,35 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo)
         return await _aseguradoraRepo.CreateAsync(aseguradora);
     }
 
-    public async Task<IEnumerable<Aseguradora>> GetAllAseguradoras()
+    public async Task<PagedResult<Aseguradora>> GetAllAseguradoras(int page = 1, int pageSize = 10, string? nameOrEmail = "")
     {
-        var items = await _aseguradoraRepo.GetAllAsync();
-        return items.OrderBy(e => e.Nombre);
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+        var query = _database.Aseguradoras.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(nameOrEmail))
+        {
+            query = query.Where(e =>
+                e.Nombre.ToLower().Contains(nameOrEmail) ||
+                e.Email.ToLower().Contains(nameOrEmail)
+            );
+        }
+
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(e => e.Nombre)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<Aseguradora>
+        {
+            Items = items,
+            Total = total,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<Aseguradora?> GetAseguradoraById(Guid id)

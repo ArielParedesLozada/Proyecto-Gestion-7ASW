@@ -15,10 +15,22 @@ public class AseguradoraController(AseguradorasService aseguradoraService) : Con
 
     [HttpGet]
     [Authorize(Policy = "ACCESS-GRANTED")]
-    public async Task<ActionResult<IEnumerable<AseguradoraDtoResponse>>> GetAll()
+    public async Task<ActionResult<PagedResponse<AseguradoraDtoResponse>>> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
     {
-        var aseguradoras = await _aseguradoraService.GetAllAseguradoras();
-        return Ok(aseguradoras.Select(Map));
+        var result = await _aseguradoraService.GetAllAseguradoras(page, pageSize, search);
+
+        var response = new PagedResponse<AseguradoraDtoResponse>
+        {
+            Items = result.Items.Select(Map),
+            Total = result.Total,
+            Page = result.Page,
+            PageSize = result.PageSize
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("{id}")]

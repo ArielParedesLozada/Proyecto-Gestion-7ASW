@@ -1,12 +1,17 @@
+using Backend.App.Dtos;
+using Backend.Data.Databases;
 using Backend.Data.Repository;
 using Backend.Domain.Errors;
 using Backend.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.App.Polizas;
 
-public class EmpresasService(IRepository<Empresa, Guid> empresaRepo)
+public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase database)
 {
     private readonly IRepository<Empresa, Guid> _empresaRepo = empresaRepo;
+    private readonly AppDatabase _database = database;
 
     public async Task<Empresa> CreateEmpresa(string nombre, string? email)
     {
@@ -24,10 +29,34 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo)
         return await _empresaRepo.CreateAsync(empresa);
     }
 
-    public async Task<IEnumerable<Empresa>> GetAllEmpresas()
+    public async Task<PagedResult<Empresa>> GetAllEmpresas(int page = 1, int pageSize = 10, string? nameOrEmail = "")
     {
-        var items = await _empresaRepo.GetAllAsync();
-        return items.OrderBy(e => e.Nombre);
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+        var query = _database.Empresas.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(nameOrEmail))
+        {
+            query = query.Where(e =>
+                e.Nombre.ToLower().Contains(nameOrEmail) ||
+                e.Email.ToLower().Contains(nameOrEmail)
+            );
+        }
+
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(e => e.Nombre)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return new PagedResult<Empresa>
+        {
+            Items = items,
+            Total = total,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<Empresa?> GetEmpresaById(Guid id)
