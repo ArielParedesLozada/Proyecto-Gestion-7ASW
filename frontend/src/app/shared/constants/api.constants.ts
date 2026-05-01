@@ -10,6 +10,10 @@ export const API_CONFIG = {
       FORGOT_PASSWORD: '/auth/request-password-reset',
       RESET_PASSWORD: '/auth/reset-password'
     },
+    ASEGURADORAS: {
+      INDEX: '/aseguradoras',
+      UNA: (id: string) => `/aseguradoras/${encodeURIComponent(id)}`
+    },
     POLIZAS: {
       EMPRESAS: '/empresas',
       RAMOS: '/ramos',

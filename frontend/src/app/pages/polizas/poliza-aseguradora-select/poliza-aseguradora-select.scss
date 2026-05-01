@@ -1,0 +1,57 @@
+/* Campo: mismo criterio que los demás `mat-form-field` outline del módulo pólizas. */
+.sicop-poliza-aseguradora-field {
+  width: 100%;
+}
+
+/* Panel del desplegable (overlay en body): clase vía `panelClass` del `mat-select`. */
+.sicop-poliza-aseguradora-panel.mat-mdc-select-panel {
+  padding-top: 0;
+  min-width: min(100vw - 32px, 320px) !important;
+}
+
+.sicop-poliza-aseguradora-panel__search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 12px 8px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sicop-poliza-aseguradora-panel__input {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: #1a1a2e;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #c1121f;
+    box-shadow: 0 0 0 2px rgba(193, 18, 31, 0.12);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: #f9fafb;
+  }
+}
+
+.sicop-poliza-aseguradora-panel__empty.mdc-list-item--disabled {
+  justify-content: center;
+  font-size: 0.88rem;
+  color: #6b7280;
+  font-style: italic;
+}

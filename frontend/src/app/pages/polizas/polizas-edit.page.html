@@ -1,165 +1,139 @@
-<div class="poliza-edit">
-    <button type="button" class="back-link" (click)="onVolver()">
-      <mat-icon>arrow_back</mat-icon>
-      Volver a pólizas
-    </button>
+<div class="polizas-nueva poliza-edit">
+  <a routerLink="/polizas" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Volver a pólizas
+  </a>
 
-    @if (poliza(); as p) {
-      <header class="polizas-header">
-        <div>
-          <h1 class="page-title">Editar Póliza {{ p.numero }}</h1>
-          <p class="page-subtitle">Vence: {{ p.fechaExpiracion | date: 'dd/MM/yyyy' }}</p>
+  @if (poliza(); as p) {
+  <header class="polizas-header">
+    <div>
+      <h1 class="page-title">Editar Póliza {{ p.numero }}</h1>
+      <p class="page-subtitle">Vence: {{ p.fechaExpiracion | date: 'dd/MM/yyyy' }}</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot"></span>
+      </button>
+      <app-header-user-menu />
+    </div>
+  </header>
+
+  <!-- 🔥 MISMA CLASE QUE NUEVA -->
+  <form [formGroup]="form" (ngSubmit)="onGuardar()" class="polizas-nueva-form" novalidate>
+    <div class="form-card">
+      <h2 class="form-card__title">Información de la Póliza</h2>
+
+      <div class="form-grid">
+
+        <!-- Fila 1 -->
+        <div class="form-row form-row--2">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Número de Póliza</mat-label>
+            <input matInput formControlName="numero" readonly />
+          </mat-form-field>
+
+          <app-poliza-contratista-select formControlName="contratista" [empresas]="empresas()"
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione empresa contratista" />
         </div>
-        <div class="polizas-header__tools"></div>
-      </header>
 
-      <section class="detail-card">
-        <h2 class="detail-card__title">Información General</h2>
-        <form [formGroup]="form" class="edit-form" novalidate>
-          <div class="form-grid">
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Número de Póliza</mat-label>
-              <input matInput formControlName="numero" readonly />
-            </mat-form-field>
+        <!-- Fila 2 -->
+        <div class="form-row form-row--1">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Obra</mat-label>
+            <input matInput formControlName="obra" [maxlength]="polizaMax.obra" />
+            <mat-hint align="end">
+              {{ form.controls.obra.value?.length ?? 0 }} / {{ polizaMax.obra }}
+            </mat-hint>
+          </mat-form-field>
+        </div>
 
-            <app-poliza-contratista-select
-              formControlName="contratista"
-              [empresas]="empresas()"
-              selectPlaceholder="Seleccione empresa"
-            />
-
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="field-wide">
-              <mat-label>Obra</mat-label>
-              <input
-                matInput
-                formControlName="obra"
-                placeholder="Descripción de la obra"
-                [maxlength]="polizaMax.obra"
-                autocomplete="off"
-              />
-              <mat-hint align="end">{{ form.controls.obra.value?.length ?? 0 }} / {{ polizaMax.obra }}</mat-hint>
-              @if (form.controls.obra.hasError('required') && form.controls.obra.touched) {
-                <mat-error>La obra es obligatoria.</mat-error>
-              } @else if (form.controls.obra.hasError('maxlength') && form.controls.obra.touched) {
-                <mat-error>La obra no puede superar los {{ polizaMax.obra }} caracteres.</mat-error>
+        <!-- Fila 3 -->
+        <div class="form-row form-row--2">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Ramo</mat-label>
+            <mat-select formControlName="ramo">
+              <mat-option value="" disabled>Seleccione un ramo</mat-option>
+              @for (r of ramos(); track r.id) {
+              <mat-option [value]="r.id">{{ r.nombre }}</mat-option>
               }
-            </mat-form-field>
+            </mat-select>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Ramo</mat-label>
-              <mat-select formControlName="ramo" placeholder="Seleccione un ramo">
-                @for (r of ramos(); track r.id) {
-                  <mat-option [value]="r.id">{{ r.nombre }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+          <app-poliza-aseguradora-select formControlName="aseguradoraId" [aseguradoras]="aseguradoras()"
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione aseguradora" />
+        </div>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Aseguradora *</mat-label>
-              <input
-                matInput
-                formControlName="aseguradora"
-                placeholder="Nombre de la aseguradora"
-                [maxlength]="polizaMax.aseguradora"
-                autocomplete="off"
-              />
-              <mat-hint align="end">{{ form.controls.aseguradora.value?.length ?? 0 }} / {{ polizaMax.aseguradora }}</mat-hint>
-              @if (form.controls.aseguradora.hasError('required') && form.controls.aseguradora.touched) {
-                <mat-error>La aseguradora es obligatoria.</mat-error>
-              } @else if (form.controls.aseguradora.hasError('maxlength') && form.controls.aseguradora.touched) {
-                <mat-error>La aseguradora no puede superar los {{ polizaMax.aseguradora }} caracteres.</mat-error>
-              }
-            </mat-form-field>
+        <!-- Fila 4 -->
+        <div class="form-row form-row--2">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Fecha de Emisión</mat-label>
+            <input matInput [matDatepicker]="pickerEmision" formControlName="fechaEmision" />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerEmision"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEmision></mat-datepicker>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Fecha de Emisión</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerEmision"
-                [max]="maxFechaEmision"
-                [matDatepickerFilter]="emisionDateFilter"
-                formControlName="fechaEmision"
-                placeholder="dd/mm/aaaa"
-              />
-              <mat-datepicker-toggle matIconSuffix [for]="pickerEmision"></mat-datepicker-toggle>
-              <mat-datepicker #pickerEmision></mat-datepicker>
-              @if (form.controls.fechaEmision.hasError('required') && form.controls.fechaEmision.touched) {
-                <mat-error>La fecha de emisión es obligatoria.</mat-error>
-              }
-              @if (form.controls.fechaEmision.hasError('emisionFutura')) {
-                <mat-error>La fecha de emisión no puede ser posterior a la fecha actual.</mat-error>
-              }
-            </mat-form-field>
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Fecha de Expiración</mat-label>
+            <input matInput [matDatepicker]="pickerExp" formControlName="fechaExpiracion" />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerExp"></mat-datepicker-toggle>
+            <mat-datepicker #pickerExp></mat-datepicker>
+          </mat-form-field>
+        </div>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Fecha de Expiración</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerExp"
-                formControlName="fechaExpiracion"
-                readonly
-                placeholder="dd/mm/aaaa"
-                (keydown)="$event.preventDefault()"
-              />
-              <mat-datepicker #pickerExp></mat-datepicker>
-            </mat-form-field>
+        <!-- Fila 5 -->
+        <div class="form-row form-row--2">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Valor Original (USD)</mat-label>
+            <input matInput type="number" formControlName="valorOriginal" />
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Valor Original</mat-label>
-              <input matInput type="number" formControlName="valorOriginal" />
-            </mat-form-field>
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Valor Actual (USD)</mat-label>
+            <input readonly matInput type="number" formControlName="valorActual" />
+          </mat-form-field>
+        </div>
 
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-              <mat-label>Valor Actual</mat-label>
-              <input
-                readonly
-                matInput
-                type="number"
-                formControlName="valorActual"
-                step="0.01"
-                min="0"
-              />
-            </mat-form-field>
-
-            <div class="field-half form-field-estado-lectura">
-              <span class="form-field-estado-lectura__label">Estado</span>
-              <app-poliza-status-badge [estado]="estadoVistaPrevia()" />
-              <p class="form-field-estado-lectura__hint">Calculado según la fecha de expiración (servidor al guardar).</p>
-            </div>
-
-            <div class="field-spacer" aria-hidden="true"></div>
-
-            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="field-full">
-              <mat-label>Observaciones</mat-label>
-              <textarea
-                matInput
-                formControlName="observaciones"
-                rows="4"
-                [maxlength]="polizaMax.observaciones"
-              ></textarea>
-              <mat-hint align="end">{{ form.controls.observaciones.value?.length ?? 0 }} / {{ polizaMax.observaciones }}</mat-hint>
-              @if (form.controls.observaciones.hasError('maxlength') && form.controls.observaciones.touched) {
-                <mat-error>Las observaciones no pueden superar los {{ polizaMax.observaciones }} caracteres.</mat-error>
-              }
-            </mat-form-field>
+        <!-- Fila 6 -->
+        <div class="form-row form-row--estado">
+          <div class="form-field-estado-lectura">
+            <span class="form-field-estado-lectura__label">Estado</span>
+            <app-poliza-status-badge [estado]="estadoVistaPrevia()" />
+            <p class="form-field-estado-lectura__hint">
+              Se calcula según la fecha de expiración.
+            </p>
           </div>
+          <div class="form-row__spacer"></div>
+        </div>
 
-          <div class="form-actions">
-            <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelar()">Cancelar</button>
-            <button type="button" mat-flat-button class="btn-guardar" (click)="onGuardar()">
-              <mat-icon>save</mat-icon>
-              Guardar cambios
-            </button>
-          </div>
-        </form>
-      </section>
-    } @else {
-      <section class="detail-card detail-card--empty">
-        <h2 class="detail-card__title">Póliza no encontrada</h2>
-        <p class="empty-text">No se encontró la póliza o no tienes permisos para verla.</p>
-        <button type="button" mat-flat-button class="header-btn header-btn--primary" (click)="onVolver()">
-          Volver al listado
+        <!-- Fila 7 -->
+        <div class="form-row form-row--1">
+          <mat-form-field appearance="outline" floatLabel="always">
+            <mat-label>Observaciones</mat-label>
+            <textarea matInput formControlName="observaciones" rows="4"></textarea>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelar()">
+          Cancelar
         </button>
-      </section>
-    }
-  </div>
+
+        <!-- 🔥 MISMO ESTILO -->
+        <button type="submit" mat-flat-button class="btn-registrar" [disabled]="saving()">
+          <mat-icon>save</mat-icon>
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  </form>
+
+  } @else {
+  <section class="detail-card detail-card--empty">
+    <h2 class="detail-card__title">Póliza no encontrada</h2>
+    <p class="empty-text">No se encontró la póliza.</p>
+  </section>
+  }
+</div>

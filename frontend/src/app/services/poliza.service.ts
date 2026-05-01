@@ -12,7 +12,7 @@ import { PolizaImportPreview, PolizaImportResult } from '../pages/polizas/models
 const PAGE_SIZE = 100;
 
 /**
- * Única conversión del campo `estado` del DTO (siempre calculado en backend).
+ * Conversión del campo `estado` del DTO (siempre calculado en backend).
  * API: 0=Vigente, 1=Por vencer, 2=Expirado.
  */
 function mapApiEstadoToUi(apiEstado: number): PolizaEstado {
@@ -115,15 +115,18 @@ function mapImportResult(api: PolizaImportResultApi): PolizaImportResult {
   };
 }
 
+// CORREGIDO: DTO actualizado con los campos reales del backend
 interface PolizaApiDto {
   id: string;
   numero: string;
   obra: string;
-  aseguradora: string;
-  contratistaId: string;
-  contratista: string;
-  ramoId: string;
-  ramo: string;
+  aseguradoraId: string;           // ← CORREGIDO: ahora es Guid
+  aseguradoraNombre: string;       // ← CORREGIDO: nombre separado
+  periodicidadRenovacion: string;  // ← NUEVO campo
+  contratistaId: string;           // ← CORREGIDO: ahora es Guid
+  contratista: string;             // ← nombre del contratista
+  ramoId: string;                  // ← CORREGIDO: ahora es Guid
+  ramo: string;                    // ← nombre del ramo
   ramoCambiaValor: boolean;
   valorOriginal: number;
   valorActual: number;
@@ -133,12 +136,13 @@ interface PolizaApiDto {
   estado: number;
 }
 
+// CORREGIDO: Payload para crear póliza (usa Guids)
 export interface PolizaRegistrarPayload {
   numero: string;
-  contratista: string;
+  contratista: string;        // ← AHORA ES GUID (string en TypeScript)
   obra: string;
-  ramo: string;
-  aseguradora: string;
+  ramo: string;              // ← AHORA ES GUID
+  aseguradoraId: string;     // ← AHORA ES GUID (cambió de aseguradora a aseguradoraId)
   fechaEmision: Date | null;
   fechaExpiracion: Date | null;
   valorOriginal: string | number;
@@ -146,11 +150,12 @@ export interface PolizaRegistrarPayload {
   observaciones?: string;
 }
 
+// CORREGIDO: Payload para actualizar póliza (usa Guids)
 export interface PolizaActualizarPayload {
-  contratista: string;
+  contratista: string;        // ← AHORA ES GUID
   obra: string;
-  ramo: string;
-  aseguradora: string;
+  ramo: string;              // ← AHORA ES GUID
+  aseguradoraId: string;     // ← AHORA ES GUID
   fechaEmision: Date | null;
   fechaExpiracion: Date | null;
   valorOriginal: number;
@@ -194,6 +199,7 @@ export class PolizaService {
     );
   }
 
+  // CORREGIDO: registrar con los nuevos campos
   registrar(payload: PolizaRegistrarPayload): Observable<PolizaApiDto> {
     const vo = Number(payload.valorOriginal);
     const va = Number(payload.valorActual);
@@ -202,10 +208,10 @@ export class PolizaService {
     }
     const body = {
       numero: payload.numero.trim(),
-      contratista: payload.contratista,
+      contratista: payload.contratista,      // ← GUID
       obra: payload.obra.trim(),
-      ramo: payload.ramo,
-      aseguradora: payload.aseguradora.trim(),
+      ramo: payload.ramo,                    // ← GUID
+      aseguradoraId: payload.aseguradoraId,  // ← CORREGIDO: ahora es aseguradoraId
       fechaEmision: dateToBackendOffset(payload.fechaEmision),
       fechaExpiracion: dateToBackendOffset(payload.fechaExpiracion),
       valorOriginal: vo,
@@ -235,10 +241,6 @@ export class PolizaService {
       );
   }
 
-  /**
-   * Descarga el PDF individual de la póliza (`GET /polizas/{id}/pdf`).
-   * @param numeroPoliza Solo para el nombre del archivo local.
-   */
   downloadPdfPoliza(id: string, numeroPoliza: string): Observable<void> {
     const safeNumero = (numeroPoliza || 'poliza').replace(/[^\w.\-]/g, '_');
     const fileName = `Poliza-${safeNumero}.pdf`;
@@ -256,15 +258,16 @@ export class PolizaService {
     );
   }
 
+  // CORREGIDO: actualizar con los nuevos campos
   actualizar(id: string, payload: PolizaActualizarPayload): Observable<PolizaApiDto> {
     if (!payload.fechaEmision || !payload.fechaExpiracion) {
       return throwError(() => new Error('Las fechas son obligatorias.'));
     }
     const body = {
-      contratista: payload.contratista,
+      contratista: payload.contratista,      // ← GUID
       obra: payload.obra.trim(),
-      ramo: payload.ramo,
-      aseguradora: payload.aseguradora.trim(),
+      ramo: payload.ramo,                    // ← GUID
+      aseguradoraId: payload.aseguradoraId,  // ← CORREGIDO
       fechaEmision: dateToBackendOffset(payload.fechaEmision),
       fechaExpiracion: dateToBackendOffset(payload.fechaExpiracion),
       valorOriginal: payload.valorOriginal,
@@ -312,31 +315,35 @@ export class PolizaService {
     );
   }
 
+  // CORREGIDO: mapeo para lista
   private mapListRow(d: PolizaApiDto): PolizaListRow {
     return {
       id: d.id,
       numero: d.numero,
-      contratista: d.contratista,
+      contratista: d.contratista,           // ← nombre del contratista
       obra: d.obra,
-      ramo: d.ramo,
-      aseguradora: d.aseguradora,
+      ramo: d.ramo,                         // ← nombre del ramo
+      aseguradora: d.aseguradoraNombre,     // ← CORREGIDO: usar aseguradoraNombre
       fechaExpiracion: d.fechaExpiracion,
       valor: d.valorActual,
       estado: mapApiEstadoToUi(d.estado),
     };
   }
 
+  // CORREGIDO: mapeo para detalle
   private mapDetail(d: PolizaApiDto): PolizaDetail {
     return {
       id: d.id,
       numero: d.numero,
-      contratista: d.contratista,
-      contratistaId: d.contratistaId,
-      ramo: d.ramo,
-      ramoId: d.ramoId,
+      contratista: d.contratista,           // ← nombre del contratista
+      contratistaId: d.contratistaId,       // ← CORREGIDO: nuevo campo
+      ramo: d.ramo,                         // ← nombre del ramo
+      ramoId: d.ramoId,                     // ← CORREGIDO: nuevo campo
       cambiaValor: d.ramoCambiaValor,
       obra: d.obra,
-      aseguradora: d.aseguradora,
+      aseguradora: d.aseguradoraNombre,     // ← CORREGIDO: usar aseguradoraNombre
+      aseguradoraId: d.aseguradoraId,       // ← NUEVO campo
+      periodicidadRenovacion: d.periodicidadRenovacion, // ← NUEVO campo
       fechaEmision: d.fechaEmision,
       fechaExpiracion: d.fechaExpiracion,
       estado: mapApiEstadoToUi(d.estado),
