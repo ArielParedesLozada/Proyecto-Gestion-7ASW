@@ -211,6 +211,9 @@ namespace backend.Data.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("ValorActual")
                         .HasColumnType("numeric");
 
@@ -226,6 +229,8 @@ namespace backend.Data.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("Ramo");
+
+                    b.HasIndex("UsuarioId");
 
                     b.HasIndex("Numero", "Obra")
                         .IsUnique();
@@ -388,11 +393,19 @@ namespace backend.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Backend.Domain.Models.User", "UsuarioNav")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AseguradoraNav");
 
                     b.Navigation("ContratistaNav");
 
                     b.Navigation("RamoNav");
+
+                    b.Navigation("UsuarioNav");
                 });
 
             modelBuilder.Entity("Backend.Domain.Models.Renovacion", b =>

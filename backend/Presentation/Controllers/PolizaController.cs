@@ -1,5 +1,6 @@
 using Backend.App.Dtos;
 using Backend.App.Polizas;
+using Backend.Domain.Services;
 using Backend.Presentation.Dtos.Requests;
 using Backend.Presentation.Dtos.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -12,12 +13,13 @@ namespace Backend.Presentation.Controllers;
 public class PolizaController(
     PolizaService polizaService,
     PolizaExcelImportService excelImportService,
-    PolizaPdfService polizaPdfService) : ControllerBase
+    PolizaPdfService polizaPdfService,
+    ICurrentUser currentUser) : ControllerBase
 {
     private readonly PolizaService _polizaService = polizaService;
     private readonly PolizaExcelImportService _excelImportService = excelImportService;
     private readonly PolizaPdfService _polizaPdfService = polizaPdfService;
-
+    private readonly ICurrentUser _currentUser = currentUser;
     /// <summary>
     /// Rutas <c>import/*</c> antes de <c>{id:guid}</c> para evitar ambigüedad en el enrutador.
     /// Sin <see cref="FromFormAttribute"/> en <see cref="IFormFile"/>: Swashbuckle no lo documenta y lanza 500 al generar <c>swagger.json</c>.
@@ -31,7 +33,8 @@ public class PolizaController(
             return BadRequest(new { message = "Debes adjuntar un archivo Excel (.xlsx)." });
 
         await using var stream = file.OpenReadStream();
-        var preview = await _excelImportService.PrevisualizarAsync(stream, file.FileName);
+        var user = _currentUser.UserId;
+        var preview = await _excelImportService.PrevisualizarAsync(stream, file.FileName, user);
         return Ok(preview);
     }
 
@@ -39,7 +42,8 @@ public class PolizaController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<PolizaImportResultResponse>> ImportConfirm([FromBody] PolizaImportConfirmRequest request)
     {
-        var result = await _excelImportService.ConfirmarAsync(request.Token);
+        var user = _currentUser.UserId;
+        var result = await _excelImportService.ConfirmarAsync(request.Token, user);
         return Ok(result);
     }
 
@@ -86,7 +90,8 @@ public class PolizaController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<PolizaDtoResponse>> Create([FromBody] PolizaRequest request)
     {
-        var poliza = await _polizaService.CrearAsync(request);
+        var user = _currentUser.UserId;
+        var poliza = await _polizaService.CrearAsync(request, user);
         return Ok(Map(poliza));
     }
 

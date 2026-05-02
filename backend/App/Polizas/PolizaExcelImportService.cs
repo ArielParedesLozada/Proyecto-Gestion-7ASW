@@ -28,8 +28,8 @@ public class PolizaExcelImportService(
         SlidingExpiration = TimeSpan.FromMinutes(30),
     };
 
-    private static string CacheKey(Guid token) => $"poliza-import:{token}";
-    public async Task<PolizaImportPreviewResponse> PrevisualizarAsync(Stream excelStream, string fileName)
+    private static string CacheKey(Guid token, string usuarioId) => $"poliza-import:{usuarioId}:{token}";
+    public async Task<PolizaImportPreviewResponse> PrevisualizarAsync(Stream excelStream, string fileName, Guid usuarioId)
     {
         if (excelStream == null || !excelStream.CanRead)
             throw new CustomError("No se recibió un archivo válido.", 400);
@@ -95,21 +95,26 @@ public class PolizaExcelImportService(
         var session = new PolizaImportSession
         {
             FileName = name,
+            UsuarioId = usuarioId,
             CreatedAt = DateTimeOffset.UtcNow,
             Rows = rows,
         };
-        _cache.Set(CacheKey(token), session, SessionOptions);
+        _cache.Set(CacheKey(token, usuarioId.ToString()), session, SessionOptions);
 
         return MapPreviewResponse(token, name, sheetsDetected, rows);
     }
 
-    public async Task<PolizaImportResultResponse> ConfirmarAsync(Guid token)
+    public async Task<PolizaImportResultResponse> ConfirmarAsync(Guid token, Guid usuarioId)
     {
-        if (!_cache.TryGetValue(CacheKey(token), out PolizaImportSession? session) || session == null)
+        if (!_cache.TryGetValue(CacheKey(token, usuarioId.ToString()), out PolizaImportSession? session) || session == null)
         {
             throw new CustomError(
                 "La sesión de importación expiró o no es válida. Vuelve a cargar el archivo para previsualizar de nuevo.",
                 400);
+        }
+        if (session.UsuarioId != usuarioId)
+        {
+            throw new CustomError("Token no válido para este usuario.", 403);
         }
 
         var aplicables = session.Rows.Where(r => r.PuedeAplicar).ToList();
@@ -168,6 +173,7 @@ public class PolizaExcelImportService(
                         entity.Obra = row.Obra!.Trim();
                         entity.Ramo = ramo.Id;
                         entity.AseguradoraId = aseguradoraId; // CORREGIDO
+                        entity.UsuarioId = usuarioId;
                         entity.PeriodicidadRenovacion = periodicidad; // NUEVO
                         entity.FechaEmision = emisionUtc;
                         entity.FechaExpiracion = expiracionUtc;
@@ -192,6 +198,7 @@ public class PolizaExcelImportService(
                             Obra = row.Obra!.Trim(),
                             Ramo = ramo.Id,
                             AseguradoraId = aseguradoraId, // CORREGIDO
+                            UsuarioId = usuarioId,
                             PeriodicidadRenovacion = periodicidad, // NUEVO
                             FechaEmision = emisionUtc,
                             FechaExpiracion = expiracionUtc,
@@ -227,7 +234,7 @@ public class PolizaExcelImportService(
         }
         finally
         {
-            _cache.Remove(CacheKey(token));
+            _cache.Remove(CacheKey(token, usuarioId.ToString()));
         }
 
         resultado.Errors = errores;
@@ -1066,6 +1073,7 @@ internal sealed class ImportPreviewRowInternal
 internal sealed class PolizaImportSession
 {
     public string FileName { get; set; } = "";
+    public Guid UsuarioId { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public List<ImportPreviewRowInternal> Rows { get; set; } = new();
 }

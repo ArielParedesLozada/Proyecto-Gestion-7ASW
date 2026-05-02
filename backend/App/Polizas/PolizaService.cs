@@ -6,14 +6,14 @@ using Backend.Domain.Models;
 using Backend.Presentation.Dtos.Requests;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Backend.Domain.Services;
 
 namespace Backend.App.Polizas;
 
 public class PolizaService(AppDatabase context)
 {
     private readonly AppDatabase _context = context;
-
-    public async Task<PolizaRes> CrearAsync(PolizaRequest request)
+    public async Task<PolizaRes> CrearAsync(PolizaRequest request, Guid userId)
     {
         var emisionUtc = AUtc(request.FechaEmision);
         var expiracionUtc = AUtc(request.FechaExpiracion);
@@ -21,7 +21,6 @@ public class PolizaService(AppDatabase context)
         await ValidarFkAsync(request.Contratista, request.Ramo, request.AseguradoraId);
 
         var valorActual = request.ValorActual > 0 ? request.ValorActual : request.ValorOriginal;
-
         var poliza = new Poliza
         {
             Id = Guid.NewGuid(),
@@ -30,6 +29,7 @@ public class PolizaService(AppDatabase context)
             Obra = request.Obra.Trim(),
             Ramo = request.Ramo,
             AseguradoraId = request.AseguradoraId,
+            UsuarioId = userId,
             PeriodicidadRenovacion = expiracionUtc - emisionUtc,
             FechaEmision = emisionUtc,
             FechaExpiracion = expiracionUtc,

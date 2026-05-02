@@ -59,7 +59,7 @@ public class AppDatabase : DbContext
             entity.HasKey(p => p.Id);
             entity.HasIndex(p => p.Id);
             // Por que no solo p.Numero
-            entity.HasIndex(p => new { p.Numero, p.Obra }).IsUnique();
+            entity.HasIndex(p => new {p.Numero, p.Obra}).IsUnique();
             entity.HasQueryFilter(p => p.DeletedAt == null);
             entity.HasOne<Empresa>(p => p.ContratistaNav)
                 .WithMany()
@@ -68,6 +68,10 @@ public class AppDatabase : DbContext
             entity.HasOne<Ramo>(p => p.RamoNav)
                 .WithMany()
                 .HasForeignKey(p => p.Ramo)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>(p => p.UsuarioNav)
+                .WithMany()
+                .HasForeignKey(p => p.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
             entity.Property(p => p.PeriodicidadRenovacion)
                 .HasColumnType("interval");
