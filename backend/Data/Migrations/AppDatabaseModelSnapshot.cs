@@ -125,6 +125,9 @@ namespace backend.Data.Migrations
                     b.Property<Guid>("PolizaId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("RenovacionId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Tipo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -134,6 +137,8 @@ namespace backend.Data.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("PolizaId");
+
+                    b.HasIndex("RenovacionId");
 
                     b.ToTable("notificaciones", (string)null);
                 });
@@ -361,7 +366,15 @@ namespace backend.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Backend.Domain.Models.Renovacion", "RenovacionNav")
+                        .WithMany()
+                        .HasForeignKey("RenovacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("PolizaNav");
+
+                    b.Navigation("RenovacionNav");
                 });
 
             modelBuilder.Entity("Backend.Domain.Models.PasswordReset", b =>

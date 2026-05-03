@@ -59,7 +59,7 @@ public class AppDatabase : DbContext
             entity.HasKey(p => p.Id);
             entity.HasIndex(p => p.Id);
             // Por que no solo p.Numero
-            entity.HasIndex(p => new {p.Numero, p.Obra}).IsUnique();
+            entity.HasIndex(p => new { p.Numero, p.Obra }).IsUnique();
             entity.HasQueryFilter(p => p.DeletedAt == null);
             entity.HasOne<Empresa>(p => p.ContratistaNav)
                 .WithMany()
@@ -104,6 +104,10 @@ public class AppDatabase : DbContext
             entity.HasOne(n => n.PolizaNav)
                 .WithMany()
                 .HasForeignKey(n => n.PolizaId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(n => n.RenovacionNav)
+                .WithMany()
+                .HasForeignKey(n => n.RenovacionId)
                 .OnDelete(DeleteBehavior.Restrict);
             entity.HasQueryFilter(n => n.PolizaNav.DeletedAt == null);
         });

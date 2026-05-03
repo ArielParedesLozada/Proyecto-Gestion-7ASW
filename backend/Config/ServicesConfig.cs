@@ -1,6 +1,8 @@
 using Backend.App.Auth;
+using Backend.App.Notificaciones;
 using Backend.App.Polizas;
 using Backend.App.Renovaciones;
+using Backend.Data.Databases;
 using Backend.Data.Repository;
 using Backend.Domain.Models;
 using Backend.Domain.Services;
@@ -42,6 +44,16 @@ public static class ServicesConfig
         services.AddScoped<ExpireRenovationService>();
         services.AddScoped<RenovacionService>();
         services.AddScoped<ValidateRenovacionService>();
+        services.AddScoped<PolizaNotificationService>(sp =>
+        {
+            return new PolizaNotificationService(
+               sp.GetRequiredService<IWordTemplate>(),
+               sp.GetRequiredService<INotifier>(),
+               sp.GetRequiredService<AppDatabase>(),
+               domain,
+               sp.GetRequiredService<ILogger<PolizaNotificationService>>()
+           );
+        });
         return services;
     }
 }

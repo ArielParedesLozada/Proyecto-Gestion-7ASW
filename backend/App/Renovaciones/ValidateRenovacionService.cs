@@ -32,6 +32,7 @@ public class ValidateRenovacionService(AppDatabase context)
         renovacion.Estado = EstadoRenovacion.Vigente;
         poliza.Estado = EstadoPoliza.Vigente;
         poliza.FechaExpiracion = poliza.FechaExpiracion.Add(poliza.PeriodicidadRenovacion);
+        await InvalidarNotificaciones(poliza.Id);
         await _context.SaveChangesAsync();
         return renovacion;
     }
@@ -50,7 +51,19 @@ public class ValidateRenovacionService(AppDatabase context)
         var ramo = poliza.RamoNav;
         renovacion.Estado = EstadoRenovacion.Vencida;
         poliza.Estado = EstadoPoliza.Vencida;
+        await InvalidarNotificaciones(poliza.Id);
         await _context.SaveChangesAsync();
         return renovacion;
+    }
+
+    private async Task InvalidarNotificaciones(Guid polizaId)
+    {
+        var notificaciones = await _context.Notificaciones
+            .Where(n => n.PolizaId == polizaId && n.Estado == EstadoNotificacion.Pendiente)
+            .ToListAsync();
+        foreach (var n in notificaciones)
+        {
+            n.Estado = EstadoNotificacion.Invalidada;
+        }
     }
 }

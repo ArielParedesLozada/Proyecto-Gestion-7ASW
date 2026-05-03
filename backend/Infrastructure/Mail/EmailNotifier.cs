@@ -29,4 +29,25 @@ public class EmailNotifier(string smtpDomain, int port, string user, string pass
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
     }
+
+    public async Task SendWithAttachmentAsync(string to, string subject, string body, byte[] file, string fileName)
+    {
+        var email = new MimeMessage();
+        email.From.Add(MailboxAddress.Parse(_user));
+        email.To.Add(MailboxAddress.Parse(to));
+        email.Subject = subject;
+
+        var builder = new BodyBuilder
+        {
+            HtmlBody = body
+        };
+        builder.Attachments.Add(fileName, file, ContentType.Parse("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        email.Body = builder.ToMessageBody();
+        using var smtp = new SmtpClient();
+        await smtp.ConnectAsync(_smtpServer, _port, MailKit.Security.SecureSocketOptions.StartTls);
+        await smtp.AuthenticateAsync(_user, _password);
+        await smtp.SendAsync(email);
+        await smtp.DisconnectAsync(true);
+    }
+    
 }
