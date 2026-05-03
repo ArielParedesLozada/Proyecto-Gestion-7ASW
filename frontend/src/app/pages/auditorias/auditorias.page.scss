@@ -1,0 +1,261 @@
+@use '../polizas/polizas-admin-header';
+@use '../polizas/polizas-toolbar/polizas-toolbar';
+
+.auditorias-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auditorias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.auditorias-header__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.auditorias-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auditorias-header__notif {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+  position: relative;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  mat-icon {
+    color: #6b7280;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.auditorias-header__notif-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #c1121f;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+.auditorias-header__profile {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: #6b7280;
+}
+
+.toolbar-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.toolbar-card__left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 2;
+}
+
+.toolbar__search {
+  flex: 2;
+  min-width: 220px;
+}
+
+.toolbar__filter {
+  min-width: 140px;
+}
+
+.toolbar__btn-limpiar {
+  border-radius: 10px !important;
+  border-color: #e5e7eb !important;
+  color: #4b5563 !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+  }
+
+  &:hover {
+    background: #f9fafb !important;
+    border-color: #d1d5db !important;
+  }
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+}
+
+/* Modal de detalles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  mat-icon {
+    color: #6b7280;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  &:hover mat-icon {
+    color: #c1121f;
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.detalle-item {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.detalle-item__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.detalle-item__value {
+  display: block;
+  font-size: 0.875rem;
+  color: #111827;
+  word-break: break-all;
+}
+
+.detalle-item__json {
+  margin: 0;
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: #1e1e2e;
+  color: #cbd5e1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .toolbar-card__left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .toolbar__search,
+  .toolbar__filter {
+    width: 100%;
+  }
+  
+  .toolbar__btn-limpiar {
+    align-self: flex-start;
+  }
+  
+  .modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+}

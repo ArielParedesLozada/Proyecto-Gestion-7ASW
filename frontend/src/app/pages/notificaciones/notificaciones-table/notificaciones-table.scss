@@ -1,0 +1,119 @@
+.notificaciones-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1.1rem 1.25rem 0;
+  overflow: hidden;
+}
+
+.notificaciones-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+}
+
+.notificaciones-table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.notificaciones-table thead th {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.notificaciones-table tbody td {
+  padding: 0.75rem 0.75rem;
+  border-bottom: 1px solid #eef0f4;
+  color: #1f2937;
+  vertical-align: middle;
+}
+
+.notificaciones-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.notificaciones-table__poliza {
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.notificaciones-table__obra {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notificaciones-table__badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.notificaciones-table__badge--pendiente {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.notificaciones-table__badge--enviada {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.notificaciones-table__badge--error {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notificaciones-table__badge--invalidada {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.notificaciones-table__badge--renovacion {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.notificaciones-table__badge--expiracion {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.notificaciones-table__empty {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.notificaciones-card__paginator {
+  margin: 0.75rem -1.25rem 0;
+  padding: 0;
+  border-top: 1px solid #eef0f4;
+  background: #fafbfc;
+}

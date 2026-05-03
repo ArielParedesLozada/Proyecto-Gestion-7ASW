@@ -31,6 +31,13 @@ export const API_CONFIG = {
       CONFIRMAR: (id: string) => `/renovaciones/${encodeURIComponent(id)}/validar`,
       RECHAZAR: (id: string) => `/renovaciones/${encodeURIComponent(id)}/rechazar`,
     },
+    AUDITORIAS : {
+      INDEX: '/auditorias'
+    },
+    NOTIFICACIONES: {
+      INDEX: '/notificaciones',
+      POR_POLIZA : (polizaId: string) => `/notificaciones/poliza/${encodeURIComponent(polizaId)}`
+    }
   }
 } as const;
 

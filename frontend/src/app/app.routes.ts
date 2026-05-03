@@ -17,6 +17,8 @@ import { authGuard } from './shared/guards/auth-guard';
 import { mandatoryPasswordGuard } from './shared/guards/mandatory-password.guard';
 import { RenovacionDetailPage } from './pages/renovaciones/renovacion-detail/renovacion-detail.page';
 import { AseguradorasPage } from './pages/aseguradoras/aseguradoras.page';
+import { NotificacionesPage } from './pages/notificaciones/notificaciones.page';
+import { AuditoriasPage } from './pages/auditorias/auditorias.page';
 
 /**
  * Rutas públicas (sin MainLayout).
@@ -48,6 +50,8 @@ export const routes: Routes = [
       { path: 'renovaciones/:id', component: RenovacionDetailPage },
       { path: 'renovaciones', component: RenovacionesPage },
       { path: 'users', component: UsersPage },
+      { path: 'notificaciones', component: NotificacionesPage },
+      { path: 'auditoria', component: AuditoriasPage },
     ],
   },
   { path: '**', redirectTo: '/login' },
