@@ -1,3 +1,4 @@
+using Backend.App.Auditorias;
 using Backend.App.Auth;
 using Backend.App.Notificaciones;
 using Backend.App.Polizas;
@@ -54,6 +55,9 @@ public static class ServicesConfig
                sp.GetRequiredService<ILogger<PolizaNotificationService>>()
            );
         });
+        services.AddScoped<AuditoriaService>();
+        services.AddScoped<AuditoriaQueryService>();
+        services.AddScoped<NotificacionService>();
         return services;
     }
 }

@@ -7,12 +7,15 @@ using Backend.Presentation.Dtos.Requests;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Backend.Domain.Services;
+using Backend.App.Auditorias;
 
 namespace Backend.App.Polizas;
 
-public class PolizaService(AppDatabase context)
+public class PolizaService(AppDatabase context, AuditoriaService auditoriaService, ICurrentUser currentUser)
 {
     private readonly AppDatabase _context = context;
+    private readonly AuditoriaService _auditoriaService = auditoriaService;
+    private readonly ICurrentUser _currentUser = currentUser;
     public async Task<PolizaRes> CrearAsync(PolizaRequest request, Guid userId)
     {
         var emisionUtc = AUtc(request.FechaEmision);
@@ -51,7 +54,23 @@ public class PolizaService(AppDatabase context)
         {
             ThrowIfPolizaSaveFailed(ex);
         }
-
+        await _auditoriaService.RegistrarAsync(
+            _currentUser.UserId,
+            "Polizas",
+            poliza.Id,
+            "CREATE",
+            null,
+            new
+            {
+                poliza.Numero,
+                poliza.Obra,
+                poliza.ValorOriginal,
+                poliza.ValorActual,
+                poliza.FechaEmision,
+                poliza.FechaExpiracion
+            }
+        );
+        await _context.SaveChangesAsync();
         return await ProyectarPorIdAsync(poliza.Id)
             ?? throw new CustomError("No se pudo recuperar la póliza creada.", 500);
     }
@@ -130,6 +149,15 @@ public class PolizaService(AppDatabase context)
         await ValidarFkAsync(request.Contratista, request.Ramo, request.AseguradoraId);
 
         var entity = await _context.Polizas.FirstOrDefaultAsync(p => p.Id == id);
+        var oldData = new
+        {
+            entity.Numero,
+            entity.Obra,
+            entity.ValorOriginal,
+            entity.ValorActual,
+            entity.FechaEmision,
+            entity.FechaExpiracion
+        };
         if (entity == null)
             return null;
 
@@ -145,7 +173,15 @@ public class PolizaService(AppDatabase context)
         entity.Observaciones = NormalizeObservaciones(request.Observaciones);
         entity.Estado = PolizaEstadoDerivadoHelper.EstadoPersistido(expiracionUtc, DateTimeOffset.UtcNow);
         entity.UpdatedAt = DateTimeOffset.UtcNow;
-
+        var newData = new
+        {
+            entity.Numero,
+            entity.Obra,
+            entity.ValorOriginal,
+            entity.ValorActual,
+            entity.FechaEmision,
+            entity.FechaExpiracion
+        };
         try
         {
             await _context.SaveChangesAsync();
@@ -154,6 +190,15 @@ public class PolizaService(AppDatabase context)
         {
             ThrowIfPolizaSaveFailed(ex);
         }
+        await _auditoriaService.RegistrarAsync(
+            _currentUser.UserId,
+            "Polizas",
+            entity.Id,
+            "UPDATE",
+            oldData,
+            newData
+        );
+        await _context.SaveChangesAsync();
 
         return await ProyectarPorIdAsync(id);
     }
