@@ -37,6 +37,10 @@ export const API_CONFIG = {
     NOTIFICACIONES: {
       INDEX: '/notificaciones',
       POR_POLIZA : (polizaId: string) => `/notificaciones/poliza/${encodeURIComponent(polizaId)}`
+    },
+    REPORTES: {
+      CONTROL_MAESTRO: 'reportes/control-maestro',
+      CONTROL_MAESTRO_PDF: 'reportes/control-maestro/pdf'
     }
   }
 } as const;
