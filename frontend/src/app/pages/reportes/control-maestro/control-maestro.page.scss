@@ -20,6 +20,14 @@
   }
 }
 
+.action-bar {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
 /* reutiliza EXACTAMENTE estilo existente */
 .action-btn {
   border-radius: 8px !important;
@@ -37,7 +45,6 @@
     margin-right: 0.25rem;
   }
 }
-
 /* ===== RESUMEN (igual que ya tienes) ===== */
 .cm-summary {
   display: grid;

@@ -23,11 +23,11 @@
         <input matInput type="number" [ngModel]="saldoInicial()" (ngModelChange)="saldoInicial.set($event)" />
     </mat-form-field>
 
-    <button mat-raised-button color="primary" class="action-btn" (click)="cargar()">
+    <button type="button" mat-raised-button color="primary" class="action-btn" (click)="cargar()">
         Calcular
     </button>
 
-    <button mat-stroked-button class="action-btn" (click)="exportarPdf()">
+    <button type="button" mat-stroked-button class="action-btn" (click)="exportarPdf()">
         <mat-icon>picture_as_pdf</mat-icon>
         PDF
     </button>
@@ -41,17 +41,17 @@
     </div>
 
     <div class="cm-card cm-card--success">
-        <span>Vigentes</span>
+        <span>Vigentes: </span>
         <strong>{{ resumen().totalVigentes | currency }}</strong>
     </div>
 
     <div class="cm-card cm-card--danger">
-        <span>Vencidas</span>
+        <span>Vencidas: </span>
         <strong>{{ resumen().totalVencidas | currency }}</strong>
     </div>
 
     <div class="cm-card cm-card--highlight">
-        <span>Cuadre total</span>
+        <span>Cuadre total: </span>
         <strong>{{ resumen().cuadreTotal | currency }}</strong>
     </div>
 </div>

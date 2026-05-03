@@ -43,10 +43,6 @@ public class ReportesController(ControlMaestroService controlMaestroService) : C
     )
     {
         var (Bytes, FileName) = await _controlMaestroService.GenerarPdfAsync(
-            pageVigentes,
-            pageSizeVigentes,
-            pageVencidas,
-            pageSizeVencidas,
             saldoInicial,
             DateTimeOffset.UtcNow
         );

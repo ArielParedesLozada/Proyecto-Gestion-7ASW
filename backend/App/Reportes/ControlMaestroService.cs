@@ -113,22 +113,82 @@ public class ControlMaestroService(AppDatabase context)
     }
 
     public async Task<(byte[] Bytes, string FileName)> GenerarPdfAsync(
-        int pageVigentes,
-        int pageSizeVigentes,
-        int pageVencidas,
-        int pageSizeVencidas,
         decimal saldoInicial,
         DateTimeOffset generadoEnUtc
     )
     {
-        var data = await ObtenerControlMaestroAsync(
-            pageVigentes,
-            pageSizeVigentes,
-            pageVencidas,
-            pageSizeVencidas,
-            saldoInicial
-        );
+        var baseQuery = _context.Polizas
+           .AsNoTracking();
+        var now = DateTimeOffset.UtcNow;
+        var vigentesQuery = baseQuery
+            .Where(p => p.Estado == EstadoPoliza.Vigente);
+        var vencidasQuery = baseQuery
+            .Where(p => p.Estado == EstadoPoliza.Vencida);
+        var totalVigentesCount = await vigentesQuery.CountAsync();
+        var vigentesItems = await vigentesQuery
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new PolizaRes
+            {
+                Id = p.Id,
+                Numero = p.Numero,
+                Obra = p.Obra,
+                AseguradoraId = p.AseguradoraId,
+                AseguradoraNombre = p.AseguradoraNav.Nombre,
+                ContratistaId = p.Contratista,
+                ContratistaNombre = p.ContratistaNav.Nombre,
+                RamoId = p.Ramo,
+                RamoNombre = p.RamoNav.Nombre,
+                FechaEmision = p.FechaEmision,
+                FechaExpiracion = p.FechaExpiracion,
+                ValorOriginal = p.ValorOriginal,
+                ValorActual = p.ValorActual,
+                Observaciones = p.Observaciones,
+                Estado = PolizaEstadoDerivadoHelper.Calcular(p.FechaExpiracion, now),
+            })
+            .ToListAsync();
+        var totalVigentes = await vigentesQuery.SumAsync(p => p.ValorActual);
+        var totalVencidasCount = await vencidasQuery.CountAsync();
+        var vencidasItems = await vencidasQuery
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new PolizaRes
+            {
+                Id = p.Id,
+                Numero = p.Numero,
+                Obra = p.Obra,
+                AseguradoraId = p.AseguradoraId,
+                AseguradoraNombre = p.AseguradoraNav.Nombre,
+                ContratistaId = p.Contratista,
+                ContratistaNombre = p.ContratistaNav.Nombre,
+                RamoId = p.Ramo,
+                RamoNombre = p.RamoNav.Nombre,
+                FechaEmision = p.FechaEmision,
+                FechaExpiracion = p.FechaExpiracion,
+                ValorOriginal = p.ValorOriginal,
+                ValorActual = p.ValorActual,
+                Observaciones = p.Observaciones,
+                Estado = EstadoPolizaDerivado.Expirado
+            })
+            .ToListAsync();
+        var totalVencidas = await vencidasQuery.SumAsync(p => p.ValorActual);
+        var cuadreTotal = saldoInicial + totalVigentes - totalVencidas;
 
+        var data = new ControlMaestroRes
+        {
+            Vigentes = new PagedResult<PolizaRes>
+            {
+                Items = vigentesItems,
+                Total = totalVigentesCount,
+            },
+            Vencidas = new PagedResult<PolizaRes>
+            {
+                Items = vencidasItems,
+                Total = totalVencidasCount,
+            },
+            TotalVigentes = totalVigentes,
+            TotalVencidas = totalVencidas,
+            SaldoInicial = saldoInicial,
+            CuadreTotal = cuadreTotal
+        };
         var bytes = ControlMaestroPdfComposer.Generate(data, generadoEnUtc);
 
         var fileName = $"ControlMaestro-{generadoEnUtc:yyyyMMddHHmmss}.pdf";
