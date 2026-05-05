@@ -7,6 +7,7 @@ using Backend.Presentation.Middleware;
 using DotNetEnv;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Hangfire;
 using Backend.Infrastructure.Jobs;
 using Serilog;  // ← Agrega esta línea
@@ -128,6 +129,11 @@ try
 
     Log.Information("Aplicación configurada correctamente, iniciando ejecución...");
     app.Run();
+}
+catch (HostAbortedException)
+{
+    // dotnet ef (design-time) aborta el host tras resolver DbContext; no es un fallo real.
+    throw;
 }
 catch (Exception ex)
 {

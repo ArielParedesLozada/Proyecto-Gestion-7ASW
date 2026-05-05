@@ -18,21 +18,23 @@ namespace backend.Data.Migrations
                 type: "uuid",
                 nullable: true);
 
-            // 2. Poblar con usuario existente (🔥 clave)
+            // 2. Poblar: preferir adminpapu (seed); si no existe aún, cualquier usuario.
+            //    El seed corre después de Migrate en Program.cs, así que no exigir adminpapu aquí.
             migrationBuilder.Sql(@"
         UPDATE polizas
-        SET ""UsuarioId"" = (
-            SELECT ""Id"" FROM users WHERE ""Username"" = 'adminpapu' LIMIT 1
+        SET ""UsuarioId"" = COALESCE(
+            (SELECT ""Id"" FROM users WHERE ""Username"" = 'adminpapu' LIMIT 1),
+            (SELECT ""Id"" FROM users ORDER BY ""Id"" LIMIT 1)
         )
         WHERE ""UsuarioId"" IS NULL;
     ");
 
-            // ⚠️ Validación opcional (muy recomendable)
             migrationBuilder.Sql(@"
         DO $$
         BEGIN
-            IF NOT EXISTS (SELECT 1 FROM users WHERE ""Username"" = 'adminpapu') THEN
-                RAISE EXCEPTION 'User adminpapu no existe. Ejecuta el seed antes.';
+            IF EXISTS (SELECT 1 FROM polizas LIMIT 1)
+               AND NOT EXISTS (SELECT 1 FROM users LIMIT 1) THEN
+                RAISE EXCEPTION 'Hay pólizas pero no hay usuarios; no se puede asignar UsuarioId.';
             END IF;
         END
         $$;

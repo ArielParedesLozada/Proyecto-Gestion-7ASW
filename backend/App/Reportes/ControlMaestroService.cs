@@ -9,6 +9,10 @@ namespace Backend.App.Reportes;
 public class ControlMaestroService(AppDatabase context)
 {
     private readonly AppDatabase _context = context;
+
+    /// <summary>Ruta del logo institucional copiado al directorio de salida (misma que PolizaPdfService).</summary>
+    private static string LogoPath =>
+        Path.Combine(AppContext.BaseDirectory, "Assets", "Gobierno.png");
     public async Task<ControlMaestroRes> ObtenerControlMaestroAsync(
         int pageVigentes,
         int pageSizeVigentes,
@@ -189,7 +193,8 @@ public class ControlMaestroService(AppDatabase context)
             SaldoInicial = saldoInicial,
             CuadreTotal = cuadreTotal
         };
-        var bytes = ControlMaestroPdfComposer.Generate(data, generadoEnUtc);
+        var reporteCodigo = $"SICOP-CM-{Guid.NewGuid():N}".ToUpperInvariant();
+        var bytes = ControlMaestroPdfComposer.Generate(data, generadoEnUtc, LogoPath, reporteCodigo);
 
         var fileName = $"ControlMaestro-{generadoEnUtc:yyyyMMddHHmmss}.pdf";
 
