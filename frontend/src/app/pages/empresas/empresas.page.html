@@ -103,8 +103,8 @@
   }
 
   <app-empresas-table
-    [rows]="pagedRows()"
-    [paginatorLength]="totalFiltrado()"
+    [rows]="rows()"
+    [paginatorLength]="total()"
     [pageIndex]="pageIndex()"
     [pageSize]="pageSize"
     (pageChange)="onPage($event)"

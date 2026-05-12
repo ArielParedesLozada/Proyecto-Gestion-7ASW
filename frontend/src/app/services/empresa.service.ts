@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import { API_CONFIG } from '../shared/constants/api.constants';
 import { EmpresaListRow } from '../pages/empresas/models/empresa-list.model';
 import { extractHttpErrorMessage } from '../shared/utils/http-error-message';
+import { PaginatedApiResponse, PaginatedResult } from '../interfaces/paginated-result';
 
 export interface EmpresaCreateRequest {
   nombre: string;
@@ -26,23 +27,38 @@ function mapDto(row: EmpresaApiDto): EmpresaListRow {
 })
 export class EmpresaService {
   private readonly api = inject(ApiService);
-  private readonly basePath = API_CONFIG.ENDPOINTS.POLIZAS.EMPRESAS;
+  private readonly basePath = API_CONFIG.ENDPOINTS.POLIZAS.EMPRESAS
 
-  getList(): Observable<EmpresaListRow[]> {
-    return this.api.get<EmpresaApiDto[]>(this.basePath).pipe(
-      map((rows) => rows.map(mapDto)),
-      catchError((err) =>
-        throwError(
-          () =>
-            new Error(
-              extractHttpErrorMessage(
-                err,
-                'No se pudieron cargar las empresas. Comprueba la sesión y el servidor.',
+  getList(page = 1, pageSize = 10, search = ""): Observable<PaginatedResult<EmpresaListRow>> {
+    return this.api
+      .getWithParams<PaginatedApiResponse<EmpresaApiDto>>(this.basePath, {
+        params: { page, pageSize, search },
+      })
+      .pipe(
+        map((res) => ({
+          items: res.items.map(mapDto),
+          total: res.total,
+          page: res.page,
+          pageSize: res.pageSize,
+        })),
+        catchError((err) =>
+          throwError(
+            () =>
+              new Error(
+                extractHttpErrorMessage(
+                  err,
+                  'No se pudieron cargar las empresas. Comprueba la sesión y el servidor.',
+                ),
               ),
-            ),
+          ),
         ),
-      ),
-    );
+      )
+  }
+
+  getListSimple(): Observable<EmpresaListRow[]> {
+    return this.getList(1, 1000).pipe(
+      map((res) => res.items)
+    )
   }
 
   create(body: EmpresaCreateRequest): Observable<EmpresaListRow> {

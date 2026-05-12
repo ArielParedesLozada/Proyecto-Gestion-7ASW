@@ -10,6 +10,8 @@ import { EmpresasTable } from './empresas-table/empresas-table';
 import { EmpresaListRow } from './models/empresa-list.model';
 import { EmpresaCreateRequest, EmpresaService } from '../../services/empresa.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-empresas-page',
@@ -53,46 +55,25 @@ export class EmpresasPage {
   readonly pageSize = 10;
   readonly pageIndex = signal(0);
 
-  readonly filteredRows = computed(() => {
-    const q = this.searchQuery().trim().toLowerCase();
-    const all = this.rows();
-    if (!q) {
-      return all;
-    }
-    return all.filter(
-      (row) =>
-        row.nombre.toLowerCase().includes(q) || row.correo.toLowerCase().includes(q),
-    );
-  });
-
-  readonly totalFiltrado = computed(() => this.filteredRows().length);
-
-  /** Tras filtrar, se pagina (como en pólizas). */
-  readonly pagedRows = computed(() => {
-    const all = this.filteredRows();
-    const start = this.pageIndex() * this.pageSize;
-    return all.slice(start, start + this.pageSize);
-  });
+  readonly total = signal(0);
 
   constructor() {
+    toObservable(this.searchQuery)
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(() => {
+        this.pageIndex.set(0);
+        this.recargarEmpresas();
+      });
+
     this.recargarEmpresas();
-
-    effect(() => {
-      this.searchQuery();
-      untracked(() => this.pageIndex.set(0));
-    });
-
-    effect(() => {
-      const total = this.filteredRows().length;
-      const maxPage = Math.max(0, Math.ceil(total / this.pageSize) - 1);
-      if (this.pageIndex() > maxPage) {
-        untracked(() => this.pageIndex.set(maxPage));
-      }
-    });
   }
 
   onPage(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
+    this.recargarEmpresas();
   }
 
   limpiarFiltros(): void {
@@ -147,16 +128,20 @@ export class EmpresasPage {
   }
 
   private recargarEmpresas(): void {
-    this.empresaService.getList().subscribe({
-      next: (data) => this.rows.set(data),
-      error: (err) => {
-        console.error(err);
-        this.rows.set([]);
-        this.notify.fromHttpError(err);
-      },
-    });
+    this.empresaService
+      .getList(this.pageIndex() + 1, this.pageSize, this.searchQuery())
+      .subscribe({
+        next: (res) => {
+          this.rows.set(res.items);
+          this.total.set(res.total);
+        },
+        error: (err) => {
+          console.error(err);
+          this.rows.set([]);
+          this.notify.fromHttpError(err);
+        },
+      });
   }
-
   /** Desde la tabla: abre el mismo formulario en modo edición y precarga la fila. */
   onEditar(row: EmpresaListRow): void {
     this.formularioModo.set('editar');

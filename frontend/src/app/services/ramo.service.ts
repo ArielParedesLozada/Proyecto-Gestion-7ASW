@@ -9,7 +9,6 @@ export interface RamoCreateRequest {
   nombre: string;
   descripcion: string;
   cambioValor: boolean;
-  periodicidad: string;
 }
 
 /** Respuesta API (camelCase); `cambiaValor` es el nombre en C#/JSON. */
@@ -18,7 +17,6 @@ interface RamoApiDto {
   nombre: string;
   descripcion: string;
   cambiaValor: boolean;
-  periodicidad: string
 }
 
 function mapDto(row: RamoApiDto): RamoListRow {
@@ -27,7 +25,6 @@ function mapDto(row: RamoApiDto): RamoListRow {
     nombre: row.nombre,
     descripcion: row.descripcion,
     cambioValor: row.cambiaValor,
-    periodicity: row.periodicidad
   };
 }
 
@@ -61,7 +58,6 @@ export class RamoService {
         nombre: body.nombre,
         descripcion: body.descripcion,
         cambiaValor: body.cambioValor,
-        periodicidadRenovacion: this.mapPeriodicidadToTimeSpan(body.periodicidad)
       })
       .pipe(
         map(mapDto),
@@ -75,21 +71,10 @@ export class RamoService {
         nombre: body.nombre,
         descripcion: body.descripcion,
         cambiaValor: body.cambioValor,
-        periodicidadRenovacion: this.mapPeriodicidadToTimeSpan(body.periodicidad)
       })
       .pipe(
         map(mapDto),
         catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),
       );
-  }
-
-  private mapPeriodicidadToTimeSpan(periodicidad: string): string {
-    switch (periodicidad) {
-      case 'day': return '1.00:00:00';
-      case 'week': return '7.00:00:00';
-      case 'month': return '30.00:00:00';
-      case 'year': return '365.00:00:00';
-      default: return '30.00:00:00';
-    }
   }
 }

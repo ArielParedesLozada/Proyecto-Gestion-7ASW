@@ -7,6 +7,7 @@ export interface PolizaListRow {
   contratista: string;
   obra: string;
   ramo: string;
+  ramoId: string;
   aseguradora: string;
   /** ISO yyyy-MM-dd */
   fechaExpiracion: string;

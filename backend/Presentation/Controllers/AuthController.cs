@@ -30,10 +30,8 @@ public class AuthController(
             return user.Identity!.Name;
         }
 
-        return user.FindFirst(ClaimTypes.Name)?.Value
-            ?? user.FindFirst("unique_name")?.Value
-            ?? user.FindFirst("name")?.Value
-            ?? user.FindFirst("email")?.Value;
+        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? user.FindFirst("nameid")?.Value;
     }
 
     [HttpPost("login")]

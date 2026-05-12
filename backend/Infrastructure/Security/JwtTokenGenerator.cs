@@ -20,8 +20,8 @@ public class JwtTokenGenerator(string privateKeyPath, double jwtTime, string iss
         var expiration = DateTime.UtcNow.AddHours(_time);
         Claim[] claims =
         [
+          new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
           new Claim(ClaimTypes.Role, user.Role),
-          new Claim(ClaimTypes.Email, user.Email),
           new Claim("must_change_password", user.MustChangePassword.ToString().ToLower()),
         ];
         var signCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);

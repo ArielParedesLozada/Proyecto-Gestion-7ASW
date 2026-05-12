@@ -1,0 +1,51 @@
+<div class="notificaciones-card">
+    <h2 class="notificaciones-card__title">Historial de Notificaciones</h2>
+
+    <div class="table-scroll">
+        <table class="notificaciones-table">
+            <thead>
+                <tr>
+                    <th>Póliza</th>
+                    <th>Obra</th>
+                    <th>Fecha Notificación</th>
+                    <th>Fecha Envío</th>
+                    <th>Fecha Expiración</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.id) {
+                <tr>
+                    <td class="notificaciones-table__poliza">{{ row.numeroPoliza }}</td>
+                    <td class="notificaciones-table__obra">{{ row.obra | truncate:60 }}</td>
+                    <td>{{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ (row.fechaEnvio | date: 'dd/MM/yyyy HH:mm') || '—' }}</td>
+                    <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
+                    <td>
+                        <span
+                            [class]="'notificaciones-table__badge notificaciones-table__badge--' + getTipoClass(row.tipo)">
+                            {{ row.tipo | notificacionTipo }}
+                        </span>
+                    </td>
+                    <td>
+                        <span
+                            [class]="'notificaciones-table__badge notificaciones-table__badge--' + getEstadoClass(row.estado)">
+                            {{ row.estado | notificacionEstado }}
+                        </span>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="7" class="notificaciones-table__empty">No hay notificaciones registradas.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="notificaciones-card__paginator">
+        <app-local-paginator [length]="paginatorLength()" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+            (page)="pageChange.emit($event)" />
+    </div>
+</div>

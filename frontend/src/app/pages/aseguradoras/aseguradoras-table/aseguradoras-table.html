@@ -1,0 +1,46 @@
+<div class="aseguradoras-card">
+    <h2 class="aseguradoras-card__title">Lista de Aseguradoras</h2>
+
+    <div class="table-scroll">
+        <table class="aseguradoras-table">
+            <thead>
+                <tr>
+                    <th>Nombre de la Aseguradora</th>
+                    <th>Correo Electrónico</th>
+                    <th class="aseguradoras-table__col-actions">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (rows().length > 0) {
+                @for (row of rows(); track row.id) {
+                <tr>
+                    <td>{{ row.nombre }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>
+                        <div class="aseguradoras-table__actions">
+                            <button mat-icon-button (click)="onEditar(row)">
+                                <mat-icon>edit_square</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+                } @else {
+                <tr>
+                    <td colspan="3" class="aseguradoras-table__empty">
+                        No hay aseguradoras registradas.
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (showPaginator()) {
+    <div class="aseguradoras-card__paginator">
+        <app-local-paginator [length]="paginatorLength()" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+            (page)="pageChange.emit($event)" />
+    </div>
+    }
+</div>

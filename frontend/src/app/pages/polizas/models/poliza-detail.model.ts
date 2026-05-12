@@ -36,6 +36,8 @@ export interface PolizaDetail {
   cambiaValor: boolean;
   obra: string;
   aseguradora: string;
+  aseguradoraId: string;
+  periodicidadRenovacion: string;  // ← NUEVO: campo del API
   fechaEmision: string;
   fechaExpiracion: string;
   /** Derivado en API (listado/detalle); no editar manualmente. */

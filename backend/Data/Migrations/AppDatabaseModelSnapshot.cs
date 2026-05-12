@@ -22,6 +22,30 @@ namespace backend.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Backend.Domain.Models.Aseguradora", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("aseguradoras", (string)null);
+                });
+
             modelBuilder.Entity("Backend.Domain.Models.Auditoria", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,9 +101,6 @@ namespace backend.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.HasIndex("Id");
 
                     b.ToTable("empresas", (string)null);
@@ -104,6 +125,9 @@ namespace backend.Data.Migrations
                     b.Property<Guid>("PolizaId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("RenovacionId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Tipo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -113,6 +137,8 @@ namespace backend.Data.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("PolizaId");
+
+                    b.HasIndex("RenovacionId");
 
                     b.ToTable("notificaciones", (string)null);
                 });
@@ -149,9 +175,8 @@ namespace backend.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Aseguradora")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("AseguradoraId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("Contratista")
                         .HasColumnType("uuid");
@@ -182,11 +207,17 @@ namespace backend.Data.Migrations
                     b.Property<string>("Observaciones")
                         .HasColumnType("text");
 
+                    b.Property<TimeSpan>("PeriodicidadRenovacion")
+                        .HasColumnType("interval");
+
                     b.Property<Guid>("Ramo")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("ValorActual")
                         .HasColumnType("numeric");
@@ -196,11 +227,15 @@ namespace backend.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AseguradoraId");
+
                     b.HasIndex("Contratista");
 
                     b.HasIndex("Id");
 
                     b.HasIndex("Ramo");
+
+                    b.HasIndex("UsuarioId");
 
                     b.HasIndex("Numero", "Obra")
                         .IsUnique();
@@ -224,9 +259,6 @@ namespace backend.Data.Migrations
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<TimeSpan>("PeriodicidadRenovacion")
-                        .HasColumnType("interval");
 
                     b.HasKey("Id");
 
@@ -334,7 +366,15 @@ namespace backend.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Backend.Domain.Models.Renovacion", "RenovacionNav")
+                        .WithMany()
+                        .HasForeignKey("RenovacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("PolizaNav");
+
+                    b.Navigation("RenovacionNav");
                 });
 
             modelBuilder.Entity("Backend.Domain.Models.PasswordReset", b =>
@@ -348,6 +388,12 @@ namespace backend.Data.Migrations
 
             modelBuilder.Entity("Backend.Domain.Models.Poliza", b =>
                 {
+                    b.HasOne("Backend.Domain.Models.Aseguradora", "AseguradoraNav")
+                        .WithMany()
+                        .HasForeignKey("AseguradoraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Backend.Domain.Models.Empresa", "ContratistaNav")
                         .WithMany()
                         .HasForeignKey("Contratista")
@@ -360,9 +406,19 @@ namespace backend.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Backend.Domain.Models.User", "UsuarioNav")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AseguradoraNav");
+
                     b.Navigation("ContratistaNav");
 
                     b.Navigation("RamoNav");
+
+                    b.Navigation("UsuarioNav");
                 });
 
             modelBuilder.Entity("Backend.Domain.Models.Renovacion", b =>

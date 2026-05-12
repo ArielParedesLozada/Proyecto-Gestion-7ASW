@@ -9,7 +9,7 @@ import { FormatTimespanPipe } from '../pipes/format-timespan-pipe';
 
 @Component({
   selector: 'app-ramos-table',
-  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, RamoCambioValorBadge, FormatTimespanPipe],
+  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, RamoCambioValorBadge],
   templateUrl: './ramos-table.html',
   styleUrl: './ramos-table.scss',
 })

@@ -7,6 +7,8 @@ public class Notificacion
     public Guid Id { get; set; }
     public Guid PolizaId { get; set; }
     public Poliza PolizaNav { get; set; } = null!;
+    public Guid RenovacionId { get; set; } // 🔥 CLAVE
+    public Renovacion RenovacionNav { get; set; } = null!;
     public EstadoNotificacion Estado { get; set; }
     public TipoNotificacion Tipo { get; set; }
     public DateTimeOffset FechaEnvio { get; set; }
