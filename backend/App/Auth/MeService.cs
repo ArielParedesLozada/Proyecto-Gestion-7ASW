@@ -7,9 +7,9 @@ namespace Backend.App.Auth;
 public class MeService(IRepository<User, Guid> userRepo)
 {
     private readonly IRepository<User, Guid> _userRepo = userRepo;
-    public async Task<User> GetMe(string userOrEmail)
+    public async Task<User> GetMe(string username)
     {
-        var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == userOrEmail || u.Email == userOrEmail) ?? throw new CustomError("User not found", 404);
+        var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == username) ?? throw new CustomError("User not found", 404);
         if (user.MustChangePassword)
         {
             throw new CustomError("User Must Change Password", 400);

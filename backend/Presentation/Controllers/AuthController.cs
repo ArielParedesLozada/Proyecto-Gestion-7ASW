@@ -23,7 +23,7 @@ public class AuthController(
     private readonly PasswordResetService _passwordResetService = passwordResetService;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
-    private static string? ResolveUser(ClaimsPrincipal user)
+    private static string? ResolveUsername(ClaimsPrincipal user)
     {
         if (!string.IsNullOrWhiteSpace(user.Identity?.Name))
         {
@@ -32,8 +32,7 @@ public class AuthController(
 
         return user.FindFirst(ClaimTypes.Name)?.Value
             ?? user.FindFirst("unique_name")?.Value
-            ?? user.FindFirst("name")?.Value
-            ?? user.FindFirst("email")?.Value;
+            ?? user.FindFirst("name")?.Value;
     }
 
     [HttpPost("login")]
@@ -56,7 +55,7 @@ public class AuthController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<UserDtoResponse>> Me()
     {
-        var username = ResolveUser(User);
+        var username = ResolveUsername(User);
         if (string.IsNullOrWhiteSpace(username))
         {
             return Unauthorized();
@@ -76,7 +75,7 @@ public class AuthController(
     [Authorize(Policy = "MUST-CHANGE-PASSWORD")]
     public async Task<ActionResult<LoginDtoResponse>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
     {
-        var username = ResolveUser(User);
+        var username = ResolveUsername(User);
         if (string.IsNullOrWhiteSpace(username))
         {
             return Unauthorized();

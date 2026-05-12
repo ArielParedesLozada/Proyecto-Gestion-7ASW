@@ -9,8 +9,6 @@ using DotNetEnv;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Hangfire;
-using Backend.Infrastructure.Jobs;
 
 Env.Load();
 
@@ -30,8 +28,7 @@ builder.Services
     .AddDatabase(CONNECTION_STRING)
     .AddJWTConfig(JWT_ISSUER, JWT_AUDIENCE, JWT_PUBLIC_KEY_FILE)
     .AddMailer(builder.Configuration, MAIL_USER, MAIL_PSSWD)
-    .AddAppServices(builder.Configuration)
-    .AddHangFire(CONNECTION_STRING);
+    .AddAppServices(builder.Configuration); ;
 builder.Services.AddMemoryCache();
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
 {
@@ -66,14 +63,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseHangfireDashboard("/hangfire");
-
-RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
-    "revision-polizas-diaria",
-    x => x.CheckRenovaciones(),
-    "* * * * *" // Solo para ruebas que se ejecute cada minuto. EN produccion, cambiar a Cron.Daily
-);
 app.MapControllers();
 
 app.Run();

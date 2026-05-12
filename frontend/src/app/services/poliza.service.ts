@@ -124,7 +124,6 @@ interface PolizaApiDto {
   contratista: string;
   ramoId: string;
   ramo: string;
-  ramoCambiaValor: boolean;
   valorOriginal: number;
   valorActual: number;
   fechaEmision: string;
@@ -175,7 +174,6 @@ export class PolizaService {
     }
     return this.api.get<PolizaApiDto>(`${this.basePath}/${id}`).pipe(
       map((dto) => this.mapDetail(dto)),
-      tap(data => console.log(data)),
       catchError((err: unknown) => {
         const status = (err as HttpErrorResponse)?.status;
         if (status === 404) {
@@ -334,7 +332,6 @@ export class PolizaService {
       contratistaId: d.contratistaId,
       ramo: d.ramo,
       ramoId: d.ramoId,
-      cambiaValor: d.ramoCambiaValor,
       obra: d.obra,
       aseguradora: d.aseguradora,
       fechaEmision: d.fechaEmision,
@@ -342,7 +339,10 @@ export class PolizaService {
       estado: mapApiEstadoToUi(d.estado),
       valorOriginal: d.valorOriginal,
       valorActual: d.valorActual,
-      observaciones: d.observaciones ?? ''
+      observaciones: d.observaciones ?? '',
+      historialRenovaciones: [],
+      notificaciones: [],
+      auditoria: [],
     };
   }
 }

@@ -13,5 +13,4 @@ public class RamoRequest
     [Required(ErrorMessage = "La descripción es obligatoria.")]
     [MaxLength(2000)]
     public string Descripcion { get; set; } = null!;
-    public TimeSpan PeriodicidadRenovacion { get; set; }
 }

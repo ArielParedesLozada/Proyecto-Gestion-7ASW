@@ -24,85 +24,101 @@
           <mat-icon>edit</mat-icon>
           Editar
         </button>
+        <button type="button" mat-stroked-button class="action-btn" (click)="onAction('Renovar')">
+          <mat-icon>autorenew</mat-icon>
+          Renovar
+        </button>
         <button type="button" mat-stroked-button class="action-btn" (click)="onAction('PDF')">
           <mat-icon>picture_as_pdf</mat-icon>
           PDF
         </button>
       </section>
 
-      <div class="poliza-summary-layout">
+      <section class="detail-card">
+        <h2 class="detail-card__title">Información General</h2>
 
-        <section class="detail-card" id="poliza-info">
-          <h2 class="detail-card__title">Información General</h2>
-  
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-item__label">Número de Póliza</span>
-              <span class="info-item__value">{{ p.numero }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Contratista</span>
-              <span class="info-item__value">{{ p.contratista }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Ramo</span>
-              <span class="info-item__value">{{ p.ramo }}</span>
-            </div>
-            <div class="info-item info-item--wide">
-              <span class="info-item__label">Obra</span>
-              <span class="info-item__value">{{ p.obra }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Aseguradora</span>
-              <span class="info-item__value">{{ p.aseguradora }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Fecha de Emisión</span>
-              <span class="info-item__value">{{ p.fechaEmision | date: 'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Fecha de Expiración</span>
-              <span class="info-item__value">{{ p.fechaExpiracion | date: 'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Estado</span>
-              <span class="info-item__value">
-                <app-poliza-status-badge [estado]="p.estado" />
-              </span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Valor Original</span>
-              <span class="info-item__value">${{ p.valorOriginal | number: '1.0-0' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-item__label">Valor Actual</span>
-              <span class="info-item__value">${{ p.valorActual | number: '1.0-0' }}</span>
-            </div>
-            <div class="info-item info-item--full">
-              <span class="info-item__label">Observaciones</span>
-              <span class="info-item__value">{{ p.observaciones }}</span>
-            </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-item__label">Número de Póliza</span>
+            <span class="info-item__value">{{ p.numero }}</span>
           </div>
-        </section>
-          <app-latest-renovation
-            [renovacion]="ultimaRenovacion"
-            [loading]="procesandoRenovacion"
-            [ramo]="poliza()?.ramo || ''"
-            (aprobar)="onAprobarUltimaRenovacion()"
-            (rechazar)="onRechazarUltimaRenovacion()"
-          />      
+          <div class="info-item">
+            <span class="info-item__label">Contratista</span>
+            <span class="info-item__value">{{ p.contratista }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Ramo</span>
+            <span class="info-item__value">{{ p.ramo }}</span>
+          </div>
+          <div class="info-item info-item--wide">
+            <span class="info-item__label">Obra</span>
+            <span class="info-item__value">{{ p.obra }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Aseguradora</span>
+            <span class="info-item__value">{{ p.aseguradora }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Fecha de Emisión</span>
+            <span class="info-item__value">{{ p.fechaEmision | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Fecha de Expiración</span>
+            <span class="info-item__value">{{ p.fechaExpiracion | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Estado</span>
+            <span class="info-item__value">
+              <app-poliza-status-badge [estado]="p.estado" />
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Valor Original</span>
+            <span class="info-item__value">${{ p.valorOriginal | number: '1.0-0' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Valor Actual</span>
+            <span class="info-item__value">${{ p.valorActual | number: '1.0-0' }}</span>
+          </div>
+          <div class="info-item info-item--full">
+            <span class="info-item__label">Observaciones</span>
+            <span class="info-item__value">{{ p.observaciones }}</span>
+          </div>
         </div>
+      </section>
 
       <section class="detail-card">
-        <app-renovaciones-table
-          [rows]="historialRenovaciones"
-          [paginatorLength]="historialRenovaciones.length"
-          [pageIndex]="0"
-          [pageSize]="10"
-          (pageChange)="onPageChange($event)"
-          (ver)="onVerRenovacion($event)"
-        />
+        <h2 class="detail-card__title">Historial de Renovaciones</h2>
+        <div class="table-wrap">
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th>Fecha Renovación</th>
+                <th>Vencimiento Anterior</th>
+                <th>Nuevo Vencimiento</th>
+                <th>Valor Anterior</th>
+                <th>Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of p.historialRenovaciones; track $index) {
+                <tr>
+                  <td>{{ item.fechaRenovacion }}</td>
+                  <td>{{ item.vencimientoAnterior }}</td>
+                  <td>{{ item.nuevoVencimiento }}</td>
+                  <td>${{ item.valorAnterior | number: '1.0-0' }}</td>
+                  <td>{{ item.usuario }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="detail-table__empty">Sin renovaciones registradas.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </section>
+
       <section class="detail-card">
         <h2 class="detail-card__title">Notificaciones Enviadas</h2>
         <div class="table-wrap">
@@ -117,17 +133,47 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of notificaciones; track $index) {
+              @for (item of p.notificaciones; track $index) {
                 <tr>
-                  <td>{{ "item.fecha" }}</td>
-                  <td>{{ "item.tipo" }}</td>
-                  <td>{{ "item.accion" }}</td>
-                  <td>{{ "item.detalle" }}</td>
-                  <td><span class="mini-badge">{{ "item.estado" }}</span></td>
+                  <td>{{ item.fecha }}</td>
+                  <td>{{ item.tipo }}</td>
+                  <td>{{ item.accion }}</td>
+                  <td>{{ item.detalle }}</td>
+                  <td><span class="mini-badge">{{ item.estado }}</span></td>
                 </tr>
               } @empty {
                 <tr>
                   <td colspan="5" class="detail-table__empty">Sin notificaciones registradas.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="detail-card">
+        <h2 class="detail-card__title">Registro de Auditoría</h2>
+        <div class="table-wrap">
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of p.auditoria; track $index) {
+                <tr>
+                  <td>{{ item.fecha }}</td>
+                  <td>{{ item.usuario }}</td>
+                  <td>{{ item.accion }}</td>
+                  <td>{{ item.detalle }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="detail-table__empty">Sin eventos de auditoría.</td>
                 </tr>
               }
             </tbody>

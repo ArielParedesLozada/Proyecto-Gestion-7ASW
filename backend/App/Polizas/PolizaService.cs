@@ -160,7 +160,6 @@ public class PolizaService(AppDatabase context)
                 ContratistaNombre = p.ContratistaNav.Nombre,
                 RamoId = p.Ramo,
                 RamoNombre = p.RamoNav.Nombre,
-                RamoCambiaValor = p.RamoNav.CambiaValor,
                 FechaEmision = p.FechaEmision,
                 FechaExpiracion = p.FechaExpiracion,
                 ValorOriginal = p.ValorOriginal,

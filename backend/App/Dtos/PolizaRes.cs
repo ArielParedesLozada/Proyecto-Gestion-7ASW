@@ -12,7 +12,6 @@ public class PolizaRes
     public string ContratistaNombre { get; set; } = null!;
     public Guid RamoId { get; set; }
     public string RamoNombre { get; set; } = null!;
-    public bool RamoCambiaValor { get; set; }
     public decimal ValorOriginal { get; set; }
     public decimal ValorActual { get; set; }
     public DateTimeOffset FechaEmision { get; set; }
