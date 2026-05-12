@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>{{ data.titulo }}</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="dialog-form">
+
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+
+            <input matInput formControlName="nombre" autocomplete="off" />
+
+            @if (form.controls.nombre.hasError('required')) {
+            <mat-error>
+                El nombre es obligatorio
+            </mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Correo electrónico</mat-label>
+
+            <input matInput formControlName="correo" autocomplete="off" />
+
+            @if (form.controls.correo.hasError('required')) {
+            <mat-error>
+                El correo es obligatorio
+            </mat-error>
+            }
+
+            @if (form.controls.correo.hasError('email')) {
+            <mat-error>
+                El correo no es válido
+            </mat-error>
+            }
+        </mat-form-field>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>
+        Cancelar
+    </button>
+
+    <button mat-flat-button color="primary" [disabled]="loading" (click)="guardar()">
+        Guardar
+    </button>
+</mat-dialog-actions>
