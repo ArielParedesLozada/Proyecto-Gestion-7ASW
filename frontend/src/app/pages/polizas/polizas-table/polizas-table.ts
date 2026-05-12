@@ -5,10 +5,10 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
-import { SicopTableCellClampComponent } from '../../../shared/components/sicop-table-cell-clamp/sicop-table-cell-clamp.component';
 import { PolizaListRow } from '../models/poliza-list.model';
 import { PolizaStatusBadge } from '../poliza-status-badge/poliza-status-badge';
 import { formatDiasRestantesDesdeIso, polizaDiasRestantesUrgenciaKey } from '../utils/poliza-list-orden.util';
+import { SicopTableCellClampComponent } from '../../../shared/components/sicop-table-cell-clamp/sicop-table-cell-clamp.component';
 
 @Component({
   selector: 'app-polizas-table',

@@ -1,12 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizasTable } from '../polizas/polizas-table/polizas-table';
 import { PolizaListRow } from '../polizas/models/poliza-list.model';
 import { sortPolizasForDashboard } from '../polizas/utils/poliza-list-orden.util';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 
 /** Máximo de filas en la vista ejecutiva del Dashboard (tras ordenar por prioridad). */
 export const DASHBOARD_POLIZAS_LIMIT = 10;

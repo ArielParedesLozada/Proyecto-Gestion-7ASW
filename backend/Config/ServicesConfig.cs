@@ -3,6 +3,7 @@ using Backend.App.Auth;
 using Backend.App.Notificaciones;
 using Backend.App.Polizas;
 using Backend.App.Renovaciones;
+using Backend.App.Reportes;
 using Backend.Data.Databases;
 using Backend.Data.Repository;
 using Backend.Domain.Models;
@@ -58,6 +59,7 @@ public static class ServicesConfig
         services.AddScoped<AuditoriaService>();
         services.AddScoped<AuditoriaQueryService>();
         services.AddScoped<NotificacionService>();
+        services.AddScoped<ControlMaestroService>();
         return services;
     }
 }

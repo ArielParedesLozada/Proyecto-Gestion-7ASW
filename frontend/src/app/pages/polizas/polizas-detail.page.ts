@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -17,6 +16,7 @@ import { RenovacionesTable } from '../renovaciones/renovaciones-table/renovacion
 import { LatestRenovation } from '../../shared/components/latest-renovation/latest-renovation';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NuevoValorRenovacionDialogComponent } from '../../shared/components/nuevo-valor-renovacion-dialog-component/nuevo-valor-renovacion-dialog-component';
+import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
 
 @Component({
   selector: 'app-polizas-detail-page',

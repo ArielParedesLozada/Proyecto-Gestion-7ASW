@@ -1,0 +1,71 @@
+<header class="polizas-header">
+    <div>
+        <h1 class="page-title">Control Maestro</h1>
+        <p class="page-subtitle">
+            Consolidado de pólizas vigentes y vencidas
+        </p>
+    </div>
+
+    <div class="polizas-header__tools">
+        <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+            <mat-icon>notifications</mat-icon>
+            <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+        </button>
+
+        <app-header-user-menu />
+    </div>
+</header>
+
+<!-- ACTION BAR (como en PolizaDetail) -->
+<section class="action-bar cm-action-bar">
+    <mat-form-field appearance="outline">
+        <mat-label>Saldo inicial</mat-label>
+        <input matInput type="number" [ngModel]="saldoInicial()" (ngModelChange)="saldoInicial.set($event)" />
+    </mat-form-field>
+
+    <button type="button" mat-raised-button color="primary" class="action-btn" (click)="cargar()">
+        Calcular
+    </button>
+
+    <button type="button" mat-stroked-button class="action-btn" (click)="exportarPdf()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        PDF
+    </button>
+</section>
+
+<!-- RESUMEN -->
+<div class="cm-summary">
+    <div class="cm-card cm-card--neutral">
+        <span>Saldo inicial</span>
+        <strong>{{ resumen().saldoInicial | currency }}</strong>
+    </div>
+
+    <div class="cm-card cm-card--success">
+        <span>Vigentes: </span>
+        <strong>{{ resumen().totalVigentes | currency }}</strong>
+    </div>
+
+    <div class="cm-card cm-card--danger">
+        <span>Vencidas: </span>
+        <strong>{{ resumen().totalVencidas | currency }}</strong>
+    </div>
+
+    <div class="cm-card cm-card--highlight">
+        <span>Cuadre total: </span>
+        <strong>{{ resumen().cuadreTotal | currency }}</strong>
+    </div>
+</div>
+
+<!-- VIGENTES -->
+<section class="cm-section">
+    <app-polizas-table tableTitle="Pólizas Vigentes" tableSubtitle="Listado activo" [rows]="vigentes()"
+        [showPaginator]="true" [paginatorLength]="totalVigentes()" [pageIndex]="pageVigentes() - 1"
+        [pageSize]="pageSizeVigentes()" (pageChange)="onPageVigentes($event)" />
+</section>
+
+<!-- VENCIDAS -->
+<section class="cm-section">
+    <app-polizas-table tableTitle="Pólizas Vencidas" tableSubtitle="Histórico expirado" [rows]="vencidas()"
+        [showPaginator]="true" [paginatorLength]="totalVencidasCount()" [pageIndex]="pageVencidas() - 1"
+        [pageSize]="pageSizeVencidas()" (pageChange)="onPageVencidas($event)" />
+</section>
