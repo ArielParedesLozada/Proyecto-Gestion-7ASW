@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Nuevo valor renovación</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline">
+    <mat-label>Nuevo valor</mat-label>
+    <input matInput type="number" [(ngModel)]="valor" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cerrar()">Cancelar</button>
+  <button mat-flat-button (click)="guardar()">Validar</button>
+</mat-dialog-actions>
