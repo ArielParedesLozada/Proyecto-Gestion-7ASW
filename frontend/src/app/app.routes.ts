@@ -19,6 +19,7 @@ import { RenovacionDetailPage } from './pages/renovaciones/renovacion-detail/ren
 import { AseguradorasPage } from './pages/aseguradoras/aseguradoras.page';
 import { NotificacionesPage } from './pages/notificaciones/notificaciones.page';
 import { AuditoriasPage } from './pages/auditorias/auditorias.page';
+import { ControlMaestroPage } from './pages/reportes/control-maestro/control-maestro.page';
 
 /**
  * Rutas públicas (sin MainLayout).
@@ -52,6 +53,7 @@ export const routes: Routes = [
       { path: 'users', component: UsersPage },
       { path: 'notificaciones', component: NotificacionesPage },
       { path: 'auditoria', component: AuditoriasPage },
+      { path: 'reportes', component: ControlMaestroPage }
     ],
   },
   { path: '**', redirectTo: '/login' },
