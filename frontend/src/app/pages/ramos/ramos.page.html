@@ -1,119 +1,126 @@
 <header class="polizas-header ramos-header">
-  <div>
-    <h1 class="page-title">Ramos</h1>
-    <p class="page-subtitle">Gestión de tipos de ramos de pólizas</p>
-  </div>
-  <div class="polizas-header__tools">
-    <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
-      <mat-icon>notifications</mat-icon>
-      <span class="polizas-header__notif-dot" aria-hidden="true"></span>
-    </button>
-    <app-header-user-menu />
-  </div>
-</header>
+    <div>
+      <h1 class="page-title">Ramos</h1>
+      <p class="page-subtitle">Gestión de tipos de ramos de pólizas</p>
+    </div>
+    <div class="polizas-header__tools">
+      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
+      </button>
+      <app-header-user-menu />
+    </div>
+  </header>
 
-@if (formularioModo() !== 'oculto') {
-<form [formGroup]="ramoForm" (ngSubmit)="onSubmitRamo()" class="ramos-registro-form" novalidate>
-  <div class="form-card ramos-registro-card">
-    <h2 class="form-card__title">
-      @if (formularioModo() === 'crear') {
-      Nuevo Ramo
-      } @else {
-      Editar Ramo
-      }
-    </h2>
-
-    <div class="form-grid">
-      <div class="form-row form-row--1">
-        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="nombre" placeholder="Nombre del ramo" autocomplete="off"
-            [maxlength]="ramoMax.nombre" />
-          <mat-hint align="end">{{ ramoForm.controls.nombre.value?.length ?? 0 }} / {{ ramoMax.nombre }}</mat-hint>
-          @if (ramoForm.controls.nombre.hasError('required') && ramoForm.controls.nombre.touched) {
-          <mat-error>Campo obligatorio</mat-error>
-          } @else if (ramoForm.controls.nombre.hasError('maxlength') && ramoForm.controls.nombre.touched) {
-          <mat-error>El nombre no puede superar los {{ ramoMax.nombre }} caracteres.</mat-error>
+  @if (formularioModo() !== 'oculto') {
+    <form [formGroup]="ramoForm" (ngSubmit)="onSubmitRamo()" class="ramos-registro-form" novalidate>
+      <div class="form-card ramos-registro-card">
+        <h2 class="form-card__title">
+          @if (formularioModo() === 'crear') {
+            Nuevo Ramo
+          } @else {
+            Editar Ramo
           }
-        </mat-form-field>
-      </div>
+        </h2>
 
-      <div class="form-row form-row--1">
-        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-          <mat-label>Descripción</mat-label>
-          <textarea matInput formControlName="descripcion" placeholder="Descripción del ramo" rows="3"
-            [maxlength]="ramoMax.descripcion"></textarea>
-          <mat-hint align="end">{{ ramoForm.controls.descripcion.value?.length ?? 0 }} / {{ ramoMax.descripcion
-            }}</mat-hint>
-          @if (ramoForm.controls.descripcion.hasError('required') && ramoForm.controls.descripcion.touched) {
-          <mat-error>Campo obligatorio</mat-error>
-          } @else if (ramoForm.controls.descripcion.hasError('maxlength') && ramoForm.controls.descripcion.touched) {
-          <mat-error>La descripción no puede superar los {{ ramoMax.descripcion }} caracteres.</mat-error>
-          }
-        </mat-form-field>
-      </div>
-      <div class="form-row form-row--1">
-        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-          <mat-label>Periodicidad de renovación</mat-label>
-          <mat-select formControlName="periodicidad">
-            <mat-option value="day">1 día</mat-option>
-            <mat-option value="week">1 semana</mat-option>
-            <mat-option value="month">1 mes</mat-option>
-            <mat-option value="year">1 año</mat-option>
-          </mat-select>
-          <mat-hint>Define cada cuánto se renueva la póliza de este ramo</mat-hint>
-        </mat-form-field>
-      </div>
+        <div class="form-grid">
+          <div class="form-row form-row--1">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Nombre</mat-label>
+              <input
+                matInput
+                formControlName="nombre"
+                placeholder="Nombre del ramo"
+                autocomplete="off"
+                [maxlength]="ramoMax.nombre"
+              />
+              <mat-hint align="end">{{ ramoForm.controls.nombre.value?.length ?? 0 }} / {{ ramoMax.nombre }}</mat-hint>
+              @if (ramoForm.controls.nombre.hasError('required') && ramoForm.controls.nombre.touched) {
+                <mat-error>Campo obligatorio</mat-error>
+              } @else if (ramoForm.controls.nombre.hasError('maxlength') && ramoForm.controls.nombre.touched) {
+                <mat-error>El nombre no puede superar los {{ ramoMax.nombre }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
 
-      <div class="form-row form-row--1">
-        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-          <mat-label>Cambio valor</mat-label>
-          <mat-select formControlName="cambioValor">
-            <mat-option [value]="false">No</mat-option>
-            <mat-option [value]="true">Sí</mat-option>
-          </mat-select>
+          <div class="form-row form-row--1">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Descripción</mat-label>
+              <textarea
+                matInput
+                formControlName="descripcion"
+                placeholder="Descripción del ramo"
+                rows="3"
+                [maxlength]="ramoMax.descripcion"
+              ></textarea>
+              <mat-hint align="end">{{ ramoForm.controls.descripcion.value?.length ?? 0 }} / {{ ramoMax.descripcion }}</mat-hint>
+              @if (ramoForm.controls.descripcion.hasError('required') && ramoForm.controls.descripcion.touched) {
+                <mat-error>Campo obligatorio</mat-error>
+              } @else if (ramoForm.controls.descripcion.hasError('maxlength') && ramoForm.controls.descripcion.touched) {
+                <mat-error>La descripción no puede superar los {{ ramoMax.descripcion }} caracteres.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row form-row--1">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+              <mat-label>Cambio valor</mat-label>
+              <mat-select formControlName="cambioValor">
+                <mat-option [value]="false">No</mat-option>
+                <mat-option [value]="true">Sí</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" mat-flat-button class="btn-registrar">
+            @if (formularioModo() === 'crear') {
+              Registrar Ramo
+            } @else {
+              Guardar Cambios
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (formularioModo() === 'oculto') {
+    <div class="toolbar-card">
+      <div class="toolbar-card__left">
+        <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+          <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+          <input
+            matInput
+            placeholder="Buscar por nombre o descripción..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
         </mat-form-field>
+
+        <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar filtros
+        </button>
+      </div>
+      <div class="toolbar-card__right">
+        <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="abrirFormularioCrear()">
+          <mat-icon>add</mat-icon>
+          Nuevo Ramo
+        </button>
       </div>
     </div>
+  }
 
-    <div class="form-actions">
-      <button type="button" mat-stroked-button class="btn-cancelar" (click)="onCancelarFormulario()">
-        Cancelar
-      </button>
-      <button type="submit" mat-flat-button class="btn-registrar">
-        @if (formularioModo() === 'crear') {
-        Registrar Ramo
-        } @else {
-        Guardar Cambios
-        }
-      </button>
-    </div>
-  </div>
-</form>
-}
-
-@if (formularioModo() === 'oculto') {
-<div class="toolbar-card">
-  <div class="toolbar-card__left">
-    <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
-      <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
-      <input matInput placeholder="Buscar por nombre o descripción..." [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)" />
-    </mat-form-field>
-
-    <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
-      <mat-icon>filter_alt_off</mat-icon>
-      Limpiar filtros
-    </button>
-  </div>
-  <div class="toolbar-card__right">
-    <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="abrirFormularioCrear()">
-      <mat-icon>add</mat-icon>
-      Nuevo Ramo
-    </button>
-  </div>
-</div>
-}
-
-<app-ramos-table [rows]="pagedRows()" [paginatorLength]="totalFiltrado()" [pageIndex]="pageIndex()"
-  [pageSize]="pageSize" (pageChange)="onPage($event)" (editar)="onEditar($event)" />
+  <app-ramos-table
+    [rows]="pagedRows()"
+    [paginatorLength]="totalFiltrado()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize"
+    (pageChange)="onPage($event)"
+    (editar)="onEditar($event)"
+  />

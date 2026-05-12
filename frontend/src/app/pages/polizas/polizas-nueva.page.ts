@@ -96,16 +96,15 @@ export class PolizasNuevaPage {
     merge(
       this.form.controls.fechaEmision.valueChanges,
       this.form.controls.ramo.valueChanges,
+      this.form.controls.fechaExpiracion.valueChanges,
     )
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.recalcularFechaExpiracion());
-    this.form.controls.valorOriginal.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => this.sincronizarValorActual());
-
-    // Ejecutar una vez al inicio por si ya hay valores precargados
-    this.recalcularFechaExpiracion();
-    this.sincronizarValorActual();
+      .subscribe(() => {
+        this.actualizarFechaExpiracionDesdeFormulario();
+        syncPreview();
+      });
+    this.actualizarFechaExpiracionDesdeFormulario();
+    syncPreview();
   }
 
   onCancel(): void {
@@ -116,6 +115,7 @@ export class PolizasNuevaPage {
     if (this.saving()) {
       return;
     }
+    this.actualizarFechaExpiracionDesdeFormulario();
     if (this.form.controls.fechaEmision.hasError('emisionFutura')) {
       this.form.markAllAsTouched();
       this.notify.warn('La fecha de emisión no puede ser posterior a la fecha actual.');
@@ -176,41 +176,13 @@ export class PolizasNuevaPage {
         error: (err: unknown) => this.notify.fromHttpError(err),
       });
   }
-  private extraerDiasDesdePeriodicidad(periodicity: string | undefined): number {
-    if (!periodicity) return 0;
-    const parts = periodicity.split('.');
-    if (parts.length >= 1) {
-      const days = parseInt(parts[0], 10);
-      return isNaN(days) ? 0 : days;
-    }
-    return 0;
-  }
 
-  private recalcularFechaExpiracion(): void {
-    const fechaEmision = this.form.controls.fechaEmision.value;
-    const ramoId = this.form.controls.ramo.value;
-    if (!fechaEmision || !ramoId) {
-      this.form.controls.fechaExpiracion.setValue(null);
-      return;
-    }
-    const ramo = this.ramos().find(r => r.id === ramoId);
-    if (!ramo) {
-      this.form.controls.fechaExpiracion.setValue(null);
-      return;
-    }
-    const days = this.extraerDiasDesdePeriodicidad(ramo.periodicity);
-    if (days === 0) {
-      this.form.controls.fechaExpiracion.setValue(null);
-      return;
-    }
-    const nuevaFecha = new Date(fechaEmision);
-    nuevaFecha.setDate(nuevaFecha.getDate() + days);
-    this.form.controls.fechaExpiracion.setValue(nuevaFecha);
-  }
-  private sincronizarValorActual(): void {
-    const original = this.form.controls.valorOriginal.value;
-    if (original !== null && original !== undefined && original !== '') {
-      this.form.controls.valorActual.setValue(original);
-    }
+  private actualizarFechaExpiracionDesdeFormulario(): void {
+    sincronizarFechaExpiracionPoliza(
+      this.form.controls.fechaEmision.value,
+      this.form.controls.ramo.value,
+      this.ramos(),
+      this.form.controls.fechaExpiracion,
+    );
   }
 }

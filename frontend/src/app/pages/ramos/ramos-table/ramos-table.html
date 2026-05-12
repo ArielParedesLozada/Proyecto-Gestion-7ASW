@@ -7,7 +7,6 @@
         <tr>
           <th>Nombre</th>
           <th>Descripción</th>
-          <th>Periodicidad</th>
           <th>Cambio Valor</th>
           <th class="ramos-table__col-actions">Acciones</th>
         </tr>
@@ -17,7 +16,6 @@
           <tr>
             <td class="ramos-table__nombre">{{ row.nombre }}</td>
             <td class="ramos-table__desc">{{ row.descripcion }}</td>
-            <td class="ramos-table__desc">{{ row.periodicity | formatTimespan }}</td>
             <td>
               <app-ramo-cambio-valor-badge [cambioValor]="row.cambioValor" />
             </td>

@@ -21,8 +21,8 @@ public class JwtTokenGenerator(string privateKeyPath, double jwtTime, string iss
         Claim[] claims =
         [
           new Claim(ClaimTypes.Role, user.Role),
-          new Claim(ClaimTypes.Email, user.Email),
-          new Claim("must_change_password", user.MustChangePassword.ToString().ToLower()),
+          new Claim(ClaimTypes.Name, user.Username),
+          new Claim("must_change_password", user.MustChangePassword.ToString().ToLower())
         ];
         var signCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
         var tokenDesc = new SecurityTokenDescriptor

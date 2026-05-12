@@ -5,11 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
 import { RamoListRow } from '../models/ramo-list.model';
 import { RamoCambioValorBadge } from '../ramo-cambio-valor-badge/ramo-cambio-valor-badge';
-import { FormatTimespanPipe } from '../pipes/format-timespan-pipe';
 
 @Component({
   selector: 'app-ramos-table',
-  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, RamoCambioValorBadge, FormatTimespanPipe],
+  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, RamoCambioValorBadge],
   templateUrl: './ramos-table.html',
   styleUrl: './ramos-table.scss',
 })
