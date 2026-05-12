@@ -6,4 +6,5 @@ public class RamoDtoResponse
     public string Nombre { get; set; } = null!;
     public bool CambiaValor { get; set; }
     public string Descripcion { get; set; } = null!;
+    public TimeSpan Periodicidad { get; set; }
 }

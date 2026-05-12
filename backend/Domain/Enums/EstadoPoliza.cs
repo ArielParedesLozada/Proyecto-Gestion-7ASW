@@ -2,6 +2,7 @@ namespace Backend.Domain.Enums;
 
 public enum EstadoPoliza
 {
-    Vigente,
-    Vencida
+    Vigente = 0,
+    PorVencer = 1,
+    Vencida = 2,
 }

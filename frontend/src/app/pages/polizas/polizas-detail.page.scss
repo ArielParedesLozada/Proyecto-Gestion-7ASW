@@ -193,3 +193,17 @@
     grid-column: auto;
   }
 }
+
+.poliza-summary-layout{
+ display:grid;
+ grid-template-columns:2fr 1fr;
+ gap:1.2rem;
+ align-items:start;
+ margin-bottom:1.25rem;
+}
+
+@media(max-width:1100px){
+ .poliza-summary-layout{
+   grid-template-columns:1fr;
+ }
+}

@@ -8,18 +8,16 @@ public class RamoService(IRepository<Ramo, Guid> ramoRepo)
     private readonly IRepository<Ramo, Guid> _ramoRepo = ramoRepo;
 
     // ✅ Crear
-    public async Task<Ramo> CreateRamo(string nombre, bool cambiaValor, string descripcion)
+    public async Task<Ramo> CreateRamo(string nombre, bool cambiaValor, string descripcion, TimeSpan periodicidadRenovacion)
     {
-        var nombreTrim = nombre.Trim();
-        var descripcionTrim = descripcion.Trim();
         var ramo = new Ramo
         {
             Id = Guid.NewGuid(),
-            Nombre = nombreTrim,
+            Nombre = nombre,
             CambiaValor = cambiaValor,
-            Descripcion = descripcionTrim
+            Descripcion = descripcion,
+            PeriodicidadRenovacion = periodicidadRenovacion
         };
-
         return await _ramoRepo.CreateAsync(ramo);
     }
 
@@ -37,19 +35,20 @@ public class RamoService(IRepository<Ramo, Guid> ramoRepo)
     }
 
     // ✅ Buscar
-    public async Task<IEnumerable<Ramo>> FindEmpresas(string nombre)
+    public async Task<IEnumerable<Ramo>> FindRamos(string nombre)
     {
         return await _ramoRepo.FindAsync(r => r.Nombre.Contains(nombre));
     }
 
-    public async Task<Ramo?> UpdateRamo(Guid id, string nombre, bool cambiaValor, string descripcion)
+    public async Task<Ramo?> UpdateRamo(Guid id, string nombre, bool cambiaValor, string descripcion, TimeSpan periodicidadRenovacion)
     {
         var ramo = await _ramoRepo.GetByIdAsync(id);
         if (ramo == null) return null;
 
-        ramo.Nombre = nombre.Trim();
+        ramo.Nombre = nombre;
         ramo.CambiaValor = cambiaValor;
-        ramo.Descripcion = descripcion.Trim();
+        ramo.Descripcion = descripcion;
+        ramo.PeriodicidadRenovacion = periodicidadRenovacion;
 
         return await _ramoRepo.UpdateAsync(ramo);
     }

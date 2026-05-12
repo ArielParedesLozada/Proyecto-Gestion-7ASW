@@ -6,4 +6,5 @@ public class Ramo
     public string Nombre { get; set; }
     public bool CambiaValor { get; set; }
     public string Descripcion { get; set; }
+    public TimeSpan PeriodicidadRenovacion { get; set; }
 }

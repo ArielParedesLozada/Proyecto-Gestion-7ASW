@@ -1,0 +1,105 @@
+// Misma línea visual que empresas / pólizas (card + tabla admin).
+.renovaciones-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1.1rem 1.25rem 0;
+  overflow: hidden;
+}
+
+.renovaciones-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+}
+
+.renovaciones-table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.renovaciones-table thead th {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.renovaciones-table tbody td {
+  padding: 0.75rem 0.75rem;
+  border-bottom: 1px solid #eef0f4;
+  color: #1f2937;
+  vertical-align: middle;
+}
+
+.renovaciones-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.renovaciones-table__poliza {
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.renovaciones-table__valor {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.renovaciones-table__col-actions {
+  text-align: right;
+  width: 72px;
+}
+
+.renovaciones-table__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.renovaciones-table__empty {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.action-btn {
+  color: #6b7280 !important;
+
+  &:hover {
+    color: #c1121f !important;
+    background: rgba(193, 18, 31, 0.06) !important;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.renovaciones-card__paginator {
+  margin: 0.75rem -1.25rem 0;
+  padding: 0;
+  border-top: 1px solid #eef0f4;
+  background: #fafbfc;
+}

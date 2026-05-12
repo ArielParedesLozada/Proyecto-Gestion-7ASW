@@ -109,6 +109,7 @@ public class PolizaController(
         Contratista = p.ContratistaNombre,
         RamoId = p.RamoId,
         Ramo = p.RamoNombre,
+        RamoCambiaValor = p.RamoCambiaValor,
         ValorOriginal = p.ValorOriginal,
         ValorActual = p.ValorActual,
         FechaEmision = p.FechaEmision,
