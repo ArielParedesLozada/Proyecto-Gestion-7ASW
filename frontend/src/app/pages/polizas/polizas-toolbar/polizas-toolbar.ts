@@ -26,6 +26,10 @@ export class PolizasToolbar {
 
   searchQueryChange = output<string>();
   estadoFiltroChange = output<PolizaEstado | 'todos'>();
+  
+  ramos = input.required<{ id: string; nombre: string }[]>();
+  ramoFiltro = input.required<string | 'todos'>();
+  ramoFiltroChange = output<string | 'todos'>();
 
   cargarExcel = output<void>();
   nuevaPoliza = output<void>();
@@ -39,6 +43,10 @@ export class PolizasToolbar {
 
   onEstadoChange(value: PolizaEstado | 'todos'): void {
     this.estadoFiltroChange.emit(value);
+  }
+
+  onRamoChange(value: string | 'todos'): void {
+    this.ramoFiltroChange.emit(value);
   }
 
   onCargarExcel(): void {

@@ -1,0 +1,24 @@
+<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic"
+    class="sicop-poliza-aseguradora-field">
+    <mat-label>Aseguradora</mat-label>
+    <mat-select [formControl]="innerCtrl" [placeholder]="selectPlaceholder()" [panelClass]="panelClass"
+        (openedChange)="openedChange($event)">
+        <div class="sicop-poliza-aseguradora-panel__search" (click)="filterClick($event)">
+            <input #searchInput type="text" class="sicop-poliza-aseguradora-panel__input" [formControl]="filterCtrl"
+                placeholder="Buscar aseguradora..." aria-label="Filtrar aseguradoras por nombre" autocomplete="off"
+                (keydown)="filterKeydown($event)" (click)="filterClick($event)" />
+        </div>
+
+        @if (showPlaceholderOption() && !hasActiveFilter() && aseguradoras().length > 0) {
+        <mat-option value="" disabled>{{ placeholderOptionLabel() }}</mat-option>
+        }
+
+        @if (filteredAseguradoras().length === 0) {
+        <mat-option disabled class="sicop-poliza-aseguradora-panel__empty">No se encontraron aseguradoras</mat-option>
+        } @else {
+        @for (a of filteredAseguradoras(); track a.id) {
+        <mat-option [value]="a.id">{{ a.nombre }}</mat-option>
+        }
+        }
+    </mat-select>
+</mat-form-field>

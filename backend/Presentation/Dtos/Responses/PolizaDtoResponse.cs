@@ -6,7 +6,9 @@ public class PolizaDtoResponse
     public Guid Id { get; set; }
     public string Numero { get; set; } = null!;
     public string Obra { get; set; } = null!;
-    public string Aseguradora { get; set; } = null!;
+    public Guid AseguradoraId { get; set; }
+    public string AseguradoraNombre { get; set; } = null!;
+    public TimeSpan PeriodicidadRenovacion { get; set; }
     public Guid ContratistaId { get; set; }
     public string Contratista { get; set; } = null!;
     public Guid RamoId { get; set; }

@@ -1,0 +1,95 @@
+<div class="auditorias-page">
+    <header class="auditorias-header">
+        <div class="auditorias-header__intro">
+            <h1 class="page-title">Auditoría</h1>
+            <p class="page-subtitle">Registro detallado de todas las acciones realizadas en el sistema</p>
+        </div>
+        <div class="auditorias-header__tools">
+            <button type="button" class="auditorias-header__notif" aria-label="Notificaciones">
+                <mat-icon>notifications</mat-icon>
+                <span class="auditorias-header__notif-dot" aria-hidden="true"></span>
+            </button>
+            <mat-icon class="auditorias-header__profile" aria-hidden="true">account_circle</mat-icon>
+        </div>
+    </header>
+
+    <div class="toolbar-card">
+        <div class="toolbar-card__left">
+            <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+                <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+                <input matInput placeholder="Buscar por usuario, tabla o acción..." [ngModel]="searchQuery()"
+                    (ngModelChange)="searchQuery.set($event)" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+                <mat-label>Tabla</mat-label>
+                <mat-select [ngModel]="tablaFilter()" (ngModelChange)="tablaFilter.set($event)">
+                    <mat-option [value]="undefined">Todas</mat-option>
+                    @for (tabla of tablasDisponibles(); track tabla) {
+                    <mat-option [value]="tabla">{{ tabla }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+                <mat-label>Acción</mat-label>
+                <mat-select [ngModel]="accionFilter()" (ngModelChange)="accionFilter.set($event)">
+                    <mat-option [value]="undefined">Todas</mat-option>
+                    <mat-option value="CREATE">CREAR</mat-option>
+                    <mat-option value="UPDATE">ACTUALIZAR</mat-option>
+                    <mat-option value="DELETE">ELIMINAR</mat-option>
+                    <mat-option value="VALIDATE">VALIDAR</mat-option>
+                    <mat-option value="REJECT">RECHAZAR</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+                <mat-icon>filter_alt_off</mat-icon>
+                Limpiar filtros
+            </button>
+        </div>
+    </div>
+
+    <app-auditorias-table [rows]="pagedAuditorias()" [paginatorLength]="totalFiltrado()" [pageIndex]="pageIndex()"
+        [pageSize]="pageSize" (pageChange)="onPage($event)" (verDetalles)="onVerDetalles($event)" />
+
+    <!-- Modal de detalles (opcional) -->
+    @if (selectedAuditoria()) {
+    <div class="modal-overlay" (click)="cerrarDetalles()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Detalles de Auditoría</h3>
+                <button type="button" class="modal-close" (click)="cerrarDetalles()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Usuario:</span>
+                    <span class="detalle-item__value">{{ selectedAuditoria()?.username }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Tabla:</span>
+                    <span class="detalle-item__value">{{ selectedAuditoria()?.tabla }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Registro ID:</span>
+                    <span class="detalle-item__value">{{ selectedAuditoria()?.registroId }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Acción:</span>
+                    <span class="detalle-item__value">{{ selectedAuditoria()?.accion }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Datos Previos:</span>
+                    <pre class="detalle-item__json">{{ selectedAuditoria()?.datosPrevios | json }}</pre>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-item__label">Datos Nuevos:</span>
+                    <pre class="detalle-item__json">{{ selectedAuditoria()?.datosNuevos | json }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>

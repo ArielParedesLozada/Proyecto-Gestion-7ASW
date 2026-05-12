@@ -1,43 +1,62 @@
+using Backend.App.Dtos;
+using Backend.Data.Databases;
 using Backend.Data.Repository;
 using Backend.Domain.Errors;
 using Backend.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.App.Polizas;
 
-public class EmpresasService(IRepository<Empresa, Guid> empresaRepo)
+public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase database)
 {
     private readonly IRepository<Empresa, Guid> _empresaRepo = empresaRepo;
+    private readonly AppDatabase _database = database;
 
-    private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
-
-    public async Task<Empresa> CreateEmpresa(string nombre, string email)
+    public async Task<Empresa> CreateEmpresa(string nombre, string? email)
     {
         var nombreTrim = nombre.Trim();
         if (string.IsNullOrWhiteSpace(nombreTrim))
             throw new CustomError("El nombre es obligatorio.", 400);
 
-        var normalizedEmail = NormalizeEmail(email);
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-            throw new CustomError("El correo es obligatorio.", 400);
-
-        var duplicado = await _empresaRepo.FirstOrDefaultAsync(e => e.Email == normalizedEmail);
-        if (duplicado != null)
-            throw new CustomError("Ya existe una empresa con ese correo electrónico.", 409);
-
         var empresa = new Empresa
         {
             Id = Guid.NewGuid(),
             Nombre = nombreTrim,
-            Email = normalizedEmail
+            Email = email ?? ""
         };
 
         return await _empresaRepo.CreateAsync(empresa);
     }
 
-    public async Task<IEnumerable<Empresa>> GetAllEmpresas()
+    public async Task<PagedResult<Empresa>> GetAllEmpresas(int page = 1, int pageSize = 10, string? nameOrEmail = "")
     {
-        var items = await _empresaRepo.GetAllAsync();
-        return items.OrderBy(e => e.Nombre);
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+        var query = _database.Empresas.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(nameOrEmail))
+        {
+            query = query.Where(e =>
+                e.Nombre.ToLower().Contains(nameOrEmail) ||
+                e.Email.ToLower().Contains(nameOrEmail)
+            );
+        }
+
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(e => e.Nombre)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return new PagedResult<Empresa>
+        {
+            Items = items,
+            Total = total,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<Empresa?> GetEmpresaById(Guid id)
@@ -50,25 +69,16 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo)
         return await _empresaRepo.FindAsync(e => e.Nombre.Contains(nombre));
     }
 
-    public async Task<Empresa?> UpdateEmpresa(Guid id, string nombre, string email)
+    public async Task<Empresa?> UpdateEmpresa(Guid id, string nombre)
     {
         var nombreTrim = nombre.Trim();
         if (string.IsNullOrWhiteSpace(nombreTrim))
             throw new CustomError("El nombre es obligatorio.", 400);
 
-        var normalizedEmail = NormalizeEmail(email);
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-            throw new CustomError("El correo es obligatorio.", 400);
-
         var empresa = await _empresaRepo.GetByIdAsync(id);
         if (empresa == null) return null;
 
-        var duplicado = await _empresaRepo.FirstOrDefaultAsync(e => e.Email == normalizedEmail && e.Id != id);
-        if (duplicado != null)
-            throw new CustomError("Ya existe una empresa con ese correo electrónico.", 409);
-
         empresa.Nombre = nombreTrim;
-        empresa.Email = normalizedEmail;
 
         return await _empresaRepo.UpdateAsync(empresa);
     }

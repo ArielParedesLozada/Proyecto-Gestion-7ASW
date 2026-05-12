@@ -19,8 +19,7 @@ public class PolizaRequest
     public Guid Ramo { get; set; }
 
     [Required(ErrorMessage = "La aseguradora es obligatoria.")]
-    [MaxLength(200)]
-    public string Aseguradora { get; set; } = null!;
+    public Guid AseguradoraId { get; set; }
 
     [Required(ErrorMessage = "La fecha de emisión es obligatoria.")]
     public DateTimeOffset FechaEmision { get; set; }

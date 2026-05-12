@@ -15,10 +15,12 @@ namespace Backend.App.Polizas;
 public class PolizaExcelImportService(
     AppDatabase context,
     EmpresasService empresasService,
+    AseguradorasService aseguradorasService,
     IMemoryCache cache)
 {
     private readonly AppDatabase _context = context;
     private readonly EmpresasService _empresasService = empresasService;
+    private readonly AseguradorasService _aseguradorasService = aseguradorasService;
     private readonly IMemoryCache _cache = cache;
 
     private static readonly MemoryCacheEntryOptions SessionOptions = new()
@@ -26,9 +28,8 @@ public class PolizaExcelImportService(
         SlidingExpiration = TimeSpan.FromMinutes(30),
     };
 
-    private static string CacheKey(Guid token) => $"poliza-import:{token}";
-
-    public async Task<PolizaImportPreviewResponse> PrevisualizarAsync(Stream excelStream, string fileName)
+    private static string CacheKey(Guid token, string usuarioId) => $"poliza-import:{usuarioId}:{token}";
+    public async Task<PolizaImportPreviewResponse> PrevisualizarAsync(Stream excelStream, string fileName, Guid usuarioId)
     {
         if (excelStream == null || !excelStream.CanRead)
             throw new CustomError("No se recibió un archivo válido.", 400);
@@ -39,14 +40,16 @@ public class PolizaExcelImportService(
 
         List<Ramo> ramos;
         List<Empresa> empresas;
+        List<Aseguradora> aseguradoras;
         try
         {
             ramos = await _context.Ramos.AsNoTracking().ToListAsync();
             empresas = await _context.Empresas.AsNoTracking().ToListAsync();
+            aseguradoras = await _context.Aseguradoras.AsNoTracking().ToListAsync();
         }
         catch (Exception ex)
         {
-            throw new CustomError($"No se pudieron cargar ramos y empresas: {ex.Message}", 500);
+            throw new CustomError($"No se pudieron cargar ramos, empresas y aseguradoras: {ex.Message}", 500);
         }
 
         List<ImportPreviewRowInternal> rows;
@@ -54,7 +57,7 @@ public class PolizaExcelImportService(
         try
         {
             using var wb = new XLWorkbook(excelStream);
-            (rows, sheetsDetected) = ParseWorkbook(wb, ramos, empresas);
+            (rows, sheetsDetected) = ParseWorkbook(wb, ramos, empresas, aseguradoras);
         }
         catch (CustomError)
         {
@@ -86,27 +89,32 @@ public class PolizaExcelImportService(
                 r.PolizaExistenteId = id;
         }
 
-        ApplyExistenceAndValidation(rows, ramos, empresas);
+        ApplyExistenceAndValidation(rows, ramos, empresas, aseguradoras);
 
         var token = Guid.NewGuid();
         var session = new PolizaImportSession
         {
             FileName = name,
+            UsuarioId = usuarioId,
             CreatedAt = DateTimeOffset.UtcNow,
             Rows = rows,
         };
-        _cache.Set(CacheKey(token), session, SessionOptions);
+        _cache.Set(CacheKey(token, usuarioId.ToString()), session, SessionOptions);
 
         return MapPreviewResponse(token, name, sheetsDetected, rows);
     }
 
-    public async Task<PolizaImportResultResponse> ConfirmarAsync(Guid token)
+    public async Task<PolizaImportResultResponse> ConfirmarAsync(Guid token, Guid usuarioId)
     {
-        if (!_cache.TryGetValue(CacheKey(token), out PolizaImportSession? session) || session == null)
+        if (!_cache.TryGetValue(CacheKey(token, usuarioId.ToString()), out PolizaImportSession? session) || session == null)
         {
             throw new CustomError(
                 "La sesión de importación expiró o no es válida. Vuelve a cargar el archivo para previsualizar de nuevo.",
                 400);
+        }
+        if (session.UsuarioId != usuarioId)
+        {
+            throw new CustomError("Token no válido para este usuario.", 403);
         }
 
         var aplicables = session.Rows.Where(r => r.PuedeAplicar).ToList();
@@ -117,7 +125,8 @@ public class PolizaExcelImportService(
         var errores = new List<PolizaImportResultErrorDto>();
 
         var ramos = await _context.Ramos.AsNoTracking().ToListAsync();
-        var creadasPorNombre = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+        var empresasCreadasPorNombre = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+        var aseguradorasCreadasPorNombre = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
@@ -127,13 +136,21 @@ public class PolizaExcelImportService(
                 await using var tx = await _context.Database.BeginTransactionAsync();
                 try
                 {
-                    var empresaId = await ResolverOcrearEmpresaAsync(row, creadasPorNombre);
+                    // Resolver contratista (empresa)
+                    var empresaId = await ResolverOcrearEmpresaAsync(row, empresasCreadasPorNombre);
+
+                    // Resolver aseguradora (NUEVA LÓGICA)
+                    var aseguradoraId = await ResolverOcrearAseguradoraAsync(row, aseguradorasCreadasPorNombre);
+
                     var emisionUtc = AUtc(row.FechaEmision!.Value);
                     var expiracionUtc = AUtc(row.FechaExpiracion!.Value);
                     PolizaFechaValidacion.ValidarEmisionYExpiracion(emisionUtc, expiracionUtc);
 
                     var valor = row.Valor ?? 0;
                     var valorActual = valor;
+
+                    // Calcular periodicidad automáticamente (punto 8)
+                    var periodicidad = expiracionUtc - emisionUtc;
 
                     if (row.PolizaExistenteId != null && row.EstadoAnalisis == "paraActualizar")
                     {
@@ -155,7 +172,9 @@ public class PolizaExcelImportService(
                         entity.Contratista = empresaId;
                         entity.Obra = row.Obra!.Trim();
                         entity.Ramo = ramo.Id;
-                        entity.Aseguradora = row.Aseguradora!.Trim();
+                        entity.AseguradoraId = aseguradoraId; // CORREGIDO
+                        entity.UsuarioId = usuarioId;
+                        entity.PeriodicidadRenovacion = periodicidad; // NUEVO
                         entity.FechaEmision = emisionUtc;
                         entity.FechaExpiracion = expiracionUtc;
                         entity.ValorOriginal = valor;
@@ -178,7 +197,9 @@ public class PolizaExcelImportService(
                             Contratista = empresaId,
                             Obra = row.Obra!.Trim(),
                             Ramo = ramo.Id,
-                            Aseguradora = row.Aseguradora!.Trim(),
+                            AseguradoraId = aseguradoraId, // CORREGIDO
+                            UsuarioId = usuarioId,
+                            PeriodicidadRenovacion = periodicidad, // NUEVO
                             FechaEmision = emisionUtc,
                             FechaExpiracion = expiracionUtc,
                             ValorOriginal = valor,
@@ -213,14 +234,35 @@ public class PolizaExcelImportService(
         }
         finally
         {
-            _cache.Remove(CacheKey(token));
+            _cache.Remove(CacheKey(token, usuarioId.ToString()));
         }
 
         resultado.Errors = errores;
         return resultado;
     }
 
-    private async Task<Guid> ResolverOcrearEmpresaAsync(ImportPreviewRowInternal row, Dictionary<string, Guid> creadasPorNombre)
+    private async Task<Guid> ResolverOcrearAseguradoraAsync(
+        ImportPreviewRowInternal row,
+        Dictionary<string, Guid> creadasPorNombre)
+    {
+        var key = NormalizeNombreContratista(row.Aseguradora);
+        if (row.AseguradoraIdExistente != null)
+            return row.AseguradoraIdExistente.Value;
+
+        if (creadasPorNombre.TryGetValue(key, out var id))
+            return id;
+
+        if (string.IsNullOrEmpty(row.EmailAseguradoraProvisional))
+            throw new CustomError("No se pudo resolver la aseguradora.", 400);
+
+        var creada = await _aseguradorasService.CreateAseguradora(key, row.EmailAseguradoraProvisional);
+        creadasPorNombre[key] = creada.Id;
+        return creada.Id;
+    }
+
+    private async Task<Guid> ResolverOcrearEmpresaAsync(
+            ImportPreviewRowInternal row,
+            Dictionary<string, Guid> creadasPorNombre)
     {
         var key = NormalizeNombreContratista(row.Contratista);
         if (row.EmpresaIdExistente != null)
@@ -236,7 +278,6 @@ public class PolizaExcelImportService(
         creadasPorNombre[key] = creada.Id;
         return creada.Id;
     }
-
     /// <summary>Clave de negocio alineada con lectura de fila y con índice único (Numero, Obra) en BD.</summary>
     private static string ClaveNegocioPoliza(string? numeroPoliza, string? obra) =>
         $"{(numeroPoliza ?? "").Trim()}\u001F{CollapseWhitespace(obra).Trim()}";
@@ -300,9 +341,10 @@ public class PolizaExcelImportService(
     }
 
     private void ApplyExistenceAndValidation(
-        List<ImportPreviewRowInternal> rows,
-        List<Ramo> ramos,
-        List<Empresa> empresas)
+            List<ImportPreviewRowInternal> rows,
+            List<Ramo> ramos,
+            List<Empresa> empresas,
+            List<Aseguradora> aseguradoras) // NUEVO parámetro
     {
         foreach (var r in rows)
         {
@@ -337,12 +379,21 @@ public class PolizaExcelImportService(
             if (r.RamoId == null)
                 r.Mensajes.Add("El ramo no existe en el sistema o no coincide con los ramos configurados.");
 
+            // Resolver contratista (empresa)
             var emp = ResolverEmpresa(NormalizeNombreContratista(r.Contratista), empresas);
             r.EmpresaResolucion = emp.Kind;
             r.EmpresaIdExistente = emp.IdExistente;
             r.EmailProvisional = emp.EmailProvisional;
             if (emp.Kind == "ambiguo")
                 r.Mensajes.Add("Varias empresas coinciden con el nombre del contratista; usa el nombre exacto registrado.");
+
+            // NUEVO: Resolver aseguradora
+            var ase = ResolverAseguradora(NormalizeNombreContratista(r.Aseguradora), aseguradoras);
+            r.AseguradoraResolucion = ase.Kind;
+            r.AseguradoraIdExistente = ase.IdExistente;
+            r.EmailAseguradoraProvisional = ase.EmailProvisional;
+            if (ase.Kind == "ambiguo")
+                r.Mensajes.Add("Varias aseguradoras coinciden con el nombre; usa el nombre exacto registrado.");
 
             if (r.Mensajes.Count > 0)
             {
@@ -378,8 +429,8 @@ public class PolizaExcelImportService(
     }
 
     private static (string Kind, Guid? IdExistente, string? EmailProvisional) ResolverEmpresa(
-        string? nombre,
-        List<Empresa> empresas)
+           string? nombre,
+           List<Empresa> empresas)
     {
         if (string.IsNullOrWhiteSpace(nombre))
             return ("sinNombre", null, null);
@@ -401,11 +452,36 @@ public class PolizaExcelImportService(
         return ("seCreara", null, email);
     }
 
+    // NUEVO MÉTODO: Resolver aseguradora (similar a empresa)
+    private static (string Kind, Guid? IdExistente, string? EmailProvisional) ResolverAseguradora(
+        string? nombre,
+        List<Aseguradora> aseguradoras)
+    {
+        if (string.IsNullOrWhiteSpace(nombre))
+            return ("sinNombre", null, null);
+
+        var t = NormalizeNombreContratista(nombre);
+        var exact = aseguradoras.FirstOrDefault(a => string.Equals(a.Nombre.Trim(), t, StringComparison.OrdinalIgnoreCase));
+        if (exact != null)
+            return ("existente", exact.Id, null);
+
+        var candidates = aseguradoras
+            .Where(a => NormalizeNombreContratista(a.Nombre).Contains(t, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        if (candidates.Count == 1)
+            return ("existente", candidates[0].Id, null);
+        if (candidates.Count > 1)
+            return ("ambiguo", null, null);
+
+        var email = $"aseguradora-import-{Guid.NewGuid():N}@import.sicop.local";
+        return ("seCreara", null, email);
+    }
+
     private static PolizaImportPreviewResponse MapPreviewResponse(
-        Guid token,
-        string fileName,
-        List<string> sheetsDetected,
-        List<ImportPreviewRowInternal> rows)
+           Guid token,
+           string fileName,
+           List<string> sheetsDetected,
+           List<ImportPreviewRowInternal> rows)
     {
         var insert = rows.Count(r => r.EstadoAnalisis == "paraInsertar");
         var update = rows.Count(r => r.EstadoAnalisis == "paraActualizar");
@@ -453,9 +529,10 @@ public class PolizaExcelImportService(
     }
 
     private static (List<ImportPreviewRowInternal> rows, List<string> sheets) ParseWorkbook(
-        XLWorkbook wb,
-        IReadOnlyList<Ramo> ramos,
-        IReadOnlyList<Empresa> _)
+            XLWorkbook wb,
+            IReadOnlyList<Ramo> ramos,
+            IReadOnlyList<Empresa> empresas,
+            IReadOnlyList<Aseguradora> aseguradoras) // NUEVO parámetro
     {
         var rows = new List<ImportPreviewRowInternal>();
         var sheets = new List<string>();
@@ -493,7 +570,7 @@ public class PolizaExcelImportService(
                     continue;
                 }
 
-                var internalRow = ReadDataRow(ws, r, colMap, defaultRamo, ramos);
+                var internalRow = ReadDataRow(ws, r, colMap, defaultRamo, ramos, empresas, aseguradoras);
                 internalRow.OrdenLectura = ordenLectura++;
                 rows.Add(internalRow);
             }
@@ -586,11 +663,13 @@ public class PolizaExcelImportService(
     }
 
     private static ImportPreviewRowInternal ReadDataRow(
-        IXLWorksheet ws,
-        int excelRow,
-        Dictionary<string, int> colMap,
-        string? defaultRamoCanonical,
-        IReadOnlyList<Ramo> ramos)
+            IXLWorksheet ws,
+            int excelRow,
+            Dictionary<string, int> colMap,
+            string? defaultRamoCanonical,
+            IReadOnlyList<Ramo> ramos,
+            IReadOnlyList<Empresa> empresas,
+            IReadOnlyList<Aseguradora> aseguradoras)
     {
         string? G(string key) =>
             colMap.TryGetValue(key, out var col) ? GetCellStringTrim(ws.Cell(excelRow, col)) : null;
@@ -633,6 +712,7 @@ public class PolizaExcelImportService(
             FechaExpiracion = ex,
             EstadoAnalisis = "incompleta",
             EmpresaResolucion = "sinNombre",
+            AseguradoraResolucion = "sinNombre",
         };
     }
 
@@ -977,18 +1057,23 @@ internal sealed class ImportPreviewRowInternal
     public DateTimeOffset? FechaExpiracion { get; set; }
     public Guid? PolizaExistenteId { get; set; }
     public string EstadoAnalisis { get; set; } = "incompleta";
+    // Resolución de empresa (contratista)
     public string EmpresaResolucion { get; set; } = "sinNombre";
     public Guid? EmpresaIdExistente { get; set; }
     public string? EmailProvisional { get; set; }
+    // NUEVO: Resolución de aseguradora
+    public string AseguradoraResolucion { get; set; } = "sinNombre";
+    public Guid? AseguradoraIdExistente { get; set; }
+    public string? EmailAseguradoraProvisional { get; set; }
     public List<string> Mensajes { get; set; } = new();
     public bool PuedeAplicar { get; set; }
-    /// <summary>Orden de aparición al leer el libro (desempate para duplicados).</summary>
     public int OrdenLectura { get; set; }
 }
 
 internal sealed class PolizaImportSession
 {
     public string FileName { get; set; } = "";
+    public Guid UsuarioId { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public List<ImportPreviewRowInternal> Rows { get; set; } = new();
 }

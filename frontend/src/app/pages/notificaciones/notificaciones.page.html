@@ -1,0 +1,53 @@
+<div class="notificaciones-page">
+    <header class="notificaciones-header">
+        <div class="notificaciones-header__intro">
+            <h1 class="page-title">Notificaciones</h1>
+            <p class="page-subtitle">Historial de notificaciones enviadas y pendientes</p>
+        </div>
+        <div class="notificaciones-header__tools">
+            <button type="button" class="notificaciones-header__notif" aria-label="Notificaciones">
+                <mat-icon>notifications</mat-icon>
+                <span class="notificaciones-header__notif-dot" aria-hidden="true"></span>
+            </button>
+            <mat-icon class="notificaciones-header__profile" aria-hidden="true">account_circle</mat-icon>
+        </div>
+    </header>
+
+    <div class="toolbar-card">
+        <div class="toolbar-card__left">
+            <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
+                <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
+                <input matInput placeholder="Buscar por número de póliza u obra..." [ngModel]="searchQuery()"
+                    (ngModelChange)="searchQuery.set($event)" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+                <mat-label>Estado</mat-label>
+                <mat-select [ngModel]="estadoFilter()" (ngModelChange)="estadoFilter.set($event)">
+                    <mat-option [value]="undefined">Todos</mat-option>
+                    <mat-option [value]="0">Enviada</mat-option>
+                    <mat-option [value]="1">Error</mat-option>
+                    <mat-option [value]="2">Pendiente</mat-option>
+                    <mat-option [value]="3">Invalidada</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="toolbar__filter" subscriptSizing="dynamic">
+                <mat-label>Tipo</mat-label>
+                <mat-select [ngModel]="tipoFilter()" (ngModelChange)="tipoFilter.set($event)">
+                    <mat-option [value]="undefined">Todos</mat-option>
+                    <mat-option [value]="0">Renovación</mat-option>
+                    <mat-option [value]="1">Expiración</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
+                <mat-icon>filter_alt_off</mat-icon>
+                Limpiar filtros
+            </button>
+        </div>
+    </div>
+
+    <app-notificaciones-table [rows]="pagedNotificaciones()" [paginatorLength]="totalFiltrado()"
+        [pageIndex]="pageIndex()" [pageSize]="pageSize" (pageChange)="onPage($event)" />
+</div>

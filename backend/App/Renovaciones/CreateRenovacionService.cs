@@ -34,7 +34,7 @@ public class CreateRenovacionService(AppDatabase context)
                    Estado = EstadoRenovacion.PorVencer,
                    Valor = poliza.ValorActual,
                    FechaRenovacion = DateTimeOffset.UtcNow,
-                   FechaExpiracion = poliza.FechaExpiracion.Add(poliza.RamoNav.PeriodicidadRenovacion),
+                   FechaExpiracion = poliza.FechaExpiracion.Add(poliza.PeriodicidadRenovacion),
                    CreatedAt = DateTimeOffset.UtcNow
                });
         }

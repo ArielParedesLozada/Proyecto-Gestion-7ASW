@@ -1,6 +1,5 @@
 @use 'polizas-admin-header';
 
-// Ocupa todo el ancho del área principal (el padding lateral viene de `main-layout .content`).
 .polizas-nueva {
   width: 100%;
   max-width: 100%;
@@ -38,7 +37,6 @@
     color: #c1121f;
   }
 
-  // Etiquetas fijas encima del campo (floatLabel="always"): aspecto tipo mockup — negrita, gris oscuro.
   ::ng-deep {
     .mat-mdc-floating-label {
       font-weight: 600;

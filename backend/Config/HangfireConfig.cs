@@ -15,6 +15,7 @@ public static class HangfireConfig
         );
         services.AddHangfireServer();
         services.AddScoped<CheckRenovacionesJob>();
+        services.AddScoped<SendNotificationsJob>();
         return services;
     }
 }
