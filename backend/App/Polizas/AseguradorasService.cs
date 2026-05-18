@@ -12,21 +12,22 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo,
     private readonly IRepository<Aseguradora, Guid> _aseguradoraRepo = aseguradoraRepo;
     private readonly AppDatabase _database = database;
 
-    private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
-
-    public async Task<Aseguradora> CreateAseguradora(string nombre, string email)
+    public async Task<Aseguradora> CreateAseguradora(string nombre, string? email)
     {
         var nombreTrim = nombre.Trim();
         if (string.IsNullOrWhiteSpace(nombreTrim))
             throw new CustomError("El nombre es obligatorio.", 400);
 
         var normalizedEmail = NormalizeEmail(email);
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-            throw new CustomError("El correo es obligatorio.", 400);
 
-        var duplicado = await _aseguradoraRepo.FirstOrDefaultAsync(e => e.Email == normalizedEmail);
-        if (duplicado != null)
-            throw new CustomError("Ya existe una aseguradora con ese correo electrónico.", 409);
+        if (normalizedEmail != null)
+        {
+            var duplicado = await _aseguradoraRepo
+                .FirstOrDefaultAsync(e => e.Email == normalizedEmail);
+
+            if (duplicado != null)
+                throw new CustomError("Ya existe una aseguradora con ese correo electrónico.", 409);
+        }
 
         var aseguradora = new Aseguradora
         {
@@ -42,13 +43,16 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo,
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
+
         var query = _database.Aseguradoras.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(nameOrEmail))
         {
+            var term = nameOrEmail.Trim().ToLower();
+
             query = query.Where(e =>
-                e.Nombre.ToLower().Contains(nameOrEmail) ||
-                e.Email.ToLower().Contains(nameOrEmail)
+                e.Nombre.ToLower().Contains(term) ||
+                (e.Email != null && e.Email.ToLower().Contains(term))
             );
         }
 
@@ -69,6 +73,32 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo,
         };
     }
 
+    public async Task<Aseguradora?> UpdateAseguradora(Guid id, string nombre, string? email)
+    {
+        var nombreTrim = nombre.Trim();
+        if (string.IsNullOrWhiteSpace(nombreTrim))
+            throw new CustomError("El nombre es obligatorio.", 400);
+
+        var aseguradora = await _aseguradoraRepo.GetByIdAsync(id);
+        if (aseguradora == null) return null;
+
+        var normalizedEmail = NormalizeEmail(email);
+
+        if (normalizedEmail != null)
+        {
+            var duplicado = await _aseguradoraRepo
+                .FirstOrDefaultAsync(e => e.Email == normalizedEmail && e.Id != id);
+
+            if (duplicado != null)
+                throw new CustomError("Ya existe una aseguradora con ese correo electrónico.", 409);
+        }
+
+        aseguradora.Nombre = nombreTrim;
+        aseguradora.Email = normalizedEmail;
+
+        return await _aseguradoraRepo.UpdateAsync(aseguradora);
+    }
+
     public async Task<Aseguradora?> GetAseguradoraById(Guid id)
     {
         return await _aseguradoraRepo.GetByIdAsync(id);
@@ -78,30 +108,7 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo,
     {
         return await _aseguradoraRepo.FindAsync(e => e.Nombre.Contains(nombre));
     }
-
-    public async Task<Aseguradora?> UpdateAseguradora(Guid id, string nombre, string email)
-    {
-        var nombreTrim = nombre.Trim();
-        if (string.IsNullOrWhiteSpace(nombreTrim))
-            throw new CustomError("El nombre es obligatorio.", 400);
-
-        var normalizedEmail = NormalizeEmail(email);
-        if (string.IsNullOrWhiteSpace(normalizedEmail))
-            throw new CustomError("El correo es obligatorio.", 400);
-
-        var aseguradora = await _aseguradoraRepo.GetByIdAsync(id);
-        if (aseguradora == null) return null;
-
-        var duplicado = await _aseguradoraRepo.FirstOrDefaultAsync(e => e.Email == normalizedEmail && e.Id != id);
-        if (duplicado != null)
-            throw new CustomError("Ya existe una aseguradora con ese correo electrónico.", 409);
-
-        aseguradora.Nombre = nombreTrim;
-        aseguradora.Email = normalizedEmail;
-
-        return await _aseguradoraRepo.UpdateAsync(aseguradora);
-    }
-
+    
     public async Task<bool> DeleteAseguradora(Guid id)
     {
         var aseguradora = await _aseguradoraRepo.GetByIdAsync(id);
@@ -109,5 +116,12 @@ public class AseguradorasService(IRepository<Aseguradora, Guid> aseguradoraRepo,
 
         await _aseguradoraRepo.DeleteAsync(aseguradora);
         return true;
+    }
+
+    private static string? NormalizeEmail(string? email)
+    {
+        return string.IsNullOrWhiteSpace(email)
+            ? null
+            : email.Trim().ToLowerInvariant();
     }
 }

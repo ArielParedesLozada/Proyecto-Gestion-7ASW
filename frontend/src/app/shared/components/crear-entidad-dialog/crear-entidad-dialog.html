@@ -20,12 +20,6 @@
 
             <input matInput formControlName="correo" autocomplete="off" />
 
-            @if (form.controls.correo.hasError('required')) {
-            <mat-error>
-                El correo es obligatorio
-            </mat-error>
-            }
-
             @if (form.controls.correo.hasError('email')) {
             <mat-error>
                 El correo no es válido

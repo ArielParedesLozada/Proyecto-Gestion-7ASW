@@ -47,6 +47,10 @@ export interface ControlMaestroParams {
   pageVencidas?: number;
   pageSizeVencidas?: number;
   saldoInicial?: number;
+
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  ramoId?: string | null;
 }
 
 @Injectable({
@@ -130,6 +134,17 @@ export class ControlMaestroService {
     }
     if (params.saldoInicial !== undefined && params.saldoInicial !== null) {
       parts.push(`saldoInicial=${params.saldoInicial}`);
+    }
+    if (params.fechaInicio) {
+      parts.push(`fechaInicio=${params.fechaInicio}`);
+    }
+
+    if (params.fechaFin) {
+      parts.push(`fechaFin=${params.fechaFin}`);
+    }
+
+    if (params.ramoId) {
+      parts.push(`ramoId=${params.ramoId}`);
     }
     return parts.join('&');
   }

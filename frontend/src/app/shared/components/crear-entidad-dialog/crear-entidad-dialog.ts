@@ -41,7 +41,7 @@ export class CrearEntidadDialog {
 
   readonly form = this.fb.group({
     nombre: ['', Validators.required],
-    correo: ['', [Validators.required, Validators.email]],
+    correo: ['', [Validators.email]],
   });
 
   loading = false;
@@ -60,30 +60,29 @@ export class CrearEntidadDialog {
 
     const raw = this.form.getRawValue();
 
+    // 🔥 NORMALIZACIÓN CLAVE
+    const correoNormalizado =
+      raw.correo && raw.correo.trim() !== ''
+        ? raw.correo.trim()
+        : null;
+
     this.loading = true;
 
-    const request : Observable<EntidadCreada> =
+    const request: Observable<EntidadCreada> =
       this.data.tipo === 'contratista'
         ? this.empresaService.create({
-          nombre: raw.nombre!,
-          correo: raw.correo!,
+          nombre: raw.nombre!.trim(),
+          correo: correoNormalizado,
         })
         : this.aseguradoraService.create({
-          nombre: raw.nombre!,
-          email: raw.correo!,
+          nombre: raw.nombre!.trim(),
+          email: correoNormalizado,
         });
 
-    request.subscribe({ /**This expression is not callable.
-  Each member of the union type '{ (observerOrNext?: Partial<Observer<AseguradoraListRow>> | ((value: AseguradoraListRow) => void) | undefined): Subscription; (next?: ((value: AseguradoraListRow) => void) | ... 1 more ... | undefined, error?: ((error: any) => void) | ... 1 more ... | undefined, complete?: (() => void) | ... 1 more ... | undefined):...' has signatures, but none of those signatures are compatible with each other. */
-      next: (created) => { /**Parameter 'created' implicitly has an 'any' type. */
-        this.dialogRef.close(created);
-      },
-      error: () => {
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      },
+    request.subscribe({
+      next: (created) => this.dialogRef.close(created),
+      error: () => (this.loading = false),
+      complete: () => (this.loading = false),
     });
   }
 }
