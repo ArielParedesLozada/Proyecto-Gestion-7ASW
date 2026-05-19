@@ -10,7 +10,8 @@ using Xunit;
 
 namespace test_integracion;
 
-public class ReportesIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("IntegrationTests")]
+public class ReportesIntegrationTests
 {
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -31,16 +32,11 @@ public class ReportesIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         await db.Aseguradoras.AddAsync(aseguradora);
         await db.Empresas.AddAsync(empresa);
         await db.Ramos.AddAsync(ramo);
-        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         var poliza = new Poliza
@@ -52,7 +48,7 @@ public class ReportesIntegrationTests : IClassFixture<CustomWebApplicationFactor
             Contratista = empresa.Id,
             Ramo = ramo.Id,
             Estado = EstadoPoliza.Vigente,
-            UsuarioId = user.Id,
+            UsuarioId = CustomWebApplicationFactory.TestUserId,
             ValorOriginal = 1000,
             ValorActual = 1000,
             FechaEmision = DateTimeOffset.UtcNow,
@@ -83,16 +79,11 @@ public class ReportesIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         await db.Aseguradoras.AddAsync(aseguradora);
         await db.Empresas.AddAsync(empresa);
         await db.Ramos.AddAsync(ramo);
-        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         var poliza = new Poliza
@@ -104,7 +95,7 @@ public class ReportesIntegrationTests : IClassFixture<CustomWebApplicationFactor
             Contratista = empresa.Id,
             Ramo = ramo.Id,
             Estado = EstadoPoliza.Vencida,
-            UsuarioId = user.Id,
+            UsuarioId = CustomWebApplicationFactory.TestUserId,
             ValorOriginal = 1000,
             ValorActual = 1000,
             FechaEmision = DateTimeOffset.UtcNow.AddYears(-2),

@@ -12,7 +12,8 @@ using Backend.Presentation.Dtos.Requests;
 
 namespace test_integracion;
 
-public class RenovacionIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("IntegrationTests")]
+public class RenovacionIntegrationTests
 {
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -33,16 +34,11 @@ public class RenovacionIntegrationTests : IClassFixture<CustomWebApplicationFact
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         await db.Aseguradoras.AddAsync(aseguradora);
         await db.Empresas.AddAsync(empresa);
         await db.Ramos.AddAsync(ramo);
-        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         var poliza = new Poliza
@@ -59,11 +55,24 @@ public class RenovacionIntegrationTests : IClassFixture<CustomWebApplicationFact
             FechaEmision = DateTimeOffset.UtcNow.AddMonths(-6),
             FechaExpiracion = DateTimeOffset.UtcNow.AddDays(-1),
             Estado = EstadoPoliza.Vencida,
-            UsuarioId = user.Id,
+            UsuarioId = CustomWebApplicationFactory.TestUserId,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
         await db.Polizas.AddAsync(poliza);
+        await db.SaveChangesAsync();
+
+        var renovacion = new Renovacion
+        {
+            Id = Guid.NewGuid(),
+            PolizaId = poliza.Id,
+            Estado = EstadoRenovacion.PorVencer,
+            Valor = 1000,
+            FechaRenovacion = DateTimeOffset.UtcNow,
+            FechaExpiracion = DateTimeOffset.UtcNow.AddDays(30),
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        await db.Renovaciones.AddAsync(renovacion);
         await db.SaveChangesAsync();
 
         var renewRequest = new ValidateRenovacionRequest
@@ -72,17 +81,25 @@ public class RenovacionIntegrationTests : IClassFixture<CustomWebApplicationFact
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/renovaciones/{poliza.Id}/validate", renewRequest);
+        var response = await _client.PostAsJsonAsync($"/renovaciones/{renovacion.Id}/validar", renewRequest);
 
         // Assert
         response.EnsureSuccessStatusCode();
 
-        // Verificar que la renovación fue creada
-        var renovacion = await db.Renovaciones
-            .FirstOrDefaultAsync(r => r.PolizaId == poliza.Id);
+        using var assertScope = _factory.Services.CreateScope();
+        var assertDb = assertScope.ServiceProvider.GetRequiredService<AppDatabase>();
 
-        renovacion.Should().NotBeNull();
-        renovacion!.Valor.Should().Be(1200);
-        renovacion.Estado.Should().Be(EstadoRenovacion.Pendiente);
+        var renovacionActualizada = await assertDb.Renovaciones
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == renovacion.Id);
+
+        renovacionActualizada.Should().NotBeNull();
+        renovacionActualizada!.Estado.Should().Be(EstadoRenovacion.Vigente);
+
+        var polizaActualizada = await assertDb.Polizas
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == poliza.Id);
+        polizaActualizada.Should().NotBeNull();
+        polizaActualizada!.ValorActual.Should().Be(1200);
     }
 }

@@ -13,7 +13,8 @@ using Xunit;
 
 namespace test_integracion;
 
-public class PolizaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("IntegrationTests")]
+public class PolizaIntegrationTests
 {
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -50,16 +51,11 @@ public class PolizaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             Descripcion = "Test"
         };
 
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         db.Aseguradoras.Add(aseguradora);
         db.Empresas.Add(empresa);
         db.Ramos.Add(ramo);
-        db.Users.Add(user);
         await db.SaveChangesAsync();
 
         var request = new PolizaRequest
@@ -96,16 +92,11 @@ public class PolizaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         await db.Aseguradoras.AddAsync(aseguradora);
         await db.Empresas.AddAsync(empresa);
         await db.Ramos.AddAsync(ramo);
-        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         var poliza = new Poliza
@@ -122,18 +113,27 @@ public class PolizaIntegrationTests : IClassFixture<CustomWebApplicationFactory>
             FechaEmision = DateTimeOffset.UtcNow.AddYears(-2),
             FechaExpiracion = DateTimeOffset.UtcNow.AddDays(-1),
             Estado = EstadoPoliza.Vigente,
-            UsuarioId = user.Id,
+            UsuarioId = CustomWebApplicationFactory.TestUserId,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
+        var renovacion = new Renovacion
+        {
+            Id = Guid.NewGuid(),
+            PolizaId = poliza.Id,
+            Estado = EstadoRenovacion.PorVencer,
+            Valor = 1000,
+            FechaRenovacion = DateTimeOffset.UtcNow,
+            FechaExpiracion = DateTimeOffset.UtcNow.AddDays(30),
+            CreatedAt = DateTimeOffset.UtcNow
+        };
         await db.Polizas.AddAsync(poliza);
+        await db.Renovaciones.AddAsync(renovacion);
         await db.SaveChangesAsync();
 
         // Act
-        var job = new Backend.Infrastructure.Jobs.CheckRenovacionesJob(
-            scope.ServiceProvider.GetRequiredService<Backend.App.Renovaciones.CreateRenovacionService>(),
-            scope.ServiceProvider.GetRequiredService<Backend.App.Renovaciones.ExpireRenovationService>());
-        await job.CheckRenovaciones();
+        var expireService = scope.ServiceProvider.GetRequiredService<Backend.App.Renovaciones.ExpireRenovationService>();
+        await expireService.ExpireRenovations();
 
         // Assert
         var updatedPoliza = await db.Polizas.FindAsync(poliza.Id);

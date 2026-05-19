@@ -12,7 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace test_integracion;
 
-public class NotificacionIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("IntegrationTests")]
+public class NotificacionIntegrationTests
 {
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -33,16 +34,11 @@ public class NotificacionIntegrationTests : IClassFixture<CustomWebApplicationFa
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         db.Aseguradoras.Add(aseguradora);
         db.Empresas.Add(empresa);
         db.Ramos.Add(ramo);
-        db.Users.Add(user);
         await db.SaveChangesAsync();
 
         var request = new PolizaRequest
@@ -76,16 +72,11 @@ public class NotificacionIntegrationTests : IClassFixture<CustomWebApplicationFa
         var aseguradora = new Aseguradora { Id = Guid.NewGuid(), Nombre = "Test Aseguradora" };
         var empresa = new Empresa { Id = Guid.NewGuid(), Nombre = "Test Empresa" };
         var ramo = new Ramo { Id = Guid.NewGuid(), Nombre = "Test Ramo", CambiaValor = true, Descripcion = "Test" };
-        var user = new User("testuser", BCrypt.Net.BCrypt.HashPassword("Password123!"), "Admin", "test@test.com")
-        {
-            Id = Guid.NewGuid(),
-            MustChangePassword = false
-        };
+        await CustomWebApplicationFactory.EnsureTestUserAsync(db);
 
         await db.Aseguradoras.AddAsync(aseguradora);
         await db.Empresas.AddAsync(empresa);
         await db.Ramos.AddAsync(ramo);
-        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         var poliza = new Poliza
@@ -101,12 +92,23 @@ public class NotificacionIntegrationTests : IClassFixture<CustomWebApplicationFa
             FechaEmision = DateTimeOffset.UtcNow.AddMonths(-1),
             FechaExpiracion = DateTimeOffset.UtcNow.AddDays(2),
             Estado = EstadoPoliza.PorVencer,
-            UsuarioId = user.Id,
+            UsuarioId = CustomWebApplicationFactory.TestUserId,
             PeriodicidadRenovacion = TimeSpan.FromDays(30),
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
+        var renovacion = new Renovacion
+        {
+            Id = Guid.NewGuid(),
+            PolizaId = poliza.Id,
+            Estado = EstadoRenovacion.PorVencer,
+            Valor = 1000,
+            FechaRenovacion = DateTimeOffset.UtcNow,
+            FechaExpiracion = DateTimeOffset.UtcNow.AddDays(30),
+            CreatedAt = DateTimeOffset.UtcNow
+        };
         await db.Polizas.AddAsync(poliza);
+        await db.Renovaciones.AddAsync(renovacion);
         await db.SaveChangesAsync();
 
         // Act

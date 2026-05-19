@@ -1,18 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { RenovacionesComponent } from '../app/pages/renovaciones/renovaciones.component'; // Suponiendo la ruta
-import { RouterTestingModule } from '@angular/router/testing';
+import { RenovacionService } from '../app/services/renovacion.service';
+import { API_CONFIG } from '../app/shared/constants/api.constants';
+
+setupZoneTestEnv();
 
 describe('Renovaciones Integration Flow', () => {
-  let fixture: ComponentFixture<any>; // Usando any si el componente no esta exportado asi
+  let service: RenovacionService;
   let httpMock: HttpTestingController;
 
   beforeEach(async () => {
-    // Componente dummy o el real si existe con ese nombre
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule],
+      imports: [HttpClientTestingModule],
+      providers: [RenovacionService],
     }).compileComponents();
 
+    service = TestBed.inject(RenovacionService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -21,17 +25,14 @@ describe('Renovaciones Integration Flow', () => {
   });
 
   it('T10. RenovacionesView_ShouldAllowApproval - Should approve a renewal', () => {
-    // En una prueba real, montariamos el componente RenovacionesComponent.
-    // Aqui probaremos el flujo HTTP que haría dicho componente al invocar al servicio.
-    const mockServiceUrl = 'http://localhost:5000/renovaciones/123/aprobar';
-    
-    // Simular llamada http que el componente haría al presionar "Aprobar"
-    // mockService.aprobar('123').subscribe()
-    
-    // Expect PUT request
-    // const req = httpMock.expectOne(mockServiceUrl);
-    // expect(req.request.method).toBe('PUT');
-    // req.flush({ success: true });
-    expect(true).toBeTruthy();
+    const renovacionId = '123';
+    service.confirmarRenovacion(renovacionId, 1200).subscribe();
+
+    const req = httpMock.expectOne(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RENOVACIONES.CONFIRMAR(renovacionId)}`,
+    );
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ nuevoValor: 1200 });
+    req.flush({ success: true });
   });
 });

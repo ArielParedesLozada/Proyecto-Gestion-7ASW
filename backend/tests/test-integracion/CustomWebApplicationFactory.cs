@@ -1,9 +1,15 @@
 using Backend.Data.Databases;
+using Backend.Infrastructure.Jobs;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Backend.Domain.Services;
 using Moq;
 using Microsoft.AspNetCore.Authentication;
@@ -13,6 +19,9 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 
 namespace test_integracion;
+
+[CollectionDefinition("IntegrationTests")]
+public class IntegrationTestCollection : ICollectionFixture<CustomWebApplicationFactory>;
 
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -28,11 +37,12 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, "Test user"),
-            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+            new Claim(ClaimTypes.Name, "testuser"),
+            new Claim(ClaimTypes.NameIdentifier, CustomWebApplicationFactory.TestUserId.ToString()),
+            new Claim("must_change_password", "false"),
         };
 
-        var identity = new ClaimsIdentity(claims, "Test");
+        var identity = new ClaimsIdentity(claims, "TestScheme");
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, "TestScheme");
 
@@ -42,7 +52,55 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
+    public static readonly Guid TestUserId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+
     public Mock<INotifier> NotifierMock { get; } = new();
+
+    private static bool _dbInitialized;
+    private static readonly object DbInitLock = new();
+
+    public static async Task EnsureTestUserAsync(AppDatabase db)
+    {
+        if (await db.Users.AnyAsync(u => u.Id == TestUserId))
+            return;
+
+        db.Users.Add(new Backend.Domain.Models.User(
+            "testuser",
+            BCrypt.Net.BCrypt.HashPassword("Password123!"),
+            "Admin",
+            "test@test.com")
+        {
+            Id = TestUserId,
+            MustChangePassword = false
+        });
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            db.ChangeTracker.Clear();
+        }
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+
+        lock (DbInitLock)
+        {
+            if (_dbInitialized)
+                return host;
+
+            using var scope = host.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDatabase>();
+            db.Database.EnsureCreated();
+            _dbInitialized = true;
+        }
+
+        return host;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -69,11 +127,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll(typeof(AppDatabase));
 
             // =========================
-            // SQLITE IN-MEMORY (CRÍTICO)
+            // EF IN-MEMORY (misma estrategia que tests unitarios)
             // =========================
             services.AddDbContext<AppDatabase>(options =>
             {
-                options.UseSqlite("Data Source=:memory:");
+                options.UseInMemoryDatabase("IntegrationTestsDb");
+                options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
 
             // =========================
@@ -83,9 +142,21 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton(NotifierMock.Object);
 
             // =========================
+            // HANGFIRE (Program omite AddHangFire en Testing, pero UseHangfireDashboard sí corre)
+            // =========================
+            services.AddHangfire(config => config.UseMemoryStorage());
+            services.AddHangfireServer();
+            services.AddScoped<CheckRenovacionesJob>();
+            services.AddScoped<SendNotificationsJob>();
+
+            // =========================
             // TEST AUTH
             // =========================
-            services.AddAuthentication("TestScheme")
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "TestScheme";
+                options.DefaultChallengeScheme = "TestScheme";
+            })
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                     "TestScheme", options => { });
 
@@ -102,20 +173,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     policy.AddAuthenticationSchemes("TestScheme");
                 });
             });
-
-            // =========================
-            // BUILD SERVICE PROVIDER
-            // =========================
-            var sp = services.BuildServiceProvider();
-
-            using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDatabase>();
-
-            // =========================
-            // SQLITE MEMORY FIX (OBLIGATORIO)
-            // =========================
-            db.Database.OpenConnection();
-            db.Database.EnsureCreated();
         });
     }
 }
