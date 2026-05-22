@@ -70,16 +70,19 @@ public class PolizaNotificationService
         var poliza = renovacion.PolizaNav
             ?? throw new InvalidOperationException("Póliza no encontrada");
 
-        // 🔒 Idempotencia
-        var yaEnviada = await _context.Notificaciones.AnyAsync(n =>
+        // 🔒 IDEMPOTENCIA REAL
+        var yaProcesada = await _context.Notificaciones.AnyAsync(n =>
             n.RenovacionId == renovacion.Id &&
-            n.Tipo == TipoNotificacion.Expiracion &&
-            n.Estado == EstadoNotificacion.Enviada
+            n.Tipo == TipoNotificacion.Expiracion
         );
 
-        if (yaEnviada)
+        if (yaProcesada)
         {
-            _logger.LogInformation("⏭️ Ya enviada {RenovacionId}", renovacion.Id);
+            _logger.LogInformation(
+                "⏭️ Notificación ya procesada {RenovacionId}",
+                renovacion.Id
+            );
+
             return;
         }
 
@@ -93,14 +96,30 @@ public class PolizaNotificationService
             CreatedAt = DateTimeOffset.UtcNow
         };
 
-        await _context.Notificaciones.AddAsync(notificacion);
-        await _context.SaveChangesAsync();
+        try
+        {
+            // 🔥 INSERT TEMPRANO PARA BLOQUEAR DUPLICADOS
+            await _context.Notificaciones.AddAsync(notificacion);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // Otro worker ganó la carrera
+            _logger.LogWarning(
+                "⚠️ Ya existe notificación para {RenovacionId}",
+                renovacion.Id
+            );
+
+            return;
+        }
 
         try
         {
-            // 📄 DOCUMENTO CON FALLBACK
             var ramoNombre = poliza.RamoNav?.Nombre ?? "GENERAL";
-            var templateName = $"{ramoNombre.Trim().ToLower().Replace(" ", "-")}-template.docx";
+
+            var templateName =
+                $"{ramoNombre.Trim().ToLower().Replace(" ", "-")}-template.docx";
+
             var dto = new PolizaDocumentoDto
             {
                 Aseguradora = poliza.AseguradoraNav?.Nombre ?? "NO ESPECIFICADA",
@@ -121,10 +140,19 @@ public class PolizaNotificationService
 
             _logger.LogInformation("✅ Documento generado");
 
-            // 📧 EMAIL
+            var email = poliza.UsuarioNav?.Email;
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new InvalidOperationException(
+                    "La póliza no tiene usuario con email"
+                );
+
             var link = $"{_baseLink}/polizas/{poliza.Id}";
+
             var bodyHtml = BuildBody(poliza, link);
+
             var subject = "Notificación de expiración de póliza";
+
             var fileName = $"Poliza-{poliza.Numero}.docx";
             var destinatario = poliza.UsuarioNav?.Email;
             var success = false;
@@ -173,12 +201,14 @@ public class PolizaNotificationService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("✅ Notificación enviada {Id}", notificacion.Id);
+            _logger.LogInformation(
+                "✅ Notificación enviada {Id}",
+                notificacion.Id
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "💥 Error en notificación");
-
             notificacion.Estado = EstadoNotificacion.Error;
             await _context.SaveChangesAsync();
         }

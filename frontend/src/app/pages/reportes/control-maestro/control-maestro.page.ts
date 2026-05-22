@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { PolizasTable } from '../../polizas/polizas-table/polizas-table';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,10 @@ import { CurrencyPipe } from '@angular/common';
 import { PolizaListRow } from '../../polizas/models/poliza-list.model';
 import { MatInputModule } from '@angular/material/input';
 import { HeaderUserMenuComponent } from "../../../components/header-user-menu/header-user-menu.component";
+import { RamoService } from '../../../services/ramo.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { ControlMaestroToolbar } from "./components/control-maestro-toolbar/control-maestro-toolbar";
 
 @Component({
   selector: 'app-control-maestro.page',
@@ -21,14 +25,19 @@ import { HeaderUserMenuComponent } from "../../../components/header-user-menu/he
     CurrencyPipe,
     MatInputModule,
     MatFormFieldModule,
-    HeaderUserMenuComponent
+    HeaderUserMenuComponent,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatOptionModule,
+    ControlMaestroToolbar
 ],
   templateUrl: './control-maestro.page.html',
   styleUrl: './control-maestro.page.scss',
 })
-export class ControlMaestroPage {
+export class ControlMaestroPage implements OnInit {
   private readonly service = inject(ControlMaestroService);
   private readonly notify = inject(NotificationService);
+  private readonly ramosService = inject(RamoService)
 
   saldoInicial = signal(0);
 
@@ -48,6 +57,14 @@ export class ControlMaestroPage {
   readonly totalVigentesSum = signal(0);
   readonly totalVencidasSum = signal(0);
 
+  // ===== FILTROS =====
+  readonly fechaDesde = signal<Date | null>(null);
+  readonly fechaHasta = signal<Date | null>(null);
+  readonly ramoId = signal<string | null>(null);
+
+  // catálogo de ramos (debes cargarlo desde API)
+  readonly ramos = signal<{ id: string; nombre: string }[]>([]);
+
   readonly resumen = computed(() => ({
     saldoInicial: this.saldoInicial(),
     totalVigentes: this.totalVigentesSum(),
@@ -58,6 +75,14 @@ export class ControlMaestroPage {
       this.totalVencidasSum(),
   }));
 
+  ngOnInit(): void {
+    this.ramosService.getList().subscribe({
+      next: (data) => this.ramos.set(data),
+    });
+
+    this.cargar();
+  }
+
   cargar(): void {
     this.service.getControlMaestro({
       pageVigentes: this.pageVigentes(),
@@ -65,16 +90,15 @@ export class ControlMaestroPage {
       pageVencidas: this.pageVencidas(),
       pageSizeVencidas: this.pageSizeVencidas(),
       saldoInicial: this.saldoInicial(),
+
+      fechaInicio: this.fechaDesde()?.toISOString(),
+      fechaFin: this.fechaHasta()?.toISOString(),
+      ramoId: this.ramoId() ?? undefined,
     })
       .subscribe({
         next: (res) => {
-          this.vigentes.set(
-            res.vigentes.items.map(r => this.mapToPolizaRow(r))
-          );
-
-          this.vencidas.set(
-            res.vencidas.items.map(r => this.mapToPolizaRow(r))
-          );
+          this.vigentes.set(res.vigentes.items.map(r => this.mapToPolizaRow(r)));
+          this.vencidas.set(res.vencidas.items.map(r => this.mapToPolizaRow(r)));
 
           this.totalVigentes.set(res.vigentes.total);
           this.totalVencidasCount.set(res.vencidas.total);
@@ -86,11 +110,10 @@ export class ControlMaestroPage {
   }
   exportarPdf(): void {
     this.service.downloadPdf({
-      pageVigentes: this.pageVigentes(),
-      pageSizeVigentes: this.pageSizeVigentes(),
-      pageVencidas: this.pageVencidas(),
-      pageSizeVencidas: this.pageSizeVencidas(),
       saldoInicial: this.saldoInicial(),
+      fechaInicio: this.fechaDesde()?.toISOString(),
+      fechaFin: this.fechaHasta()?.toISOString(),
+      ramoId: this.ramoId() ?? undefined,
     }).subscribe({
       error: (err) => this.notify.fromHttpError(err)
     });

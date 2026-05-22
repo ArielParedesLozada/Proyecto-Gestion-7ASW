@@ -61,14 +61,15 @@ try
         .AddJWTConfig(JWT_ISSUER, JWT_AUDIENCE, JWT_PUBLIC_KEY_FILE)
         .AddMailer(builder.Configuration, MAIL_USER, MAIL_PSSWD)
         .AddDocs(builder.Configuration)
-        .AddAppServices(builder.Configuration)
-        .AddHangFire(CONNECTION_STRING);
+        .AddAppServices(builder.Configuration);
+    if (!builder.Environment.IsEnvironment("Testing"))
+    {
+        builder.Services.AddHangFire(CONNECTION_STRING);
+    }
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders = ForwardedHeaders.All;
     });
-
-
     builder.Services.AddMemoryCache();
     builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
     {
@@ -89,21 +90,22 @@ try
     // ============================================================
     // 3. AGREGAR MIDDLEWARE PARA LOG DE REQUESTS HTTP
     // ============================================================
-    app.UseSerilogRequestLogging();  // ← Registra automáticamente cada request HTTP
-
-    using (var scope = app.Services.CreateScope())
+    if (!app.Environment.IsEnvironment("Testing"))
     {
-        var db = scope.ServiceProvider.GetRequiredService<AppDatabase>();
-        Log.Information("Ejecutando migraciones de base de datos...");
-        await db.Database.MigrateAsync();
-        Log.Information("Migraciones completadas");
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDatabase>();
+            Log.Information("Ejecutando migraciones de base de datos...");
+            await db.Database.MigrateAsync();
+            Log.Information("Migraciones completadas");
 
-        Log.Information("Ejecutando seed de usuarios...");
-        await UserSeeder.SeedAsync(db, ADMIN_PASSWORD);
-        Log.Information("Seed completado");
+            Log.Information("Ejecutando seed de usuarios...");
+            await UserSeeder.SeedAsync(db, ADMIN_PASSWORD);
+            Log.Information("Seed completado");
 
-        await db.Database.ExecuteSqlRawAsync(
-            """UPDATE "users" SET "MustChangePassword" = false WHERE "Username" = 'adminpapu' AND "MustChangePassword" = true;""");
+            await db.Database.ExecuteSqlRawAsync(
+                """UPDATE "users" SET "MustChangePassword" = false WHERE "Username" = 'adminpapu' AND "MustChangePassword" = true;""");
+        }
     }
 
     // Configure the HTTP request pipeline.
@@ -119,17 +121,20 @@ try
 
     app.UseHangfireDashboard("/hangfire");
 
-    RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
-        "revision-polizas-diaria",
-        x => x.CheckRenovaciones(),
-        "* * * * *"
-    );
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
+            "revision-polizas-diaria",
+            x => x.CheckRenovaciones(),
+            "* * * * *"
+        );
 
-    RecurringJob.AddOrUpdate<SendNotificationsJob>(
-        "revision-notificaciones-diaria",
-        x => x.NotifyPeople(),
-        "* * * * *"
-    );
+        RecurringJob.AddOrUpdate<SendNotificationsJob>(
+            "revision-notificaciones-diaria",
+            x => x.NotifyPeople(),
+            "* * * * *"
+        );
+    }
 
     app.UseForwardedHeaders();
     app.MapControllers();
@@ -152,3 +157,5 @@ finally
     Log.Information("🛑 Aplicación cerrada");
     Log.CloseAndFlush();  // Importante: asegura que todos los logs se escriban
 }
+
+public partial class Program { }

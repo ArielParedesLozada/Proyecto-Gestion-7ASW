@@ -8,8 +8,6 @@ public class AseguradoraRequest
     [MaxLength(500)]
     public string Nombre { get; set; } = null!;
 
-    [Required(ErrorMessage = "El correo es obligatorio.")]
     [EmailAddress(ErrorMessage = "El correo no tiene un formato válido.")]
-    [MaxLength(320)]
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; } = null!;
 }

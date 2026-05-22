@@ -37,7 +37,7 @@
             }
           </mat-form-field>
           <app-poliza-contratista-select formControlName="contratista" [empresas]="empresas()"
-            [showPlaceholderOption]="true" selectPlaceholder="Seleccione empresa contratista" />
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione empresa contratista" (agregar)="abrirModalContratista()"/>
         </div>
 
         <!-- Fila 2: obra ancho completo -->
@@ -69,7 +69,7 @@
 
           <!-- CAMBIADO: Ahora es un selector de aseguradoras, no un input de texto -->
           <app-poliza-aseguradora-select formControlName="aseguradoraId" [aseguradoras]="aseguradoras()"
-            [showPlaceholderOption]="true" selectPlaceholder="Seleccione aseguradora" />
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione aseguradora" (agregar)="abrirModalAseguradora()"/>
         </div>
 
         <!-- Fila 4: fechas (AHORA la fecha de expiración es MANUAL, no automática) -->
