@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Hangfire;
 using Backend.Infrastructure.Jobs;
-using Serilog;  // ← Agrega esta línea
+using Serilog;
+using Microsoft.AspNetCore.HttpOverrides;  // ← Agrega esta línea
 
 Env.Load();
 
@@ -62,6 +63,11 @@ try
         .AddDocs(builder.Configuration)
         .AddAppServices(builder.Configuration)
         .AddHangFire(CONNECTION_STRING);
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.All;
+    });
+
 
     builder.Services.AddMemoryCache();
     builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
@@ -125,6 +131,7 @@ try
         "* * * * *"
     );
 
+    app.UseForwardedHeaders();
     app.MapControllers();
 
     Log.Information("Aplicación configurada correctamente, iniciando ejecución...");
