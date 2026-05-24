@@ -19,17 +19,17 @@
     <nav class="menu">
 
       <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-        class="menu-item">
+        class="menu-item" data-testid="nav-dashboard">
         <mat-icon class="icon">dashboard</mat-icon>
         @if (!isCollapsed()) { <span>Dashboard</span> }
       </a>
 
-      <a routerLink="/polizas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="menu-item">
+      <a routerLink="/polizas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="menu-item" data-testid="nav-polizas">
         <mat-icon class="icon">description</mat-icon>
         @if (!isCollapsed()) { <span>Pólizas</span> }
       </a>
 
-      <a routerLink="/renovaciones" routerLinkActive="active" class="menu-item">
+      <a routerLink="/renovaciones" routerLinkActive="active" class="menu-item" data-testid="nav-renovaciones">
         <mat-icon class="icon">autorenew</mat-icon>
         @if (!isCollapsed()) { <span>Renovaciones</span> }
       </a>
@@ -39,13 +39,13 @@
         @if (!isCollapsed()) { <span>Notificaciones</span> }
       </a>
 
-      <a routerLink="/reportes" routerLinkActive="active" class="menu-item">
+      <a routerLink="/reportes" routerLinkActive="active" class="menu-item" data-testid="nav-reportes">
         <mat-icon class="icon">bar_chart</mat-icon>
         @if (!isCollapsed()) { <span>Reportes</span> }
       </a>
 
       @if (canShowAdminStuff()) {
-      <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="menu-item">
+      <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="menu-item" data-testid="nav-users">
         <mat-icon class="icon">manage_accounts</mat-icon>
         @if (!isCollapsed()) { <span>Usuarios</span> }
       </a>
@@ -69,7 +69,7 @@
       </a>
 
       @if (canShowAdminStuff()) {
-      <a routerLink="/auditoria" routerLinkActive="active" class="menu-item">
+      <a routerLink="/auditoria" routerLinkActive="active" class="menu-item" data-testid="nav-auditoria">
         <mat-icon class="icon">history</mat-icon>
         @if (!isCollapsed()) { <span>Auditorías</span> }
       </a>

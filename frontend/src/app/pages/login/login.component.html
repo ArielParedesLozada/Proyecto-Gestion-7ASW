@@ -19,7 +19,7 @@
         <!-- Usuario -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Usuario</mat-label>
-          <input matInput type="text" id="username" [value]="username()"
+          <input matInput type="text" id="username" data-testid="login-username" [value]="username()"
             (input)="username.set($any($event.target).value); clearError()" placeholder="Ingrese su usuario"
             autocomplete="username" required [disabled]="isLoading()" />
           <mat-icon matPrefix>email</mat-icon>
@@ -28,20 +28,20 @@
         <!-- Contraseña -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input matInput type="password" id="password" [value]="password()"
+          <input matInput type="password" id="password" data-testid="login-password" [value]="password()"
             (input)="password.set($any($event.target).value); clearError()" placeholder="Ingrese su contraseña"
             autocomplete="current-password" required [disabled]="isLoading()" />
           <mat-icon matPrefix>lock</mat-icon>
         </mat-form-field>
 
         @if (errorMessage()) {
-        <div class="error-message">
+        <div class="error-message" data-testid="login-error">
           <mat-icon>error_outline</mat-icon>
           {{ errorMessage() }}
         </div>
         }
 
-        <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
+        <button mat-raised-button color="primary" type="submit" class="login-button" data-testid="login-submit" [disabled]="isLoading()">
           @if (isLoading()) {
           <span>Iniciando sesión...</span>
           } @else {

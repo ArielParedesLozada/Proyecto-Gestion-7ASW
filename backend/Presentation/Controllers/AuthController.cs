@@ -23,17 +23,6 @@ public class AuthController(
     private readonly PasswordResetService _passwordResetService = passwordResetService;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
-    private static string? ResolveUser(ClaimsPrincipal user)
-    {
-        if (!string.IsNullOrWhiteSpace(user.Identity?.Name))
-        {
-            return user.Identity!.Name;
-        }
-
-        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? user.FindFirst("nameid")?.Value;
-    }
-
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginDtoResponse>> Login([FromBody] LoginDtoRequest request)
@@ -54,13 +43,13 @@ public class AuthController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<UserDtoResponse>> Me()
     {
-        var username = ResolveUser(User);
-        if (string.IsNullOrWhiteSpace(username))
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userIdClaim))
         {
             return Unauthorized();
         }
 
-        var response = await _meService.GetMe(username);
+        var response = await _meService.GetMe(userIdClaim);
         return Ok(new UserDtoResponse
         {
             Id = response.Id,
@@ -74,14 +63,14 @@ public class AuthController(
     [Authorize(Policy = "MUST-CHANGE-PASSWORD")]
     public async Task<ActionResult<LoginDtoResponse>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
     {
-        var username = ResolveUser(User);
-        if (string.IsNullOrWhiteSpace(username))
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
         {
             return Unauthorized();
         }
 
         var user = await _changePasswordService.ChangePassword(
-            username,
+            userId,
             changePasswordRequest.OldPassword,
             changePasswordRequest.NewPassword,
             changePasswordRequest.ConfirmNewPassword);
