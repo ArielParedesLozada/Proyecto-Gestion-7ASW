@@ -33,12 +33,15 @@ test.describe('Usuarios y permisos', () => {
   test('PA-USR-03 - Validar menú restringido para usuario normal', async ({ page }) => {
     // Objetivo: ocultar opciones admin para rol USER.
     // Mejora si falla: mejorar control de permisos por rol.
-    await loginAsUser(page, normalUser.username, normalUser.password);
+    const passwordAfterChange = `${initialPassword}-changed`;
+    await loginAsUser(page, normalUser.username, initialPassword, {
+      newPasswordAfterMandatoryChange: passwordAfterChange,
+    });
     await expect(page.getByTestId('nav-dashboard')).toBeVisible();
     await expect(page.getByTestId('nav-polizas')).toBeVisible();
     await expect(page.getByTestId('nav-users')).toHaveCount(0);
     await expect(page.getByTestId('nav-auditoria')).toHaveCount(0);
     await page.goto('/users');
-    await expect(page).toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 });

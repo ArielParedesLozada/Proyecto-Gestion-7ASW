@@ -37,10 +37,10 @@ test.describe.serial('Pólizas', () => {
       await page.goto('/dashboard');
       catalog = buildCatalogData();
       await createFullCatalog(page, catalog);
-      setCatalogSnapshot(catalog);
       poliza = buildPolizaData(catalog);
       await context.close();
     }
+    setCatalogSnapshot(catalog);
   });
 
   test('PA-POL-01 - Crear póliza completa', async ({ page }) => {

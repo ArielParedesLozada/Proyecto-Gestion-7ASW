@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Backend.App.Auth;
 using Backend.Domain.Services;
@@ -23,6 +24,30 @@ public class AuthController(
     private readonly PasswordResetService _passwordResetService = passwordResetService;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
+    /// <summary>
+    /// Con MapInboundClaims = false el JWT expone el id como "nameid", no como ClaimTypes.NameIdentifier.
+    /// </summary>
+    private static Guid? ResolveUserId(ClaimsPrincipal user)
+    {
+        string?[] claimTypes =
+        [
+            ClaimTypes.NameIdentifier,
+            JwtRegisteredClaimNames.Sub,
+            "nameid",
+        ];
+
+        foreach (var claimType in claimTypes)
+        {
+            var value = user.FindFirst(claimType)?.Value;
+            if (Guid.TryParse(value, out var userId))
+            {
+                return userId;
+            }
+        }
+
+        return null;
+    }
+
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginDtoResponse>> Login([FromBody] LoginDtoRequest request)
@@ -43,13 +68,13 @@ public class AuthController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<UserDtoResponse>> Me()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrWhiteSpace(userIdClaim))
+        var userId = ResolveUserId(User);
+        if (userId is null)
         {
             return Unauthorized();
         }
 
-        var response = await _meService.GetMe(userIdClaim);
+        var response = await _meService.GetMe(userId.Value.ToString());
         return Ok(new UserDtoResponse
         {
             Id = response.Id,
@@ -63,14 +88,14 @@ public class AuthController(
     [Authorize(Policy = "MUST-CHANGE-PASSWORD")]
     public async Task<ActionResult<LoginDtoResponse>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(userIdClaim, out var userId))
+        var userId = ResolveUserId(User);
+        if (userId is null)
         {
             return Unauthorized();
         }
 
         var user = await _changePasswordService.ChangePassword(
-            userId,
+            userId.Value,
             changePasswordRequest.OldPassword,
             changePasswordRequest.NewPassword,
             changePasswordRequest.ConfirmNewPassword);

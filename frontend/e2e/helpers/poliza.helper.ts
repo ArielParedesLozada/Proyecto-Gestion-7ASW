@@ -10,7 +10,9 @@ function formatDateInput(date: Date): string {
 
 async function selectMatOption(page: Page, fieldLabel: string, optionText: string): Promise<void> {
   await page.getByLabel(fieldLabel, { exact: false }).click();
-  await page.getByRole('option', { name: optionText }).click();
+  const option = page.getByRole('option', { name: optionText });
+  await expect(option).toBeVisible({ timeout: 15_000 });
+  await option.click();
 }
 
 const MONTH_LABELS = [
@@ -47,7 +49,7 @@ async function pickMatDateField(page: Page, label: string, date: Date): Promise<
   const periodButton = calendar.locator('.mat-calendar-period-button');
   const day = String(date.getDate());
 
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < 36; i++) {
     const periodText = (await periodButton.textContent()) ?? '';
     if (calendarShowsMonthYear(periodText, date)) {
       const enabledCell = calendar.locator(
@@ -80,7 +82,7 @@ export async function fillPolizaForm(
 ): Promise<void> {
   const emision = new Date();
   const expiracion = new Date();
-  expiracion.setDate(expiracion.getDate() + (options?.expiracionEnDias ?? 365));
+  expiracion.setDate(expiracion.getDate() + (options?.expiracionEnDias ?? 60));
 
   await page.getByLabel('Número de Póliza').fill(poliza.numero);
   await selectMatOption(page, 'Contratista', catalog.empresaNombre);

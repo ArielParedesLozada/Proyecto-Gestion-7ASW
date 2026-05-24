@@ -33,7 +33,7 @@ export async function completeMandatoryPasswordChange(
   await page.getByRole('textbox', { name: 'Nueva contraseña', exact: true }).fill(newPassword);
   await page.getByRole('textbox', { name: 'Confirmar nueva contraseña' }).fill(newPassword);
   await page.getByRole('button', { name: 'Actualizar contraseña' }).click();
-  await expect(page.locator('.error-message')).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.locator('.error-message')).not.toBeVisible({ timeout: 20_000 });
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
   await expect(page.getByTestId('nav-dashboard')).toBeVisible();
 }

@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test';
+import { searchPolizaByNumero } from './poliza.helper';
 
 export async function goToDashboard(page: Page): Promise<void> {
   await page.getByTestId('nav-dashboard').click();
@@ -9,7 +10,7 @@ export async function goToDashboard(page: Page): Promise<void> {
 export async function goToPolizas(page: Page): Promise<void> {
   await page.getByTestId('nav-polizas').click();
   await expect(page).toHaveURL(/\/polizas$/);
-  await expect(page.getByRole('heading', { name: 'Pólizas' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Pólizas', exact: true })).toBeVisible();
 }
 
 export async function goToRenovaciones(page: Page): Promise<void> {
@@ -45,6 +46,7 @@ export async function goToUsers(page: Page): Promise<void> {
 }
 
 export async function openPolizaRowByNumero(page: Page, numero: string): Promise<void> {
+  await searchPolizaByNumero(page, numero);
   const row = page.locator('table.polizas-table tbody tr').filter({ hasText: numero }).first();
   await expect(row).toBeVisible();
   await row.getByRole('button', { name: 'Ver' }).click();

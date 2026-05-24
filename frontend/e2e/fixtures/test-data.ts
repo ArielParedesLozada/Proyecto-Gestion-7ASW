@@ -1,3 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+
+const dataDir = path.join(__dirname, '..', '.data');
+const catalogFile = path.join(dataDir, 'catalog-snapshot.json');
+const polizaFile = path.join(dataDir, 'poliza-snapshot.json');
+
 /** Datos compartidos entre specs E2E (catálogo + póliza). */
 export interface E2ECatalogSnapshot {
   unique: number;
@@ -48,11 +55,27 @@ export function buildPolizaData(
   };
 }
 
+function writeJson(filePath: string, data: unknown): void {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');
+}
+
+function readJson<T>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
+}
+
 export function setCatalogSnapshot(data: E2ECatalogSnapshot): void {
   catalog = data;
+  writeJson(catalogFile, data);
 }
 
 export function getCatalogSnapshot(): E2ECatalogSnapshot {
+  if (!catalog) {
+    catalog = readJson<E2ECatalogSnapshot>(catalogFile);
+  }
   if (!catalog) {
     throw new Error('Catálogo E2E no inicializado. Ejecuta catalogos.spec antes o llama setCatalogSnapshot.');
   }
@@ -61,9 +84,13 @@ export function getCatalogSnapshot(): E2ECatalogSnapshot {
 
 export function setPolizaSnapshot(data: E2EPolizaSnapshot): void {
   poliza = data;
+  writeJson(polizaFile, data);
 }
 
 export function getPolizaSnapshot(): E2EPolizaSnapshot {
+  if (!poliza) {
+    poliza = readJson<E2EPolizaSnapshot>(polizaFile);
+  }
   if (!poliza) {
     throw new Error('Póliza E2E no inicializada. Ejecuta polizas.spec en orden o llama setPolizaSnapshot.');
   }

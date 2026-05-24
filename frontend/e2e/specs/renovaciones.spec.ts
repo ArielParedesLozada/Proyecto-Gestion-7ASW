@@ -22,13 +22,11 @@ test.describe.serial('Renovaciones', () => {
     // Objetivo: aprobar renovación desde detalle de póliza.
     // Mejora si falla: mejorar aprobación de renovaciones.
     // Precondición: póliza por vencer + job CheckRenovaciones (cada minuto).
-    let catalog;
+    const catalog = getCatalogSnapshot();
     let poliza;
     try {
-      catalog = getCatalogSnapshot();
       poliza = getPolizaSnapshot();
     } catch {
-      catalog = buildCatalogData();
       poliza = buildPolizaData(catalog);
     }
 
