@@ -23,7 +23,7 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
         {
             Id = Guid.NewGuid(),
             Nombre = nombreTrim,
-            Email = email ?? ""
+            Email = NormalizeEmail(email)
         };
 
         return await _empresaRepo.CreateAsync(empresa);
@@ -33,13 +33,16 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
+
         var query = _database.Empresas.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(nameOrEmail))
         {
+            var term = nameOrEmail.Trim().ToLower();
+
             query = query.Where(e =>
-                e.Nombre.ToLower().Contains(nameOrEmail) ||
-                e.Email.ToLower().Contains(nameOrEmail)
+                e.Nombre.ToLower().Contains(term) ||
+                (e.Email != null && e.Email.ToLower().Contains(term))
             );
         }
 
@@ -50,6 +53,7 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
         return new PagedResult<Empresa>
         {
             Items = items,
@@ -59,6 +63,20 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
         };
     }
 
+    public async Task<Empresa?> UpdateEmpresa(Guid id, string nombre, string? email)
+    {
+        var nombreTrim = nombre.Trim();
+        if (string.IsNullOrWhiteSpace(nombreTrim))
+            throw new CustomError("El nombre es obligatorio.", 400);
+
+        var empresa = await _empresaRepo.GetByIdAsync(id);
+        if (empresa == null) return null;
+
+        empresa.Nombre = nombreTrim;
+        empresa.Email = NormalizeEmail(email);
+
+        return await _empresaRepo.UpdateAsync(empresa);
+    }
     public async Task<Empresa?> GetEmpresaById(Guid id)
     {
         return await _empresaRepo.GetByIdAsync(id);
@@ -69,20 +87,6 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
         return await _empresaRepo.FindAsync(e => e.Nombre.Contains(nombre));
     }
 
-    public async Task<Empresa?> UpdateEmpresa(Guid id, string nombre)
-    {
-        var nombreTrim = nombre.Trim();
-        if (string.IsNullOrWhiteSpace(nombreTrim))
-            throw new CustomError("El nombre es obligatorio.", 400);
-
-        var empresa = await _empresaRepo.GetByIdAsync(id);
-        if (empresa == null) return null;
-
-        empresa.Nombre = nombreTrim;
-
-        return await _empresaRepo.UpdateAsync(empresa);
-    }
-
     public async Task<bool> DeleteEmpresa(Guid id)
     {
         var empresa = await _empresaRepo.GetByIdAsync(id);
@@ -90,5 +94,11 @@ public class EmpresasService(IRepository<Empresa, Guid> empresaRepo, AppDatabase
 
         await _empresaRepo.DeleteAsync(empresa);
         return true;
+    }
+    private static string? NormalizeEmail(string? email)
+    {
+        return string.IsNullOrWhiteSpace(email)
+            ? null
+            : email.Trim().ToLowerInvariant();
     }
 }

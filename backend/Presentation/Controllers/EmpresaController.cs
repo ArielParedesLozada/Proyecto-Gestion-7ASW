@@ -55,7 +55,7 @@ public class EmpresaController(EmpresasService empresaService) : ControllerBase
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<EmpresaDtoResponse>> Update(Guid id, [FromBody] EmpresaRequest request)
     {
-        var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre);
+        var empresa = await _empresaService.UpdateEmpresa(id, request.Nombre, request.Email);
         if (empresa == null)
             return NotFound();
         return Ok(Map(empresa));

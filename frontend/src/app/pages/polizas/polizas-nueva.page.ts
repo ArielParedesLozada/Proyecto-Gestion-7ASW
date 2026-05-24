@@ -22,6 +22,10 @@ import { RamoService } from '../../services/ramo.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { POLIZA_MAX, polizaMensajeMaxLength } from './utils/poliza-form-limits';
 import { PolizaAseguradoraSelect } from './poliza-aseguradora-select/poliza-aseguradora-select';
+import { EmpresaListRow } from '../empresas/models/empresa-list.model';
+import { AseguradoraListRow } from '../aseguradoras/models/aseguradora-list-row';
+import { MatDialog } from '@angular/material/dialog';
+import { CrearEntidadDialog } from '../../shared/components/crear-entidad-dialog/crear-entidad-dialog';
 
 // NUEVO: Validador personalizado para fechas
 function expiracionPosteriorEmisionValidator(): ValidatorFn {
@@ -69,11 +73,13 @@ export class PolizasNuevaPage {
   private readonly aseguradoraService = inject(AseguradoraService); // NUEVO
   private readonly notify = inject(NotificationService);
 
-  readonly empresas = toSignal(this.empresaService.getListSimple(), { initialValue: [] }); /// ERROR AQUI 
-  readonly aseguradoras = toSignal(this.aseguradoraService.getListSimple(), { initialValue: [] }); /// ERROR AQUI 
+  readonly empresas = signal<EmpresaListRow[]>([]);
+  readonly aseguradoras = signal<AseguradoraListRow[]>([]);
   readonly ramos = toSignal(this.ramoService.getList(), { initialValue: [] });
 
   readonly saving = signal(false);
+
+  private readonly dialog = inject(MatDialog);
   private readonly fechaExpPreview = signal<Date | null>(null);
 
   readonly estadoVistaPrevia = computed(() => calcularEstadoDesdeFechaExpiracion(this.fechaExpPreview()));
@@ -116,6 +122,9 @@ export class PolizasNuevaPage {
       .subscribe((fecha) => this.fechaExpPreview.set(fecha));
 
     this.sincronizarValorActual();
+    this.cargarAseguradoras()
+    this.cargarEmpresas()
+
   }
 
   onCancel(): void {
@@ -178,4 +187,58 @@ export class PolizasNuevaPage {
       this.form.controls.valorActual.setValue(original);
     }
   }
+  private cargarEmpresas(): void {
+    this.empresaService.getListSimple()
+      .subscribe({
+        next: (rows) => this.empresas.set(rows),
+      });
+  }
+
+  private cargarAseguradoras(): void {
+    this.aseguradoraService.getListSimple()
+      .subscribe({
+        next: (rows) => this.aseguradoras.set(rows),
+      });
+  }
+
+  abrirModalContratista(): void {
+    const ref = this.dialog.open(CrearEntidadDialog, {
+      width: '500px',
+      data: {
+        tipo: 'contratista',
+        titulo: 'Nuevo contratista',
+      },
+    });
+
+    ref.afterClosed().subscribe((created) => {
+      if (!created) return;
+
+      this.cargarEmpresas();
+
+      this.form.controls.contratista.setValue(created.id);
+
+      this.notify.success('Contratista creado correctamente.');
+    });
+  }
+
+  abrirModalAseguradora(): void {
+    const ref = this.dialog.open(CrearEntidadDialog, {
+      width: '500px',
+      data: {
+        tipo: 'aseguradora',
+        titulo: 'Nueva aseguradora',
+      },
+    });
+
+    ref.afterClosed().subscribe((created) => {
+      if (!created) return;
+
+      this.cargarAseguradoras();
+
+      this.form.controls.aseguradoraId.setValue(created.id);
+
+      this.notify.success('Aseguradora creada correctamente.');
+    });
+  }
+
 }

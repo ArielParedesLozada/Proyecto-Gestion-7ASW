@@ -7,6 +7,7 @@ import {
   signal,
   viewChild,
   ElementRef,
+  output,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
@@ -14,12 +15,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { startWith } from 'rxjs';
 import { EmpresaListRow } from '../../empresas/models/empresa-list.model';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-poliza-contratista-select',
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatIconModule],
   templateUrl: './poliza-contratista-select.component.html',
   styleUrl: './poliza-contratista-select.component.scss',
   providers: [
@@ -69,6 +71,8 @@ export class PolizaContratistaSelectComponent implements ControlValueAccessor {
     return list;
   });
 
+  /* cambios menores */
+  readonly agregar = output<void>()
   readonly panelClass = 'sicop-poliza-contratista-panel';
 
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
@@ -122,5 +126,10 @@ export class PolizaContratistaSelectComponent implements ControlValueAccessor {
       this.innerCtrl.enable({ emitEvent: false });
       this.filterCtrl.enable({ emitEvent: false });
     }
+  }
+
+  agregarNuevo(ev: MouseEvent): void {
+    ev.stopPropagation();
+    this.agregar.emit();
   }
 }

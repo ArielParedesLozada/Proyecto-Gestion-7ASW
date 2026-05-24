@@ -1,15 +1,16 @@
-import { Component, computed, ElementRef, forwardRef, input, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, forwardRef, input, output, signal, viewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { AseguradoraListRow } from '../../aseguradoras/models/aseguradora-list-row';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-poliza-aseguradora-select',
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatIconModule],
   templateUrl: './poliza-aseguradora-select.html',
   styleUrl: './poliza-aseguradora-select.scss',
   providers: [
@@ -32,6 +33,9 @@ export class PolizaAseguradoraSelect implements ControlValueAccessor {
 
   /** Etiqueta de la opción vacía inicial. */
   readonly placeholderOptionLabel = input('Seleccione aseguradora');
+
+  /* modal crear*/
+  readonly agregar = output<void>()
 
   readonly innerCtrl = new FormControl<string>('', { nonNullable: true });
   readonly filterCtrl = new FormControl('', { nonNullable: true });
@@ -112,5 +116,10 @@ export class PolizaAseguradoraSelect implements ControlValueAccessor {
       this.innerCtrl.enable({ emitEvent: false });
       this.filterCtrl.enable({ emitEvent: false });
     }
+  }
+
+  agregarNuevo(ev: MouseEvent): void {
+    ev.stopPropagation();
+    this.agregar.emit();
   }
 }
