@@ -8,7 +8,7 @@ import { PaginatedApiResponse, PaginatedResult } from '../interfaces/paginated-r
 
 export interface EmpresaCreateRequest {
   nombre: string;
-  correo: string;
+  correo?: string | null;
 }
 
 /** Formato del API (camelCase desde ASP.NET Core). */
@@ -19,7 +19,7 @@ interface EmpresaApiDto {
 }
 
 function mapDto(row: EmpresaApiDto): EmpresaListRow {
-  return { id: row.id, nombre: row.nombre, correo: row.email };
+  return { id: row.id, nombre: row.nombre, correo: row.email ?? '' };
 }
 
 @Injectable({
@@ -63,7 +63,7 @@ export class EmpresaService {
 
   create(body: EmpresaCreateRequest): Observable<EmpresaListRow> {
     return this.api
-      .post<EmpresaApiDto>(this.basePath, { nombre: body.nombre, email: body.correo })
+      .post<EmpresaApiDto>(this.basePath, { nombre: body.nombre, email: body.correo ?? null })
       .pipe(
         map(mapDto),
         catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),

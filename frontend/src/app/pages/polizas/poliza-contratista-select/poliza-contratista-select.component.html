@@ -31,6 +31,16 @@
 
     @if (filteredEmpresas().length === 0) {
       <mat-option disabled class="sicop-poliza-contratista-panel__empty">No se encontraron contratistas</mat-option>
+      <button
+      type="button"
+      mat-flat-button
+      class="sicop-poliza-contratista-panel__add-btn"
+      (click)="agregarNuevo($event)"
+      >
+        <mat-icon>add</mat-icon>
+        Agregar contratista
+      </button>
+
     } @else {
       @for (e of filteredEmpresas(); track e.id) {
         <mat-option [value]="e.id">{{ e.nombre }}</mat-option>

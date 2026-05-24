@@ -70,16 +70,19 @@ public class PolizaNotificationService
         var poliza = renovacion.PolizaNav
             ?? throw new InvalidOperationException("Póliza no encontrada");
 
-        // 🔒 Idempotencia
-        var yaEnviada = await _context.Notificaciones.AnyAsync(n =>
+        // 🔒 IDEMPOTENCIA REAL
+        var yaProcesada = await _context.Notificaciones.AnyAsync(n =>
             n.RenovacionId == renovacion.Id &&
-            n.Tipo == TipoNotificacion.Expiracion &&
-            n.Estado == EstadoNotificacion.Enviada
+            n.Tipo == TipoNotificacion.Expiracion
         );
 
-        if (yaEnviada)
+        if (yaProcesada)
         {
-            _logger.LogInformation("⏭️ Ya enviada {RenovacionId}", renovacion.Id);
+            _logger.LogInformation(
+                "⏭️ Notificación ya procesada {RenovacionId}",
+                renovacion.Id
+            );
+
             return;
         }
 
@@ -93,14 +96,30 @@ public class PolizaNotificationService
             CreatedAt = DateTimeOffset.UtcNow
         };
 
-        await _context.Notificaciones.AddAsync(notificacion);
-        await _context.SaveChangesAsync();
+        try
+        {
+            // 🔥 INSERT TEMPRANO PARA BLOQUEAR DUPLICADOS
+            await _context.Notificaciones.AddAsync(notificacion);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // Otro worker ganó la carrera
+            _logger.LogWarning(
+                "⚠️ Ya existe notificación para {RenovacionId}",
+                renovacion.Id
+            );
+
+            return;
+        }
 
         try
         {
-            // 📄 DOCUMENTO CON FALLBACK
             var ramoNombre = poliza.RamoNav?.Nombre ?? "GENERAL";
-            var templateName = $"{ramoNombre.Trim().ToLower().Replace(" ", "-")}-template.docx";
+
+            var templateName =
+                $"{ramoNombre.Trim().ToLower().Replace(" ", "-")}-template.docx";
+
             var dto = new PolizaDocumentoDto
             {
                 Aseguradora = poliza.AseguradoraNav?.Nombre ?? "NO ESPECIFICADA",
@@ -121,78 +140,44 @@ public class PolizaNotificationService
 
             _logger.LogInformation("✅ Documento generado");
 
-            // 📧 EMAIL
+            var email = poliza.UsuarioNav?.Email;
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new InvalidOperationException(
+                    "La póliza no tiene usuario con email"
+                );
+
             var link = $"{_baseLink}/polizas/{poliza.Id}";
+
             var bodyHtml = BuildBody(poliza, link);
+
             var subject = "Notificación de expiración de póliza";
+
             var fileName = $"Poliza-{poliza.Numero}.docx";
 
-            var destinatarios = new List<string?>
-            {
-                poliza.AseguradoraNav?.Email,
-                poliza.UsuarioNav?.Email
-            };
+            _logger.LogDebug("📤 Enviando a {Email}", email);
 
-            var success = false;
-
-            foreach (var email in destinatarios)
-            {
-                if (string.IsNullOrWhiteSpace(email))
-                    continue;
-
-                try
-                {
-                    _logger.LogDebug("📤 Enviando a {Email}", email);
-
-                    await _notifier.SendWithAttachmentAsync(
-                        email,
-                        subject,
-                        bodyHtml,
-                        docBytes,
-                        fileName
-                    );
-
-                    success = true;
-
-                    // 🔥 Throttle para Mailtrap
-                    await Task.Delay(500);
-                }
-                catch (SmtpCommandException ex) when (ex.Message.Contains("Too many emails"))
-                {
-                    _logger.LogWarning("⏳ Rate limit, reintentando...");
-
-                    await Task.Delay(1000);
-
-                    await _notifier.SendWithAttachmentAsync(
-                        email,
-                        subject,
-                        bodyHtml,
-                        docBytes,
-                        fileName
-                    );
-
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "❌ Error enviando a {Email}", email);
-                }
-            }
-
-            if (!success)
-                throw new InvalidOperationException("No se pudo enviar a ningún destinatario");
+            await _notifier.SendWithAttachmentAsync(
+                email,
+                subject,
+                bodyHtml,
+                docBytes,
+                fileName
+            );
 
             notificacion.Estado = EstadoNotificacion.Enviada;
             notificacion.FechaEnvio = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("✅ Notificación enviada {Id}", notificacion.Id);
+            _logger.LogInformation(
+                "✅ Notificación enviada {Id}",
+                notificacion.Id
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "💥 Error en notificación");
-
             notificacion.Estado = EstadoNotificacion.Error;
             await _context.SaveChangesAsync();
         }

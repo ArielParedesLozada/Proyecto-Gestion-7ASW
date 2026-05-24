@@ -5,6 +5,34 @@
       <input matInput placeholder="Buscar por número, contratista u obra..." [ngModel]="searchQuery()"
         (ngModelChange)="onSearchInput($event)" />
     </mat-form-field>
+
+    <!-- NUEVO -->
+    <mat-form-field appearance="outline" class="toolbar__search">
+      <mat-label>Contratista</mat-label>
+      <input matInput [ngModel]="contratistaFiltro()" (ngModelChange)="contratistaFiltroChange.emit($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="toolbar__search">
+      <mat-label>Aseguradora</mat-label>
+      <input matInput [ngModel]="aseguradoraFiltro()" (ngModelChange)="aseguradoraFiltroChange.emit($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Vence desde</mat-label>
+      <input matInput [matDatepicker]="pickerDesde" [ngModel]="fechaDesde()"
+        (ngModelChange)="fechaDesdeChange.emit($event)" />
+      <mat-datepicker-toggle matSuffix [for]="pickerDesde" />
+      <mat-datepicker #pickerDesde />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Vence hasta</mat-label>
+      <input matInput [matDatepicker]="pickerHasta" [ngModel]="fechaHasta()"
+        (ngModelChange)="fechaHastaChange.emit($event)" />
+      <mat-datepicker-toggle matSuffix [for]="pickerHasta" />
+      <mat-datepicker #pickerHasta />
+    </mat-form-field>
+    <!-- NUEVO -->
     <mat-form-field appearance="outline" class="toolbar__select" subscriptSizing="dynamic">
       <mat-select [ngModel]="ramoFiltro()" (ngModelChange)="onRamoChange($event)">
         <mat-option value="todos">Todos los ramos</mat-option>

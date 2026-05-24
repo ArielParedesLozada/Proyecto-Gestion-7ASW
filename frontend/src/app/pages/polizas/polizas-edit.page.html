@@ -34,7 +34,7 @@
           </mat-form-field>
 
           <app-poliza-contratista-select formControlName="contratista" [empresas]="empresas()"
-            [showPlaceholderOption]="true" selectPlaceholder="Seleccione empresa contratista" />
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione empresa contratista" (agregar)="abrirModalContratista()"/>
         </div>
 
         <!-- Fila 2 -->
@@ -61,7 +61,7 @@
           </mat-form-field>
 
           <app-poliza-aseguradora-select formControlName="aseguradoraId" [aseguradoras]="aseguradoras()"
-            [showPlaceholderOption]="true" selectPlaceholder="Seleccione aseguradora" />
+            [showPlaceholderOption]="true" selectPlaceholder="Seleccione aseguradora" (agregar)="abrirModalAseguradora()"/>
         </div>
 
         <!-- Fila 4 -->

@@ -8,7 +8,7 @@ import { PaginatedApiResponse, PaginatedResult } from '../interfaces/paginated-r
 
 export interface AseguradoraCreateRequest {
   nombre: string
-  email: string
+  email?: string | null
 }
 
 interface AseguradoraApiDto {
@@ -18,7 +18,7 @@ interface AseguradoraApiDto {
 }
 
 function mapDto(row: AseguradoraApiDto): AseguradoraListRow {
-  return { id: row.id, nombre: row.nombre, email: row.email };
+  return { id: row.id, nombre: row.nombre, email: row.email ?? '' };
 }
 
 @Injectable({
@@ -28,7 +28,7 @@ export class AseguradoraService {
   private readonly api = inject(ApiService);
 
   private mapDto(row: AseguradoraApiDto): AseguradoraListRow {
-    return { id: row.id, nombre: row.nombre, email: row.email }
+    return { id: row.id, nombre: row.nombre, email: row.email ?? '' }
   }
 
   getList(page = 1, pageSize = 10, search = ""): Observable<PaginatedResult<AseguradoraListRow>> {
@@ -68,7 +68,7 @@ export class AseguradoraService {
   }
   create(body: AseguradoraCreateRequest): Observable<AseguradoraListRow> {
     return this.api
-      .post<AseguradoraApiDto>(API_CONFIG.ENDPOINTS.ASEGURADORAS.INDEX, { nombre: body.nombre, email: body.email })
+      .post<AseguradoraApiDto>(API_CONFIG.ENDPOINTS.ASEGURADORAS.INDEX, { nombre: body.nombre, email: body.email ?? null})
       .pipe(
         map(this.mapDto),
         catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err)))),

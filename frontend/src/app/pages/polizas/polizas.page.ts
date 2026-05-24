@@ -28,33 +28,94 @@ export class PolizasPage {
   private readonly notify = inject(NotificationService);
   private readonly ramoService = inject(RamoService);
   private readonly dialog = inject(MatDialog);
-  
+
   private readonly excelFileInput = viewChild<ElementRef<HTMLInputElement>>('excelFileInput');
-  
+
   private readonly allRows = signal<PolizaListRow[]>([]);
-  
+
   /** Tamaño de página fijo (local; luego se puede alinear con el backend). */
   readonly pageSize = 10;
-  
+
   readonly ramos = toSignal(this.ramoService.getList(), { initialValue: [] });
   readonly searchQuery = signal('');
   readonly estadoFiltro = signal<PolizaEstado | 'todos'>('todos');
   readonly ramoFiltro = signal<string | 'todos'>('todos');
   readonly pageIndex = signal(0);
+  /*Filtros comunes */
+  readonly contratistaFiltro = signal('');
+  readonly aseguradoraFiltro = signal('');
+
+  readonly fechaDesdeFiltro = signal<Date | null>(null);
+  readonly fechaHastaFiltro = signal<Date | null>(null);
 
   readonly filteredRows = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
+
     const est = this.estadoFiltro();
-    const ramo = this.ramoFiltro()
+    const ramo = this.ramoFiltro();
+
+    const contratista = this.contratistaFiltro().trim().toLowerCase();
+    const aseguradora = this.aseguradoraFiltro().trim().toLowerCase();
+
+    const desde = this.fechaDesdeFiltro();
+    const hasta = this.fechaHastaFiltro();
+
     const filtered = this.allRows().filter((row) => {
+
+      // Estado
       if (est !== 'todos' && row.estado !== est) {
         return false;
       }
 
+      // Ramo
       if (ramo !== 'todos' && row.ramoId !== ramo) {
         return false;
       }
 
+      // Contratista
+      if (
+        contratista &&
+        !row.contratista.toLowerCase().includes(contratista)
+      ) {
+        return false;
+      }
+
+      // Aseguradora
+      if (
+        aseguradora &&
+        !row.aseguradora.toLowerCase().includes(aseguradora)
+      ) {
+        return false;
+      }
+
+      // Fecha
+      const fechaExp = new Date(row.fechaExpiracion);
+      if (desde) {
+        const desdeDate = new Date(desde);
+        desdeDate.setHours(0, 0, 0, 0);
+
+        if (fechaExp < desdeDate) {
+          return false;
+        }
+      }
+
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setHours(23, 59, 59, 999);
+
+        if (fechaExp > hastaDate) {
+          return false;
+        }
+      }
+      if (desde && fechaExp < desde) {
+        return false;
+      }
+
+      if (hasta && fechaExp > hasta) {
+        return false;
+      }
+
+      // Search global
       if (!q) {
         return true;
       }

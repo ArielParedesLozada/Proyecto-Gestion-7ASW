@@ -8,4 +8,5 @@ module.exports = {
   setupFiles: ['<rootDir>/setup-jest.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testMatch: ['<rootDir>/src/tests-unitaria/**/*.spec.ts'],
+  testMatch: ['<rootDir>/src/tests-integracion/**/*.spec.ts'],
 };

@@ -23,6 +23,14 @@
     (cargarExcel)="onCargarExcel()"
     (nuevaPoliza)="onNuevaPoliza()"
     (limpiarFiltros)="limpiarFiltros()"
+    [contratistaFiltro]="contratistaFiltro()"
+    [aseguradoraFiltro]="aseguradoraFiltro()"
+    [fechaDesde]="fechaDesdeFiltro()"
+    [fechaHasta]="fechaHastaFiltro()"
+    (contratistaFiltroChange)="contratistaFiltro.set($event)"
+    (aseguradoraFiltroChange)="aseguradoraFiltro.set($event)"
+    (fechaDesdeChange)="fechaDesdeFiltro.set($event)"
+    (fechaHastaChange)="fechaHastaFiltro.set($event)"
   />
 
   <app-polizas-table

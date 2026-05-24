@@ -44,14 +44,12 @@ public class AppDatabase : DbContext
         {
             entity.ToTable("aseguradoras");
             entity.HasKey(a => a.Id);
-            entity.HasIndex(a => a.Id);
             entity.HasIndex(a => a.Email).IsUnique();
         });
         modelBuilder.Entity<Empresa>(entity =>
         {
             entity.ToTable("empresas");
             entity.HasKey(e => e.Id);
-            entity.HasIndex(e => e.Id);
         });
         modelBuilder.Entity<Poliza>(entity =>
         {

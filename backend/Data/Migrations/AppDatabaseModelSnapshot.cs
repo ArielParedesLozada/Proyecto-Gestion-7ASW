@@ -29,7 +29,6 @@ namespace backend.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Nombre")
@@ -41,8 +40,6 @@ namespace backend.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("Id");
-
                     b.ToTable("aseguradoras", (string)null);
                 });
 
@@ -53,23 +50,19 @@ namespace backend.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Accion")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("DatosNuevos")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DatosPrevios")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("RegistroId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Tabla")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -92,7 +85,6 @@ namespace backend.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Nombre")
@@ -100,8 +92,6 @@ namespace backend.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Id");
 
                     b.ToTable("empresas", (string)null);
                 });

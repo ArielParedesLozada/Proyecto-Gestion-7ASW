@@ -14,15 +14,32 @@ public class ControlMaestroService(AppDatabase context)
     private static string LogoPath =>
         Path.Combine(AppContext.BaseDirectory, "Assets", "Gobierno.png");
     public async Task<ControlMaestroRes> ObtenerControlMaestroAsync(
-        int pageVigentes,
-        int pageSizeVigentes,
-        int pageVencidas,
-        int pageSizeVencidas,
-        decimal saldoInicial
+            int pageVigentes,
+            int pageSizeVigentes,
+            int pageVencidas,
+            int pageSizeVencidas,
+            decimal saldoInicial,
+            DateTimeOffset? fechaInicio,
+            DateTimeOffset? fechaFin,
+            Guid? ramoId
     )
     {
         var baseQuery = _context.Polizas
             .AsNoTracking();
+        if (fechaInicio.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.FechaEmision >= fechaInicio.Value);
+        }
+
+        if (fechaFin.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.FechaEmision <= fechaFin.Value);
+        }
+
+        if (ramoId.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.Ramo == ramoId.Value);
+        }
         var vigentesQuery = baseQuery
             .Where(p => p.Estado == EstadoPoliza.Vigente);
 
@@ -118,11 +135,28 @@ public class ControlMaestroService(AppDatabase context)
 
     public async Task<(byte[] Bytes, string FileName)> GenerarPdfAsync(
         decimal saldoInicial,
-        DateTimeOffset generadoEnUtc
+        DateTimeOffset generadoEnUtc,
+        DateTimeOffset? fechaInicio,
+        DateTimeOffset? fechaFin,
+        Guid? ramoId
     )
     {
         var baseQuery = _context.Polizas
            .AsNoTracking();
+        if (fechaInicio.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.FechaEmision >= fechaInicio.Value);
+        }
+
+        if (fechaFin.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.FechaEmision <= fechaFin.Value);
+        }
+
+        if (ramoId.HasValue)
+        {
+            baseQuery = baseQuery.Where(p => p.Ramo == ramoId.Value);
+        }
         var now = DateTimeOffset.UtcNow;
         var vigentesQuery = baseQuery
             .Where(p => p.Estado == EstadoPoliza.Vigente);
