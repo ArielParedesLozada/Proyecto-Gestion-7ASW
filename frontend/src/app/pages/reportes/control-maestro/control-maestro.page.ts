@@ -1,7 +1,12 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
+import { PageEvent } from '@angular/material/paginator';
 import { PolizasTable } from '../../polizas/polizas-table/polizas-table';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
+import {
+  SicopSegmentedControl,
+  SicopSegmentedOption,
+} from '../../../shared/components/sicop-segmented-control/sicop-segmented-control';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { ControlMaestroService, PolizaControlRow } from '../../../services/control-maestro.service';
 import { CurrencyPipe } from '@angular/common';
@@ -15,11 +20,14 @@ import {
   validateVencimientoDateRange,
 } from '../../../shared/utils/vencimiento-date-range.util';
 
+export type ControlMaestroListaVista = 'vigentes' | 'vencidas';
+
 @Component({
   selector: 'app-control-maestro.page',
   imports: [
     PolizasTable,
     MatIconModule,
+    SicopSegmentedControl,
     CurrencyPipe,
     PageHeaderActions,
     ControlMaestroToolbar,
@@ -31,6 +39,7 @@ export class ControlMaestroPage implements OnInit {
   private readonly service = inject(ControlMaestroService);
   private readonly notify = inject(NotificationService);
   private readonly ramosService = inject(RamoService);
+  private readonly router = inject(Router);
 
   saldoInicial = signal(0);
 
@@ -54,6 +63,44 @@ export class ControlMaestroPage implements OnInit {
 
   readonly ramos = signal<{ id: string; nombre: string }[]>([]);
 
+  readonly listaActiva = signal<ControlMaestroListaVista>('vigentes');
+
+  readonly listaOpciones = computed((): SicopSegmentedOption<ControlMaestroListaVista>[] => [
+    {
+      value: 'vigentes',
+      label: 'Vigentes',
+      count: this.totalVigentes(),
+      tone: 'success',
+    },
+    {
+      value: 'vencidas',
+      label: 'Vencidas',
+      count: this.totalVencidasCount(),
+      tone: 'danger',
+    },
+  ]);
+
+  readonly tablaActiva = computed(() => {
+    if (this.listaActiva() === 'vencidas') {
+      return {
+        title: 'Pólizas Vencidas',
+        subtitle: 'Histórico expirado',
+        rows: this.vencidas(),
+        paginatorLength: this.totalVencidasCount(),
+        pageIndex: this.pageVencidas() - 1,
+        pageSize: this.pageSizeVencidas(),
+      };
+    }
+    return {
+      title: 'Pólizas Vigentes',
+      subtitle: 'Listado activo',
+      rows: this.vigentes(),
+      paginatorLength: this.totalVigentes(),
+      pageIndex: this.pageVigentes() - 1,
+      pageSize: this.pageSizeVigentes(),
+    };
+  });
+
   readonly resumen = computed(() => ({
     saldoInicial: this.saldoInicial(),
     totalVigentes: this.totalVigentesSum(),
@@ -64,11 +111,38 @@ export class ControlMaestroPage implements OnInit {
       this.totalVencidasSum(),
   }));
 
+  constructor() {
+    effect(() => {
+      this.fechaDesde();
+      this.fechaHasta();
+      this.ramoId();
+
+      untracked(() => {
+        this.pageVigentes.set(1);
+        this.pageVencidas.set(1);
+        this.recargarSiFiltrosAplicables();
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.ramosService.getList().subscribe({
       next: (data) => this.ramos.set(data),
     });
+  }
 
+  onSaldoInicialChange(value: number): void {
+    this.saldoInicial.set(value);
+  }
+
+  onRamoChange(ramoId: string | null): void {
+    this.ramoId.set(ramoId);
+  }
+
+  private recargarSiFiltrosAplicables(): void {
+    if (hasPartialVencimientoRange(this.fechaDesde(), this.fechaHasta())) {
+      return;
+    }
     this.cargar();
   }
 
@@ -129,9 +203,6 @@ export class ControlMaestroPage implements OnInit {
     this.fechaHasta.set(null);
     this.ramoId.set(null);
     this.saldoInicial.set(0);
-    this.pageVigentes.set(1);
-    this.pageVencidas.set(1);
-    this.cargar();
   }
 
   onFechaDesdeChange(value: Date | null): void {
@@ -154,6 +225,22 @@ export class ControlMaestroPage implements OnInit {
     this.pageVencidas.set(e.pageIndex + 1);
     this.pageSizeVencidas.set(e.pageSize);
     this.cargar();
+  }
+
+  onListaActivaChange(vista: ControlMaestroListaVista): void {
+    this.listaActiva.set(vista);
+  }
+
+  onTablaPageChange(event: PageEvent): void {
+    if (this.listaActiva() === 'vencidas') {
+      this.onPageVencidas(event);
+      return;
+    }
+    this.onPageVigentes(event);
+  }
+
+  onVer(row: PolizaListRow): void {
+    void this.router.navigate(['/polizas', row.id]);
   }
 
   private validarFiltrosFecha(): boolean {

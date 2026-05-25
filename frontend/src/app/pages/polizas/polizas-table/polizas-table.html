@@ -67,7 +67,7 @@
       <td>
         <div
           class="sicop-data-table__actions polizas-table__actions"
-          [class.polizas-table__actions--solo-ver]="variant() === 'dashboard'"
+          [class.polizas-table__actions--solo-ver]="variant() === 'dashboard' || !showEditAction()"
         >
           <button
             type="button"
@@ -78,7 +78,7 @@
           >
             <mat-icon>visibility</mat-icon>
           </button>
-          @if (variant() === 'full') {
+          @if (variant() === 'full' && showEditAction()) {
             <button
               type="button"
               mat-icon-button
@@ -87,15 +87,6 @@
               (click)="onEditar(row)"
             >
               <mat-icon>edit_square</mat-icon>
-            </button>
-            <button
-              type="button"
-              mat-icon-button
-              class="sicop-data-table__action-btn"
-              aria-label="Renovar"
-              (click)="onRenovar(row)"
-            >
-              <mat-icon>autorenew</mat-icon>
             </button>
           }
         </div>

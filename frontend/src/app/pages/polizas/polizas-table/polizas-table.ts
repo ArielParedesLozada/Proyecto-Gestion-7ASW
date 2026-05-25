@@ -33,6 +33,7 @@ export class PolizasTable {
   showPaginator = input(true);
 
   variant = input<'full' | 'dashboard'>('full');
+  showEditAction = input(true);
   showTableTitle = input(true);
   tableTitle = input('Listado de Pólizas');
   tableSubtitle = input<string | undefined>(undefined);
@@ -54,7 +55,6 @@ export class PolizasTable {
 
   ver = output<PolizaListRow>();
   editar = output<PolizaListRow>();
-  renovar = output<PolizaListRow>();
 
   readonly diasRestantesUrgenciaKey = polizaDiasRestantesUrgenciaKey;
 
@@ -68,9 +68,5 @@ export class PolizasTable {
 
   onEditar(row: PolizaListRow): void {
     this.editar.emit(row);
-  }
-
-  onRenovar(row: PolizaListRow): void {
-    this.renovar.emit(row);
   }
 }

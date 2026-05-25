@@ -256,10 +256,6 @@ export class PolizasPage {
     void this.router.navigate(['/polizas', row.id, 'editar']);
   }
 
-  onRenovar(row: PolizaListRow): void {
-    console.log('[SICOP Pólizas] Renovar', row.numero, row);
-  }
-
   private recargarPolizas(): void {
     this.polizaService.getList().subscribe({
       next: (data) => this.allRows.set(data),

@@ -152,6 +152,10 @@ $z-topbar: 1080;
     transform: translateX(-50%);
   }
 
+  .sidebar-footer {
+    justify-content: center;
+    padding-inline: 0.25rem;
+  }
 }
 
 .sidebar-header {

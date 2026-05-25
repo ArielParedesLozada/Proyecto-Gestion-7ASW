@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -13,6 +13,7 @@ import { finalize, merge } from 'rxjs';
 import { emisionDiaPermitidoEnCalendario, emisionNoFuturaValidator } from './utils/poliza-emision-validators';
 import { calcularEstadoDesdeFechaExpiracion } from './utils/poliza-estado-derivado.util';
 import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { PageBackLink } from '../../shared/components/page-back-link/page-back-link';
 import { PolizaContratistaSelectComponent } from './poliza-contratista-select/poliza-contratista-select.component';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { EmpresaService } from '../../services/empresa.service';
@@ -44,7 +45,7 @@ function expiracionPosteriorEmisionValidator(): ValidatorFn {
 @Component({
   selector: 'app-polizas-nueva-page',
   imports: [
-    RouterLink,
+    PageBackLink,
     ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,

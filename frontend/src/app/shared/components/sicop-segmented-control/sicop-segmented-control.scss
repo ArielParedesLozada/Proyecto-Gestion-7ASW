@@ -1,0 +1,133 @@
+:host {
+  display: block;
+}
+
+.sicop-segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 14px rgba(15, 23, 42, 0.05);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sicop-segmented__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.45rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(.sicop-segmented__btn--active) {
+    background: #f9fafb;
+    color: #1f2937;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #c1121f;
+    outline-offset: 2px;
+  }
+}
+
+.sicop-segmented__label {
+  line-height: 1.2;
+}
+
+.sicop-segmented__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.65rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: #f3f4f6;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.sicop-segmented__btn--active {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+
+  .sicop-segmented__badge {
+    background: rgba(255, 255, 255, 0.22);
+    color: inherit;
+  }
+}
+
+.sicop-segmented__btn--active:not(.sicop-segmented__btn--success):not(.sicop-segmented__btn--danger):not(
+    .sicop-segmented__btn--warn
+  ) {
+  background: #c1121f;
+  border-color: #c1121f;
+  color: #ffffff;
+}
+
+.sicop-segmented__btn--active.sicop-segmented__btn--success {
+  background: #e8f5e9;
+  border-color: #86efac;
+  color: #166534;
+
+  .sicop-segmented__badge {
+    background: #dcfce7;
+    color: #15803d;
+  }
+}
+
+.sicop-segmented__btn--active.sicop-segmented__btn--danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+
+  .sicop-segmented__badge {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+.sicop-segmented__btn--active.sicop-segmented__btn--warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+
+  .sicop-segmented__badge {
+    background: #fef3c7;
+    color: #a16207;
+  }
+}
+
+@media (max-width: 520px) {
+  .sicop-segmented {
+    display: flex;
+    width: 100%;
+  }
+
+  .sicop-segmented__btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 0.65rem;
+  }
+}

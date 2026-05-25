@@ -1,8 +1,5 @@
 <div class="poliza-detail">
-    <button type="button" class="back-link" (click)="onVolver()">
-      <mat-icon>arrow_back</mat-icon>
-      Volver a pólizas
-    </button>
+    <app-page-back-link />
 
     @if (poliza(); as p) {
       <header class="polizas-header">

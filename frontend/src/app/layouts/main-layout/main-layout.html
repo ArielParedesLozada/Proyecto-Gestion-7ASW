@@ -60,8 +60,8 @@
     ></app-sidebar-nav>
 
     <div class="sidebar-footer">
-      <mat-icon class="logout-icon" aria-hidden="true">logout</mat-icon>
       @if (sidebarLabelsVisible()) {
+        <mat-icon class="logout-icon" aria-hidden="true">logout</mat-icon>
         <app-button (action)="logout()">Cerrar Sesión</app-button>
       } @else {
         <button type="button" class="sidebar-footer__icon-btn" aria-label="Cerrar sesión" (click)="logout()">

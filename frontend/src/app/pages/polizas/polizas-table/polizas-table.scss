@@ -43,10 +43,11 @@
 
 :host ::ng-deep .polizas-table__col-actions {
   text-align: center;
-  width: 168px;
+  width: 104px;
 }
 
-:host ::ng-deep .sicop-data-table--dashboard .polizas-table__col-actions {
+:host ::ng-deep .sicop-data-table--dashboard .polizas-table__col-actions,
+:host ::ng-deep .polizas-table:has(.polizas-table__actions--solo-ver) .polizas-table__col-actions {
   width: 72px;
 }
 

@@ -1,15 +1,13 @@
 <header class="polizas-header">
-    <div>
-        <h1 class="page-title">Control Maestro</h1>
-        <p class="page-subtitle">
-            Consolidado de pólizas vigentes y vencidas
-        </p>
-    </div>
-
-    <div class="polizas-header__tools">
-        <app-page-header-actions />
-    </div>
+  <div>
+    <h1 class="page-title">Control Maestro</h1>
+    <p class="page-subtitle">Consolidado de pólizas vigentes y vencidas</p>
+  </div>
+  <div class="polizas-header__tools">
+    <app-page-header-actions />
+  </div>
 </header>
+
 <app-control-maestro-toolbar
   [fechaDesde]="fechaDesde()"
   [fechaHasta]="fechaHasta()"
@@ -18,46 +16,51 @@
   [saldoInicial]="saldoInicial()"
   (fechaDesdeChange)="onFechaDesdeChange($event)"
   (fechaHastaChange)="onFechaHastaChange($event)"
-  (ramoIdChange)="ramoId.set($event)"
-  (saldoInicialChange)="saldoInicial.set($event)"
+  (ramoIdChange)="onRamoChange($event)"
+  (saldoInicialChange)="onSaldoInicialChange($event)"
   (limpiarFiltros)="limpiarFiltros()"
-  (cargar)="cargar()"
   (exportarPdf)="exportarPdf()"
 />
 
-<!-- RESUMEN -->
 <div class="cm-summary">
-    <div class="cm-card cm-card--neutral">
-        <span>Saldo inicial: </span>
-        <strong>{{ resumen().saldoInicial | currency }}</strong>
-    </div>
-
-    <div class="cm-card cm-card--success">
-        <span>Vigentes: </span>
-        <strong>{{ resumen().totalVigentes | currency }}</strong>
-    </div>
-
-    <div class="cm-card cm-card--danger">
-        <span>Vencidas: </span>
-        <strong>{{ resumen().totalVencidas | currency }}</strong>
-    </div>
-
-    <div class="cm-card cm-card--highlight">
-        <span>Cuadre total: </span>
-        <strong>{{ resumen().cuadreTotal | currency }}</strong>
-    </div>
+  <div class="cm-card cm-card--neutral">
+    <span>Saldo inicial: </span>
+    <strong>{{ resumen().saldoInicial | currency }}</strong>
+  </div>
+  <div class="cm-card cm-card--success">
+    <span>Vigentes: </span>
+    <strong>{{ resumen().totalVigentes | currency }}</strong>
+  </div>
+  <div class="cm-card cm-card--danger">
+    <span>Vencidas: </span>
+    <strong>{{ resumen().totalVencidas | currency }}</strong>
+  </div>
+  <div class="cm-card cm-card--highlight">
+    <span>Cuadre total: </span>
+    <strong>{{ resumen().cuadreTotal | currency }}</strong>
+  </div>
 </div>
 
-<!-- VIGENTES -->
-<section class="cm-section">
-    <app-polizas-table tableTitle="Pólizas Vigentes" tableSubtitle="Listado activo" [rows]="vigentes()"
-        [showPaginator]="true" [paginatorLength]="totalVigentes()" [pageIndex]="pageVigentes() - 1"
-        [pageSize]="pageSizeVigentes()" (pageChange)="onPageVigentes($event)" />
-</section>
+<div class="cm-list-switch">
+  <app-sicop-segmented-control
+    ariaLabel="Tipo de listado de pólizas"
+    [options]="listaOpciones()"
+    [value]="listaActiva()"
+    (valueChange)="onListaActivaChange($event)"
+  />
+</div>
 
-<!-- VENCIDAS -->
 <section class="cm-section">
-    <app-polizas-table tableTitle="Pólizas Vencidas" tableSubtitle="Histórico expirado" [rows]="vencidas()"
-        [showPaginator]="true" [paginatorLength]="totalVencidasCount()" [pageIndex]="pageVencidas() - 1"
-        [pageSize]="pageSizeVencidas()" (pageChange)="onPageVencidas($event)" />
+  <app-polizas-table
+    [tableTitle]="tablaActiva().title"
+    [tableSubtitle]="tablaActiva().subtitle"
+    [rows]="tablaActiva().rows"
+    [showEditAction]="false"
+    [showPaginator]="true"
+    [paginatorLength]="tablaActiva().paginatorLength"
+    [pageIndex]="tablaActiva().pageIndex"
+    [pageSize]="tablaActiva().pageSize"
+    (pageChange)="onTablaPageChange($event)"
+    (ver)="onVer($event)"
+  />
 </section>

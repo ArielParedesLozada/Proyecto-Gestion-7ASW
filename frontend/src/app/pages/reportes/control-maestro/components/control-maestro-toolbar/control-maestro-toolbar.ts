@@ -40,7 +40,6 @@ export class ControlMaestroToolbar {
   ramoIdChange = output<string | null>();
   saldoInicialChange = output<number>();
   limpiarFiltros = output<void>();
-  cargar = output<void>();
   exportarPdf = output<void>();
 
   readonly filtersExpanded = signal(false);

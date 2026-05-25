@@ -24,5 +24,14 @@
   .cm-summary {
     grid-template-columns: 1fr;
   }
+}
 
+.cm-list-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cm-section {
+  min-width: 0;
 }
