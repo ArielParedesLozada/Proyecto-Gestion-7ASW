@@ -6,9 +6,10 @@ import { RenovacionService } from '../../../services/renovacion.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { RenovacionHistorialRow } from '../../../interfaces/renovacion.interface';
 import { take } from 'rxjs';
-import { EstadoPipe } from '../pipes/estado-pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { PageHeaderActions } from '../../../components/page-header-actions/page-header-actions';
+import { RenovacionStatusBadge } from '../../../shared/components/renovacion-status-badge/renovacion-status-badge';
+import { isRenovacionEditable } from '../../../shared/utils/renovacion-estado-display.util';
 
 @Component({
   selector: 'app-renovacion-detail.page',
@@ -16,9 +17,9 @@ import { PageHeaderActions } from '../../../components/page-header-actions/page-
     DatePipe,
     DecimalPipe,
     MatButtonModule,
-    EstadoPipe,
     MatIconModule,
     PageHeaderActions,
+    RenovacionStatusBadge,
   ],
   templateUrl: './renovacion-detail.page.html',
   styleUrl: './renovacion-detail.page.scss',
@@ -31,8 +32,8 @@ export class RenovacionDetailPage {
 
   readonly renovacion = signal<RenovacionHistorialRow | null>(null);
 
-  readonly detalleEsEditable = computed(
-    () => this.renovacion()?.estado === 'pendiente'
+  readonly detalleEsEditable = computed(() =>
+    isRenovacionEditable(this.renovacion()?.estado),
   );
 
   constructor() {
@@ -77,7 +78,7 @@ export class RenovacionDetailPage {
             r
               ? {
                 ...r,
-                estado: 'confirmada'
+                estado: 0
               }
               : null
           );

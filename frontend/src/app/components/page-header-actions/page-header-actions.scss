@@ -1,52 +1,10 @@
-:host {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex-shrink: 0;
-}
-
-.page-header-actions__notif {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  padding: 0.2rem;
-  cursor: pointer;
-  line-height: 0;
-  border-radius: 50%;
-  text-decoration: none;
-  color: inherit;
-
-  mat-icon {
-    font-size: 1.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    color: #6b7280;
-  }
-
-  &:hover mat-icon {
-    color: #374151;
-  }
-}
-
-.page-header-actions__notif-dot {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
-  background: #c1121f;
-  border-radius: 50%;
-  border: 2px solid #f5f7fb;
-}
-
-// Variante barra móvil superior (fondo blanco)
-:host(.page-header-actions--topbar) {
-  gap: 0.15rem;
-
-  .page-header-actions__notif-dot {
-    border-color: #ffffff;
-  }
-}
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+:host(.page-header-actions--topbar) {
+  gap: 0.15rem;
+}

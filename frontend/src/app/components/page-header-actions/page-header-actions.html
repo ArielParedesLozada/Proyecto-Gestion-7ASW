@@ -1,12 +1,5 @@
 @if (showNotifications()) {
-  <a
-    routerLink="/notificaciones"
-    class="page-header-actions__notif"
-    aria-label="Ir a notificaciones"
-  >
-    <mat-icon>notifications</mat-icon>
-    <span class="page-header-actions__notif-dot" aria-hidden="true"></span>
-  </a>
+  <app-notification-bell [dotBorderColor]="dotBorderColor()" />
 }
 
 @if (showUserMenu()) {

@@ -12,7 +12,7 @@ export interface NotificacionItem {
   renovacionId: string;
   fechaRenovacion: string;
   fechaExpiracion: string;
-  estado: number; // 0: Pendiente, 1: Enviada, 2: Error, 3: Invalidada
+  estado: number; // 0: Enviada, 1: Error, 2: Pendiente, 3: Invalidada
   tipo: number; // 0: Renovacion, 1: Expiracion
   createdAt: string;
   fechaEnvio: string | null;
@@ -96,7 +96,7 @@ export class NotificacionService {
     page: number = 1,
     pageSize: number = 10
   ): Observable<NotificacionPaginatedResponse> {
-    return this.getNotificacionesPaginadas(page, pageSize, undefined, 0, undefined);
+    return this.getNotificacionesPaginadas(page, pageSize, undefined, 2, undefined);
   }
 
   /**
@@ -108,5 +108,16 @@ export class NotificacionService {
     pageSize: number = 10
   ): Observable<NotificacionPaginatedResponse> {
     return this.getNotificacionesPaginadas(page, pageSize, undefined, undefined, 1);
+  }
+
+  /** Últimas notificaciones para el popover del header (más recientes primero). */
+  getUltimasNotificaciones(limit = 5): Observable<NotificacionItem[]> {
+    return this.getNotificacionesPaginadas(1, limit).pipe(
+      map((response) =>
+        [...response.items]
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, limit),
+      ),
+    );
   }
 }

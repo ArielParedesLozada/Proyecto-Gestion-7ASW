@@ -1,0 +1,15 @@
+<article class="notif-item">
+  <div class="notif-item__icon notif-item__icon--{{ row().tone }}" aria-hidden="true">
+    <mat-icon>{{ row().icon }}</mat-icon>
+  </div>
+  <div class="notif-item__body">
+    <div class="notif-item__head">
+      <h4 class="notif-item__title">{{ row().title }}</h4>
+      @if (row().relativeTime) {
+        <span class="notif-item__time">{{ row().relativeTime }}</span>
+      }
+    </div>
+    <p class="notif-item__desc">{{ row().description }}</p>
+    <span class="notif-item__status">{{ row().estadoLabel }}</span>
+  </div>
+</article>

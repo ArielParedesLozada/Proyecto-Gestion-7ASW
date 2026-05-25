@@ -23,10 +23,7 @@
                 Consulta de la renovación registrada.
             </p>
         </div>
-        <span class="detalle-estado-pill" [class.detalle-estado-pill--pendiente]="detalle.estado==='pendiente'"
-            [class.detalle-estado-pill--confirmada]="detalle.estado==='confirmada'">
-            {{ detalle.estado | estado }}
-        </span>
+        <app-renovacion-status-badge [estado]="detalle.estado" />
     </header>
     <div class="detalle-grid">
         <div class="detalle-item">

@@ -24,8 +24,8 @@ export interface RenovacionHistorialRow {
   valor: number;
   fechaRenovacion: string;
   fechaExpiracion: string;
-  /** Ciclo de la renovación en pantalla: solo pendiente de confirmación o ya confirmada. */
-  estado: RenovacionEstado;
+  /** EstadoRenovacion del API (0–3) o claves legacy en cliente. */
+  estado: RenovacionEstado | number;
   observaciones: string | null;
 }
 

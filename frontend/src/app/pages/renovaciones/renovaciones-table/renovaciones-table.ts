@@ -5,11 +5,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
 import { RenovacionHistorialRow } from '../../../interfaces/renovacion.interface';
-import { EstadoPipe } from '../pipes/estado-pipe';
+import { RenovacionStatusBadge } from '../../../shared/components/renovacion-status-badge/renovacion-status-badge';
 
 @Component({
   selector: 'app-renovaciones-table',
-  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, DatePipe, DecimalPipe, EstadoPipe],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    LocalPaginatorComponent,
+    DatePipe,
+    DecimalPipe,
+    RenovacionStatusBadge,
+  ],
   templateUrl: './renovaciones-table.html',
   styleUrl: './renovaciones-table.scss',
 })

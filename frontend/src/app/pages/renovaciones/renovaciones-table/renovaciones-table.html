@@ -22,7 +22,9 @@
             <td>{{ row.fechaRenovacion | date: 'dd/MM/yyyy' }}</td>
             <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
             <td class="renovaciones-table__valor">${{ row.valor | number: '1.0-0' }}</td>
-            <td>{{ row.estado | estado}}</td>
+            <td>
+              <app-renovacion-status-badge [estado]="row.estado" />
+            </td>
             <td>
               <div class="renovaciones-table__actions">
                 <button
