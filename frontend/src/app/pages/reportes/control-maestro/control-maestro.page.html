@@ -10,28 +10,25 @@
         <app-page-header-actions />
     </div>
 </header>
-<app-control-maestro-toolbar [fechaDesde]="fechaDesde()" [fechaHasta]="fechaHasta()" [ramoId]="ramoId()"
-    [ramos]="ramos()" (fechaDesdeChange)="fechaDesde.set($event)" (fechaHastaChange)="fechaHasta.set($event)"
-    (ramoIdChange)="ramoId.set($event)" />
-<section class="action-bar cm-action-bar">
-    <mat-form-field appearance="outline">
-        <mat-label>Saldo inicial</mat-label>
-        <input matInput type="number" [ngModel]="saldoInicial()" (ngModelChange)="saldoInicial.set($event)" />
-    </mat-form-field>
-    <button type="button" mat-raised-button color="primary" class="action-btn" (click)="cargar()">
-        Calcular
-    </button>
-
-    <button type="button" mat-stroked-button class="action-btn" (click)="exportarPdf()">
-        <mat-icon>picture_as_pdf</mat-icon>
-        PDF
-    </button>
-</section>
+<app-control-maestro-toolbar
+  [fechaDesde]="fechaDesde()"
+  [fechaHasta]="fechaHasta()"
+  [ramoId]="ramoId()"
+  [ramos]="ramos()"
+  [saldoInicial]="saldoInicial()"
+  (fechaDesdeChange)="onFechaDesdeChange($event)"
+  (fechaHastaChange)="onFechaHastaChange($event)"
+  (ramoIdChange)="ramoId.set($event)"
+  (saldoInicialChange)="saldoInicial.set($event)"
+  (limpiarFiltros)="limpiarFiltros()"
+  (cargar)="cargar()"
+  (exportarPdf)="exportarPdf()"
+/>
 
 <!-- RESUMEN -->
 <div class="cm-summary">
     <div class="cm-card cm-card--neutral">
-        <span>Saldo inicial</span>
+        <span>Saldo inicial: </span>
         <strong>{{ resumen().saldoInicial | currency }}</strong>
     </div>
 

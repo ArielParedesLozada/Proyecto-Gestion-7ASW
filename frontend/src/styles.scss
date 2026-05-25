@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use 'responsive';
+@use 'list-page-toolbar';
 
 // ── Custom red theme matching the app's brand ─────────────────────────────
 $primary: mat.m2-define-palette(mat.$m2-red-palette, 700, 400, 900);

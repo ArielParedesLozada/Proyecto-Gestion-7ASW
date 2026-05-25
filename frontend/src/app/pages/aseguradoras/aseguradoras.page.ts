@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 import { AseguradorasTable } from './aseguradoras-table/aseguradoras-table';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -23,7 +25,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    PageHeaderActions,],
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
+  ],
   templateUrl: './aseguradoras.page.html',
   styleUrl: './aseguradoras.page.scss',
 })

@@ -10,6 +10,9 @@ import { FormsModule } from '@angular/forms';
 import { AuditoriaItem, AuditoriaService } from '../../services/auditoria.service';
 import { PageEvent } from '@angular/material/paginator';
 import { NotificationService } from '../../shared/services/notification.service';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -24,6 +27,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatSelectModule,
     FormsModule,
     JsonPipe,
+    ListPageToolbar,
+    ClearFiltersButton,
+    PageHeaderActions,
   ],
   templateUrl: './auditorias.page.html',
   styleUrl: './auditorias.page.scss',

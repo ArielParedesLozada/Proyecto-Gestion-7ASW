@@ -11,6 +11,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '../../shared/services/notification.service';
 import { NotificacionItem, NotificacionService } from '../../services/notificacion.service';
 import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 
 @Component({
   selector: 'app-notificaciones.page',
@@ -23,6 +25,8 @@ import { PageHeaderActions } from '../../components/page-header-actions/page-hea
     MatSelectModule,
     FormsModule,
     PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './notificaciones.page.html',
   styleUrl: './notificaciones.page.scss',

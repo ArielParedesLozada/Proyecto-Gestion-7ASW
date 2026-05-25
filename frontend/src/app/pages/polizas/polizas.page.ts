@@ -14,6 +14,11 @@ import { NotificationService } from '../../shared/services/notification.service'
 import { PolizasExcelImportDialogComponent } from './polizas-excel-import-dialog/polizas-excel-import-dialog';
 import { polizaEstadoFromQueryParam } from './utils/poliza-estado-query.util';
 import { RamoService } from '../../services/ramo.service';
+import {
+  hasPartialVencimientoRange,
+  matchesVencimientoRange,
+  validateVencimientoDateRange,
+} from '../../shared/utils/vencimiento-date-range.util';
 
 @Component({
   selector: 'app-polizas-page',
@@ -57,9 +62,6 @@ export class PolizasPage {
     const contratista = this.contratistaFiltro().trim().toLowerCase();
     const aseguradora = this.aseguradoraFiltro().trim().toLowerCase();
 
-    const desde = this.fechaDesdeFiltro();
-    const hasta = this.fechaHastaFiltro();
-
     const filtered = this.allRows().filter((row) => {
 
       // Estado
@@ -88,30 +90,13 @@ export class PolizasPage {
         return false;
       }
 
-      // Fecha
-      const fechaExp = new Date(row.fechaExpiracion);
-      if (desde) {
-        const desdeDate = new Date(desde);
-        desdeDate.setHours(0, 0, 0, 0);
-
-        if (fechaExp < desdeDate) {
-          return false;
-        }
-      }
-
-      if (hasta) {
-        const hastaDate = new Date(hasta);
-        hastaDate.setHours(23, 59, 59, 999);
-
-        if (fechaExp > hastaDate) {
-          return false;
-        }
-      }
-      if (desde && fechaExp < desde) {
-        return false;
-      }
-
-      if (hasta && fechaExp > hasta) {
+      if (
+        !matchesVencimientoRange(
+          row.fechaExpiracion,
+          this.fechaDesdeFiltro(),
+          this.fechaHastaFiltro(),
+        )
+      ) {
         return false;
       }
 
@@ -151,6 +136,10 @@ export class PolizasPage {
       this.searchQuery();
       this.estadoFiltro();
       this.ramoFiltro();
+      this.contratistaFiltro();
+      this.aseguradoraFiltro();
+      this.fechaDesdeFiltro();
+      this.fechaHastaFiltro();
       untracked(() => this.pageIndex.set(0));
     });
 
@@ -169,15 +158,44 @@ export class PolizasPage {
 
   limpiarFiltros(): void {
     this.searchQuery.set('');
+    this.contratistaFiltro.set('');
+    this.aseguradoraFiltro.set('');
+    this.fechaDesdeFiltro.set(null);
+    this.fechaHastaFiltro.set(null);
     this.pageIndex.set(0);
     this.estadoFiltro.set('todos');
-    this.ramoFiltro.set('todos')
+    this.ramoFiltro.set('todos');
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { estado: null },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  onFechaDesdeChange(value: Date | null): void {
+    this.fechaDesdeFiltro.set(value);
+    this.avisoRangoFechasIncompleto();
+  }
+
+  onFechaHastaChange(value: Date | null): void {
+    this.fechaHastaFiltro.set(value);
+    this.avisoRangoFechasIncompleto();
+  }
+
+  private avisoRangoFechasIncompleto(): void {
+    const desde = this.fechaDesdeFiltro();
+    const hasta = this.fechaHastaFiltro();
+    if (!hasPartialVencimientoRange(desde, hasta)) {
+      const check = validateVencimientoDateRange(desde, hasta);
+      if (!check.valid && check.message) {
+        this.notify.warn(check.message);
+      }
+      return;
+    }
+    this.notify.warn(
+      'Selecciona «Vence desde» y «Vence hasta» para filtrar por fecha de vencimiento.',
+    );
   }
 
   onEstadoFiltroFromUser(value: PolizaEstado | 'todos'): void {

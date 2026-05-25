@@ -25,8 +25,8 @@
     [fechaHasta]="fechaHastaFiltro()"
     (contratistaFiltroChange)="contratistaFiltro.set($event)"
     (aseguradoraFiltroChange)="aseguradoraFiltro.set($event)"
-    (fechaDesdeChange)="fechaDesdeFiltro.set($event)"
-    (fechaHastaChange)="fechaHastaFiltro.set($event)"
+    (fechaDesdeChange)="onFechaDesdeChange($event)"
+    (fechaHastaChange)="onFechaHastaChange($event)"
   />
 
   <app-polizas-table

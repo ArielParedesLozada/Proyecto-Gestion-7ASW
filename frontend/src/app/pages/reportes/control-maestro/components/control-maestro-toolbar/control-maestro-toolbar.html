@@ -1,32 +1,79 @@
-<div class="toolbar-card">
-    <div class="toolbar-card__left">
-
-        <mat-form-field appearance="outline" class="toolbar__search">
-            <mat-label>Vence desde</mat-label>
-            <input matInput [matDatepicker]="pickerDesde" [ngModel]="fechaDesde()"
-                (ngModelChange)="fechaDesdeChange.emit($event)" />
-            <mat-datepicker-toggle matSuffix [for]="pickerDesde" />
-            <mat-datepicker #pickerDesde />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="toolbar__search">
-            <mat-label>Vence hasta</mat-label>
-            <input matInput [matDatepicker]="pickerHasta" [ngModel]="fechaHasta()"
-                (ngModelChange)="fechaHastaChange.emit($event)" />
-            <mat-datepicker-toggle matSuffix [for]="pickerHasta" />
-            <mat-datepicker #pickerHasta />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="toolbar__select">
-            <mat-label>Ramo</mat-label>
-            <mat-select [ngModel]="ramoId()" (ngModelChange)="ramoIdChange.emit($event)">
-                <mat-option [value]="null">Todos</mat-option>
-
-                @for (ramo of ramos(); track ramo.id) {
-                <mat-option [value]="ramo.id">{{ ramo.nombre }}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-
+<div class="list-toolbar cm-toolbar">
+  <div class="list-toolbar__main">
+    <div class="list-toolbar__leading">
+      <mat-form-field
+        appearance="outline"
+        class="list-toolbar__field cm-toolbar__saldo"
+        subscriptSizing="dynamic"
+      >
+        <mat-label>Saldo inicial</mat-label>
+        <input
+          matInput
+          type="number"
+          [ngModel]="saldoInicial()"
+          (ngModelChange)="onSaldoChange($event)"
+        />
+      </mat-form-field>
     </div>
+
+    <div class="list-toolbar__actions">
+      <button
+        type="button"
+        mat-stroked-button
+        class="list-toolbar__btn list-toolbar__btn-filters"
+        [class.list-toolbar__btn-filters--active]="filtersExpanded()"
+        [attr.aria-expanded]="filtersExpanded()"
+        (click)="toggleFiltersPanel()"
+      >
+        <mat-icon>{{ filtersExpanded() ? 'expand_less' : 'tune' }}</mat-icon>
+        {{ filtersButtonLabel() }}
+      </button>
+
+      <app-clear-filters-button (clear)="onLimpiar()" />
+
+      <button
+        type="button"
+        mat-flat-button
+        class="list-toolbar__btn list-toolbar__btn-primary"
+        (click)="cargar.emit()"
+      >
+        Calcular
+      </button>
+
+      <button
+        type="button"
+        mat-stroked-button
+        class="list-toolbar__btn list-toolbar__btn-secondary"
+        (click)="exportarPdf.emit()"
+      >
+        <mat-icon>picture_as_pdf</mat-icon>
+        PDF
+      </button>
+    </div>
+  </div>
+
+  @if (filtersExpanded()) {
+    <section class="list-toolbar__advanced" aria-label="Filtros del reporte">
+      <div class="list-toolbar__grid">
+        <app-vencimiento-date-range-fields
+          class="list-toolbar__dates"
+          fieldClass="list-toolbar__grid-field"
+          [fechaDesde]="fechaDesde()"
+          [fechaHasta]="fechaHasta()"
+          (fechaDesdeChange)="fechaDesdeChange.emit($event)"
+          (fechaHastaChange)="fechaHastaChange.emit($event)"
+        />
+
+        <mat-form-field appearance="outline" class="list-toolbar__grid-field" subscriptSizing="dynamic">
+          <mat-label>Ramo</mat-label>
+          <mat-select [ngModel]="ramoId()" (ngModelChange)="ramoIdChange.emit($event)">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (ramo of ramos(); track ramo.id) {
+              <mat-option [value]="ramo.id">{{ ramo.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </section>
+  }
 </div>
