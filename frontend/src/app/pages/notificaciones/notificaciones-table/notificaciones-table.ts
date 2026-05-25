@@ -1,8 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
-import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { SicopDataTable } from '../../../shared/components/sicop-data-table/sicop-data-table';
 import { NotificacionItem } from '../../../services/notificacion.service';
 import { PageEvent } from '@angular/material/paginator';
 import { NotificacionEstadoPipe } from '../pipes/notificacion-estado-pipe';
@@ -13,12 +11,10 @@ import { TruncatePipe } from '../pipes/truncate-pipe';
   selector: 'app-notificaciones-table',
   imports: [
     DatePipe,
-    LocalPaginatorComponent,
-    MatIconModule,
-    MatButtonModule,
+    SicopDataTable,
     NotificacionEstadoPipe,
     NotificacionTipoPipe,
-    TruncatePipe
+    TruncatePipe,
   ],
   templateUrl: './notificaciones-table.html',
   styleUrl: './notificaciones-table.scss',
@@ -35,7 +31,7 @@ export class NotificacionesTable {
       0: 'enviada',
       1: 'error',
       2: 'pendiente',
-      3: 'invalidada'
+      3: 'invalidada',
     };
     return estadoMap[estado] || 'pendiente';
   }
@@ -43,7 +39,7 @@ export class NotificacionesTable {
   getTipoClass(tipo: number): string {
     const tipoMap: Record<number, string> = {
       0: 'renovacion',
-      1: 'expiracion'
+      1: 'expiracion',
     };
     return tipoMap[tipo] || 'renovacion';
   }

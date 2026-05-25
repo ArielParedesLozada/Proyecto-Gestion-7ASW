@@ -1,59 +1,48 @@
-<div class="renovaciones-card">
-  <h2 class="renovaciones-card__title">Historial de Renovaciones</h2>
+<app-sicop-data-table
+  title="Historial de Renovaciones"
+  tableMinWidth="900px"
+  [paginatorLength]="paginatorLength()"
+  [pageIndex]="pageIndex()"
+  [pageSize]="pageSize()"
+  (pageChange)="pageChange.emit($event)"
+>
+  <tr sicopThead>
+    <th>Póliza</th>
+    <th>Contratista</th>
+    <th>Fecha Renovación</th>
+    <th>Fecha Expiración</th>
+    <th>Valor</th>
+    <th>Estado</th>
+    <th class="sicop-data-table__col-actions">Acciones</th>
+  </tr>
 
-  <div class="table-scroll">
-    <table class="renovaciones-table">
-      <thead>
-        <tr>
-          <th>Póliza</th>
-          <th>Contratista</th>
-          <th>Fecha Renovación</th>
-          <th>Fecha Expiración</th>
-          <th>Valor</th>
-          <th>Estado</th>
-          <th class="renovaciones-table__col-actions">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of rows(); track row.id) {
-          <tr>
-            <td class="renovaciones-table__poliza">{{ row.numeroPoliza }}</td>
-            <td>{{ row.contratistaNombre }}</td>
-            <td>{{ row.fechaRenovacion | date: 'dd/MM/yyyy' }}</td>
-            <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
-            <td class="renovaciones-table__valor">${{ row.valor | number: '1.0-0' }}</td>
-            <td>
-              <app-renovacion-status-badge [estado]="row.estado" />
-            </td>
-            <td>
-              <div class="renovaciones-table__actions">
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="action-btn"
-                  aria-label="Ver detalle"
-                  (click)="onVer(row)"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="8" class="renovaciones-table__empty">No hay renovaciones registradas.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <div class="renovaciones-card__paginator">
-    <app-local-paginator
-      [length]="paginatorLength()"
-      [pageIndex]="pageIndex()"
-      [pageSize]="pageSize()"
-      (page)="pageChange.emit($event)"
-    />
-  </div>
-</div>
+  @for (row of rows(); track row.id) {
+    <tr>
+      <td class="sicop-data-table__cell--mono">{{ row.numeroPoliza }}</td>
+      <td>{{ row.contratistaNombre }}</td>
+      <td>{{ row.fechaRenovacion | date: 'dd/MM/yyyy' }}</td>
+      <td>{{ row.fechaExpiracion | date: 'dd/MM/yyyy' }}</td>
+      <td class="sicop-data-table__cell--numeric">${{ row.valor | number: '1.0-0' }}</td>
+      <td>
+        <app-renovacion-status-badge [estado]="row.estado" />
+      </td>
+      <td>
+        <div class="sicop-data-table__actions">
+          <button
+            type="button"
+            mat-icon-button
+            class="sicop-data-table__action-btn"
+            aria-label="Ver detalle"
+            (click)="onVer(row)"
+          >
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+  } @empty {
+    <tr>
+      <td colspan="7" class="sicop-data-table__empty">No hay renovaciones registradas.</td>
+    </tr>
+  }
+</app-sicop-data-table>

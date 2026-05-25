@@ -1,0 +1,160 @@
+// Tabla administrativa SICOP (contenedor + tabla base)
+.sicop-data-table {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  padding: 1.1rem 1.25rem 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+
+  &--dashboard {
+    padding-top: 1rem;
+  }
+
+  &--no-paginator {
+    padding-bottom: 0.25rem;
+  }
+}
+
+.sicop-data-table__dash-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.sicop-data-table__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+
+  .sicop-data-table--dashboard & {
+    margin-bottom: 0.2rem;
+  }
+}
+
+.sicop-data-table__subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.sicop-data-table__dash-link {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #c1121f;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.sicop-data-table__scroll {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sicop-data-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  thead th {
+    text-align: left;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+    background: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 0.75rem 0.75rem;
+    border-bottom: 1px solid #eef0f4;
+    color: #1f2937;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  tbody tr:hover {
+    background: #fafbfc;
+  }
+}
+
+.sicop-data-table__col-actions {
+  text-align: right;
+  width: 72px;
+  white-space: nowrap;
+}
+
+.sicop-data-table__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.sicop-data-table__action-btn,
+.action-btn {
+  color: #6b7280 !important;
+
+  &:hover {
+    color: #c1121f !important;
+    background: rgba(193, 18, 31, 0.06) !important;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.sicop-data-table__empty {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.sicop-data-table__cell--strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.sicop-data-table__cell--muted {
+  color: #4b5563;
+}
+
+.sicop-data-table__cell--mono {
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.sicop-data-table__cell--numeric {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sicop-data-table__paginator {
+  margin: 0.75rem -1.25rem 0;
+  padding: 0;
+  border-top: 1px solid #eef0f4;
+  background: #fafbfc;
+}

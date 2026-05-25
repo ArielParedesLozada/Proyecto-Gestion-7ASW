@@ -1,19 +1,12 @@
-import { DatePipe, SlicePipe } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
-import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { SicopDataTable } from '../../../shared/components/sicop-data-table/sicop-data-table';
 import { AuditoriaItem } from '../../../services/auditoria.service';
 import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-auditorias-table',
-  imports: [
-    SlicePipe,
-    LocalPaginatorComponent,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [SlicePipe, SicopDataTable],
   templateUrl: './auditorias-table.html',
   styleUrl: './auditorias-table.scss',
 })
@@ -28,14 +21,14 @@ export class AuditoriasTable {
   getAccionClass(accion: string): string {
     const accionLower = accion.toLowerCase();
     const accionMap: Record<string, string> = {
-      'create': 'create',
-      'insert': 'create',
-      'update': 'update',
-      'modify': 'update',
-      'delete': 'delete',
-      'remove': 'delete',
-      'validate': 'validate',
-      'reject': 'reject'
+      create: 'create',
+      insert: 'create',
+      update: 'update',
+      modify: 'update',
+      delete: 'delete',
+      remove: 'delete',
+      validate: 'validate',
+      reject: 'reject',
     };
 
     for (const [key, value] of Object.entries(accionMap)) {
@@ -43,7 +36,7 @@ export class AuditoriasTable {
         return value;
       }
     }
-    return 'update'; // default
+    return 'update';
   }
 
   onVerDetalles(row: AuditoriaItem): void {
