@@ -1,5 +1,4 @@
 @use '../polizas/polizas-admin-header';
-@use '../polizas/polizas-toolbar/polizas-toolbar';
 
 .auditorias-page {
   display: flex;
@@ -7,131 +6,11 @@
   gap: 1rem;
 }
 
-.auditorias-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-
 .auditorias-header__intro {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   min-width: 0;
-}
-
-.auditorias-header__tools {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.auditorias-header__notif {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.4rem;
-  border-radius: 50%;
-  transition: background 0.2s;
-  position: relative;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-
-  mat-icon {
-    color: #6b7280;
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-  }
-}
-
-.auditorias-header__notif-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  background: #c1121f;
-  border-radius: 50%;
-  border: 1px solid white;
-}
-
-.auditorias-header__profile {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
-  color: #6b7280;
-}
-
-.toolbar-card {
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e8eaef;
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.toolbar-card__left {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 2;
-}
-
-.toolbar__search {
-  flex: 2;
-  min-width: 220px;
-}
-
-.toolbar__filter {
-  min-width: 140px;
-}
-
-.toolbar__btn-limpiar {
-  border-radius: 10px !important;
-  border-color: #e5e7eb !important;
-  color: #4b5563 !important;
-  font-weight: 500 !important;
-  white-space: nowrap;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    margin-right: 4px;
-  }
-
-  &:hover {
-    background: #f9fafb !important;
-    border-color: #d1d5db !important;
-  }
-}
-
-.page-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-
-.page-subtitle {
-  color: #6b7280;
-  font-size: 0.85rem;
-  margin: 0.25rem 0 0;
 }
 
 /* Modal de detalles */
@@ -240,20 +119,6 @@
 }
 
 @media (max-width: 768px) {
-  .toolbar-card__left {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .toolbar__search,
-  .toolbar__filter {
-    width: 100%;
-  }
-  
-  .toolbar__btn-limpiar {
-    align-self: flex-start;
-  }
-  
   .modal-content {
     width: 95%;
     max-height: 90vh;

@@ -6,14 +6,14 @@ import { PolizaListRow } from '../polizas/models/poliza-list.model';
 import { sortPolizasForDashboard } from '../polizas/utils/poliza-list-orden.util';
 import { PolizaService } from '../../services/poliza.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 
 /** Máximo de filas en la vista ejecutiva del Dashboard (tras ordenar por prioridad). */
 export const DASHBOARD_POLIZAS_LIMIT = 10;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PolizasTable, MatIconModule, HeaderUserMenuComponent, RouterLink],
+  imports: [PolizasTable, MatIconModule, PageHeaderActions, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

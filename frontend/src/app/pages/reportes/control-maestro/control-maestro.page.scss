@@ -5,47 +5,7 @@
   margin-bottom: 0.75rem;
 }
 
-/* ACTION BAR estilo PolizaDetail */
-.cm-action-bar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.55rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-
-  mat-form-field {
-    width: 160px;
-    margin-right: auto;
-  }
-}
-
-.action-bar {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  margin-bottom: 1rem;
-}
-
-/* reutiliza EXACTAMENTE estilo existente */
-.action-btn {
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  min-height: 36px !important;
-  padding: 0 0.9rem !important;
-  border-color: #d1d5db !important;
-  color: #374151 !important;
-  background: #fff !important;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    margin-right: 0.25rem;
-  }
-}
-/* ===== RESUMEN (igual que ya tienes) ===== */
+/* ===== RESUMEN ===== */
 .cm-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -64,13 +24,14 @@
   .cm-summary {
     grid-template-columns: 1fr;
   }
+}
 
-  .cm-action-bar {
-    justify-content: stretch;
+.cm-list-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 
-    mat-form-field {
-      width: 100%;
-      margin-right: 0;
-    }
-  }
+.cm-section {
+  min-width: 0;
 }

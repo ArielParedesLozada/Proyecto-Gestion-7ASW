@@ -1,0 +1,64 @@
+<nav class="sidebar-nav menu">
+  <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+    class="menu-item" data-testid="nav-dashboard" (click)="onNavClick()">
+    <mat-icon class="icon">dashboard</mat-icon>
+    @if (labelsVisible()) { <span>Dashboard</span> }
+  </a>
+
+  <a routerLink="/polizas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }"
+    class="menu-item" data-testid="nav-polizas" (click)="onNavClick()">
+    <mat-icon class="icon">description</mat-icon>
+    @if (labelsVisible()) { <span>Pólizas</span> }
+  </a>
+
+  <a routerLink="/renovaciones" routerLinkActive="active" class="menu-item"
+    data-testid="nav-renovaciones" (click)="onNavClick()">
+    <mat-icon class="icon">autorenew</mat-icon>
+    @if (labelsVisible()) { <span>Renovaciones</span> }
+  </a>
+
+  <a routerLink="/notificaciones" routerLinkActive="active" class="menu-item" (click)="onNavClick()">
+    <mat-icon class="icon">notifications</mat-icon>
+    @if (labelsVisible()) { <span>Notificaciones</span> }
+  </a>
+
+  <a routerLink="/reportes" routerLinkActive="active" class="menu-item" data-testid="nav-reportes"
+    (click)="onNavClick()">
+    <mat-icon class="icon">bar_chart</mat-icon>
+    @if (labelsVisible()) { <span>Reportes</span> }
+  </a>
+
+  @if (showAdminLinks()) {
+    <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }"
+      class="menu-item" data-testid="nav-users" (click)="onNavClick()">
+      <mat-icon class="icon">manage_accounts</mat-icon>
+      @if (labelsVisible()) { <span>Usuarios</span> }
+    </a>
+  }
+
+  <a routerLink="/empresas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }"
+    class="menu-item" (click)="onNavClick()">
+    <mat-icon class="icon">business</mat-icon>
+    @if (labelsVisible()) { <span>Empresas</span> }
+  </a>
+
+  <a routerLink="/aseguradoras" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }"
+    class="menu-item" (click)="onNavClick()">
+    <mat-icon class="icon">account_balance</mat-icon>
+    @if (labelsVisible()) { <span>Aseguradoras</span> }
+  </a>
+
+  <a routerLink="/ramos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+    class="menu-item" (click)="onNavClick()">
+    <mat-icon class="icon">label</mat-icon>
+    @if (labelsVisible()) { <span>Ramos</span> }
+  </a>
+
+  @if (showAdminLinks()) {
+    <a routerLink="/auditoria" routerLinkActive="active" class="menu-item" data-testid="nav-auditoria"
+      (click)="onNavClick()">
+      <mat-icon class="icon">history</mat-icon>
+      @if (labelsVisible()) { <span>Auditorías</span> }
+    </a>
+  }
+</nav>

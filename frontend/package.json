@@ -7,7 +7,11 @@
     "dev": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test -c e2e/playwright.config.ts --ui",
+    "test:e2e:report": "playwright show-report e2e/playwright-report",
+    "e2e:fixtures": "node e2e/scripts/generate-excel-fixtures.mjs"
   },
   "private": true,
   "dependencies": {
@@ -31,12 +35,14 @@
     "@angular-devkit/build-angular": "^20.1.0",
     "@angular/cli": "^20.1.0",
     "@angular/compiler-cli": "^20.1.0",
+    "@playwright/test": "^1.60.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-preset-angular": "^16.1.5",
     "ts-jest": "^29.4.9",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "xlsx": "^0.18.5"
   }
 }

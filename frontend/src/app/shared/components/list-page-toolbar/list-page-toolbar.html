@@ -1,0 +1,12 @@
+<div class="list-toolbar">
+  <div class="list-toolbar__main">
+    <div class="list-toolbar__leading">
+      <ng-content select="[listToolbarSearch]" />
+      <ng-content select="[listToolbarInline]" />
+    </div>
+    <div class="list-toolbar__actions">
+      <ng-content select="[listToolbarActions]" />
+    </div>
+  </div>
+  <ng-content select="[listToolbarExtra]" />
+</div>

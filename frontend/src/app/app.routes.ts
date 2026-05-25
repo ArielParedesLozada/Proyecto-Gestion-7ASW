@@ -13,6 +13,7 @@ import { RamosPage } from './pages/ramos/ramos.page';
 import { RenovacionesPage } from './pages/renovaciones/renovaciones.page';
 import { ResetPassword } from './pages/reset-password/reset-password';
 import { UsersPage } from './pages/users/users.page';
+import { adminGuard } from './shared/guards/admin.guard';
 import { authGuard } from './shared/guards/auth-guard';
 import { mandatoryPasswordGuard } from './shared/guards/mandatory-password.guard';
 import { RenovacionDetailPage } from './pages/renovaciones/renovacion-detail/renovacion-detail.page';
@@ -50,9 +51,9 @@ export const routes: Routes = [
       { path: 'ramos', component: RamosPage },
       { path: 'renovaciones/:id', component: RenovacionDetailPage },
       { path: 'renovaciones', component: RenovacionesPage },
-      { path: 'users', component: UsersPage },
+      { path: 'users', component: UsersPage, canActivate: [adminGuard] },
       { path: 'notificaciones', component: NotificacionesPage },
-      { path: 'auditoria', component: AuditoriasPage },
+      { path: 'auditoria', component: AuditoriasPage, canActivate: [adminGuard] },
       { path: 'reportes', component: ControlMaestroPage }
     ],
   },

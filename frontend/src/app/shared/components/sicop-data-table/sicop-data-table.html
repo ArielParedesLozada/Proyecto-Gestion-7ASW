@@ -1,0 +1,52 @@
+<div
+  class="sicop-data-table"
+  [class.sicop-data-table--dashboard]="layout() === 'dashboard'"
+  [class.sicop-data-table--no-paginator]="!showPaginator()"
+>
+  @if (layout() === 'dashboard') {
+    <header class="sicop-data-table__dash-head">
+      <div>
+        <h2
+          class="sicop-data-table__title"
+          [id]="titleId() ?? null"
+        >
+          {{ title() }}
+        </h2>
+        @if (subtitle(); as sub) {
+          <p class="sicop-data-table__subtitle">{{ sub }}</p>
+        }
+      </div>
+      @if (verTodasLink(); as link) {
+        <a [routerLink]="link" class="sicop-data-table__dash-link">Ver todas</a>
+      }
+    </header>
+  } @else if (showTitle()) {
+    <h2 class="sicop-data-table__title">{{ title() }}</h2>
+  }
+
+  <div class="sicop-data-table__scroll sicop-table-scroll">
+    <table
+      class="sicop-data-table__table"
+      [ngClass]="tableClass()"
+      [style.min-width]="tableMinWidth()"
+    >
+      <thead>
+        <ng-content select="[sicopThead]" />
+      </thead>
+      <tbody>
+        <ng-content />
+      </tbody>
+    </table>
+  </div>
+
+  @if (showPaginator()) {
+    <div class="sicop-data-table__paginator">
+      <app-local-paginator
+        [length]="paginatorLength()"
+        [pageIndex]="pageIndex()"
+        [pageSize]="pageSize()"
+        (page)="pageChange.emit($event)"
+      />
+    </div>
+  }
+</div>

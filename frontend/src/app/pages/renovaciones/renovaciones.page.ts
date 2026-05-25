@@ -13,6 +13,9 @@ import { RenovacionService } from '../../services/renovacion.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RenovacionesTable } from './renovaciones-table/renovaciones-table';
 import { Router } from '@angular/router';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 
 @Component({
   selector: 'app-renovaciones-page',
@@ -23,6 +26,9 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './renovaciones.page.html',
   styleUrl: './renovaciones.page.scss',

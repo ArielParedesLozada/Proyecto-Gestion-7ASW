@@ -9,12 +9,12 @@ public class ChangePasswordService(IRepository<User, Guid> userRepo)
     private readonly IRepository<User, Guid> _userRepo = userRepo;
 
     public async Task<User> ChangePassword(
-        string username,
+        Guid userId,
         string currentPassword,
         string newPassword,
         string confirmNewPassword)
     {
-        var user = await _userRepo.FirstOrDefaultAsync(u => u.Username == username)
+        var user = await _userRepo.GetByIdAsync(userId)
             ?? throw new CustomError("Usuario no encontrado.", 404);
         if (!user.MustChangePassword)
         {

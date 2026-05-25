@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Backend.App.Auth;
 using Backend.Domain.Services;
@@ -23,15 +24,28 @@ public class AuthController(
     private readonly PasswordResetService _passwordResetService = passwordResetService;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
-    private static string? ResolveUser(ClaimsPrincipal user)
+    /// <summary>
+    /// Con MapInboundClaims = false el JWT expone el id como "nameid", no como ClaimTypes.NameIdentifier.
+    /// </summary>
+    private static Guid? ResolveUserId(ClaimsPrincipal user)
     {
-        if (!string.IsNullOrWhiteSpace(user.Identity?.Name))
+        string?[] claimTypes =
+        [
+            ClaimTypes.NameIdentifier,
+            JwtRegisteredClaimNames.Sub,
+            "nameid",
+        ];
+
+        foreach (var claimType in claimTypes)
         {
-            return user.Identity!.Name;
+            var value = user.FindFirst(claimType)?.Value;
+            if (Guid.TryParse(value, out var userId))
+            {
+                return userId;
+            }
         }
 
-        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? user.FindFirst("nameid")?.Value;
+        return null;
     }
 
     [HttpPost("login")]
@@ -54,13 +68,13 @@ public class AuthController(
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<UserDtoResponse>> Me()
     {
-        var username = ResolveUser(User);
-        if (string.IsNullOrWhiteSpace(username))
+        var userId = ResolveUserId(User);
+        if (userId is null)
         {
             return Unauthorized();
         }
 
-        var response = await _meService.GetMe(username);
+        var response = await _meService.GetMe(userId.Value.ToString());
         return Ok(new UserDtoResponse
         {
             Id = response.Id,
@@ -74,14 +88,14 @@ public class AuthController(
     [Authorize(Policy = "MUST-CHANGE-PASSWORD")]
     public async Task<ActionResult<LoginDtoResponse>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
     {
-        var username = ResolveUser(User);
-        if (string.IsNullOrWhiteSpace(username))
+        var userId = ResolveUserId(User);
+        if (userId is null)
         {
             return Unauthorized();
         }
 
         var user = await _changePasswordService.ChangePassword(
-            username,
+            userId.Value,
             changePasswordRequest.OldPassword,
             changePasswordRequest.NewPassword,
             changePasswordRequest.ConfirmNewPassword);

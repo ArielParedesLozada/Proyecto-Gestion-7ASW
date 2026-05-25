@@ -10,6 +10,10 @@ import { PageEvent } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '../../shared/services/notification.service';
 import { NotificacionItem, NotificacionService } from '../../services/notificacion.service';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
+import { NotificationPopoverFacade } from '../../shared/services/notification-popover.facade';
 
 @Component({
   selector: 'app-notificaciones.page',
@@ -21,6 +25,9 @@ import { NotificacionItem, NotificacionService } from '../../services/notificaci
     MatInputModule,
     MatSelectModule,
     FormsModule,
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './notificaciones.page.html',
   styleUrl: './notificaciones.page.scss',
@@ -29,6 +36,7 @@ export class NotificacionesPage {
   private readonly notify = inject(NotificationService);
   private readonly notificacionesApi = inject(NotificacionService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly notificationPopover = inject(NotificationPopoverFacade);
 
   readonly notificaciones = signal<NotificacionItem[]>([]);
 
@@ -109,6 +117,7 @@ export class NotificacionesPage {
           this.notificaciones.set(items);
           this.totalRegistros.set(items.length);
           this.isLoading.set(false);
+          this.notificationPopover.refreshPendingIndicator();
         },
         error: (err) => {
           this.notificaciones.set([]);

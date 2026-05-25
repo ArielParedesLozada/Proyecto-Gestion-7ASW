@@ -1,53 +1,41 @@
-<div class="ramos-card">
-  <h2 class="ramos-card__title">Lista de Ramos</h2>
+<app-sicop-data-table
+  title="Lista de Ramos"
+  [paginatorLength]="paginatorLength()"
+  [pageIndex]="pageIndex()"
+  [pageSize]="pageSize()"
+  (pageChange)="pageChange.emit($event)"
+>
+  <tr sicopThead>
+    <th>Nombre</th>
+    <th>Descripción</th>
+    <th>Cambio Valor</th>
+    <th class="sicop-data-table__col-actions">Acciones</th>
+  </tr>
 
-  <div class="table-scroll">
-    <table class="ramos-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Cambio Valor</th>
-          <th class="ramos-table__col-actions">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of rows(); track row.id) {
-          <tr>
-            <td class="ramos-table__nombre">{{ row.nombre }}</td>
-            <td class="ramos-table__desc">{{ row.descripcion }}</td>
-            <td>
-              <app-ramo-cambio-valor-badge [cambioValor]="row.cambioValor" />
-            </td>
-            <td>
-              <div class="ramos-table__actions">
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="action-btn"
-                  aria-label="Editar"
-                  (click)="onEditar(row)"
-                >
-                  <mat-icon>edit_square</mat-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="4" class="ramos-table__empty">No hay ramos registrados.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <div class="ramos-card__paginator">
-    <app-local-paginator
-      [length]="paginatorLength()"
-      [pageIndex]="pageIndex()"
-      [pageSize]="pageSize()"
-      (page)="pageChange.emit($event)"
-    />
-  </div>
-</div>
+  @for (row of rows(); track row.id) {
+    <tr>
+      <td class="sicop-data-table__cell--strong">{{ row.nombre }}</td>
+      <td class="sicop-data-table__cell--muted">{{ row.descripcion }}</td>
+      <td>
+        <app-ramo-cambio-valor-badge [cambioValor]="row.cambioValor" />
+      </td>
+      <td>
+        <div class="sicop-data-table__actions">
+          <button
+            type="button"
+            mat-icon-button
+            class="sicop-data-table__action-btn"
+            aria-label="Editar"
+            (click)="onEditar(row)"
+          >
+            <mat-icon>edit_square</mat-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+  } @empty {
+    <tr>
+      <td colspan="4" class="sicop-data-table__empty">No hay ramos registrados.</td>
+    </tr>
+  }
+</app-sicop-data-table>

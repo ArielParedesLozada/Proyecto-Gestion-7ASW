@@ -1,0 +1,32 @@
+<div class="notif-popover" role="dialog" aria-label="Notificaciones del sistema">
+  <header class="notif-popover__header">
+    <h3 class="notif-popover__title">Notificaciones del Sistema</h3>
+  </header>
+
+  <div class="notif-popover__body">
+    <p class="notif-popover__subtitle">Últimas Notificaciones</p>
+
+    <div class="notif-popover__scroll" tabindex="0" role="region" aria-label="Listado de notificaciones">
+      @if (facade.loading()) {
+        <p class="notif-popover__empty">Cargando notificaciones…</p>
+      } @else if (facade.rows().length === 0) {
+        <p class="notif-popover__empty">No hay notificaciones recientes.</p>
+      } @else {
+        <ul class="notif-popover__list">
+          @for (row of facade.rows(); track row.id) {
+            <li>
+              <app-notification-popover-item [row]="row" />
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <footer class="notif-popover__footer">
+    <button type="button" class="notif-popover__view-all" (click)="onViewAll()">
+      Ver todas las notificaciones
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </footer>
+</div>

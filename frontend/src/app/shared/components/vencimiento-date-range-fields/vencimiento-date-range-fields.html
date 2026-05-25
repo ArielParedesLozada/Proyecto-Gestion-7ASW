@@ -1,0 +1,23 @@
+<mat-form-field appearance="outline" [class]="fieldClass()">
+  <mat-label>Vence desde</mat-label>
+  <input
+    matInput
+    [matDatepicker]="pickerDesde"
+    [ngModel]="fechaDesde()"
+    (ngModelChange)="fechaDesdeChange.emit($event)"
+  />
+  <mat-datepicker-toggle matSuffix [for]="pickerDesde" />
+  <mat-datepicker #pickerDesde />
+</mat-form-field>
+
+<mat-form-field appearance="outline" [class]="fieldClass()">
+  <mat-label>Vence hasta</mat-label>
+  <input
+    matInput
+    [matDatepicker]="pickerHasta"
+    [ngModel]="fechaHasta()"
+    (ngModelChange)="fechaHastaChange.emit($event)"
+  />
+  <mat-datepicker-toggle matSuffix [for]="pickerHasta" />
+  <mat-datepicker #pickerHasta />
+</mat-form-field>
