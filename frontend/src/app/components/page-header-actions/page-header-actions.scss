@@ -1,32 +1,52 @@
-.header-actions {
-  display: flex;
+:host {
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
-.notifications-btn {
+.page-header-actions__notif {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0.2rem;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 50%;
+  text-decoration: none;
+  color: inherit;
 
   mat-icon {
-    color: #0f1f4b;
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: #6b7280;
+  }
+
+  &:hover mat-icon {
+    color: #374151;
   }
 }
 
-.notify-dot {
+.page-header-actions__notif-dot {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   background: #c1121f;
-  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border: 2px solid #f5f7fb;
 }
 
-.user-avatar {
-  font-size: 2.2rem;
-  width: 2.2rem;
-  height: 2.2rem;
-  color: #0f1f4b;
-  cursor: default;
+// Variante barra móvil superior (fondo blanco)
+:host(.page-header-actions--topbar) {
+  gap: 0.15rem;
+
+  .page-header-actions__notif-dot {
+    border-color: #ffffff;
+  }
 }

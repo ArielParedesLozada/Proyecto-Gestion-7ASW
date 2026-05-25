@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 import { AseguradorasTable } from './aseguradoras-table/aseguradoras-table';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -23,7 +23,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    HeaderUserMenuComponent,],
+    PageHeaderActions,],
   templateUrl: './aseguradoras.page.html',
   styleUrl: './aseguradoras.page.scss',
 })

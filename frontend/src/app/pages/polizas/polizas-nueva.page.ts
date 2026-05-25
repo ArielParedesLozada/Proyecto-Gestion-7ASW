@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { finalize, merge } from 'rxjs';
 import { emisionDiaPermitidoEnCalendario, emisionNoFuturaValidator } from './utils/poliza-emision-validators';
 import { calcularEstadoDesdeFechaExpiracion } from './utils/poliza-estado-derivado.util';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 import { PolizaContratistaSelectComponent } from './poliza-contratista-select/poliza-contratista-select.component';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
 import { EmpresaService } from '../../services/empresa.service';
@@ -55,7 +55,7 @@ function expiracionPosteriorEmisionValidator(): ValidatorFn {
     PolizaContratistaSelectComponent,
     PolizaAseguradoraSelect, // NUEVO
     PolizaStatusBadge,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
   ],
   templateUrl: './polizas-nueva.page.html',
   styleUrl: './polizas-nueva.page.scss',

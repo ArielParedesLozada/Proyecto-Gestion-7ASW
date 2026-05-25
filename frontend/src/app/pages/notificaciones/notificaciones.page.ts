@@ -10,6 +10,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '../../shared/services/notification.service';
 import { NotificacionItem, NotificacionService } from '../../services/notificacion.service';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 
 @Component({
   selector: 'app-notificaciones.page',
@@ -21,6 +22,7 @@ import { NotificacionItem, NotificacionService } from '../../services/notificaci
     MatInputModule,
     MatSelectModule,
     FormsModule,
+    PageHeaderActions,
   ],
   templateUrl: './notificaciones.page.html',
   styleUrl: './notificaciones.page.scss',

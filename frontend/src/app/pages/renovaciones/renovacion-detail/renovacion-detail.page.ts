@@ -8,6 +8,7 @@ import { RenovacionHistorialRow } from '../../../interfaces/renovacion.interface
 import { take } from 'rxjs';
 import { EstadoPipe } from '../pipes/estado-pipe';
 import { MatIconModule } from '@angular/material/icon';
+import { PageHeaderActions } from '../../../components/page-header-actions/page-header-actions';
 
 @Component({
   selector: 'app-renovacion-detail.page',
@@ -16,7 +17,8 @@ import { MatIconModule } from '@angular/material/icon';
     DecimalPipe,
     MatButtonModule,
     EstadoPipe,
-    MatIconModule
+    MatIconModule,
+    PageHeaderActions,
   ],
   templateUrl: './renovacion-detail.page.html',
   styleUrl: './renovacion-detail.page.scss',

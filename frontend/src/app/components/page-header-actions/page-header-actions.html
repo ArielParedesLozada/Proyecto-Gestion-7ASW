@@ -1,7 +1,14 @@
-<div class="header-actions">
-  <button type="button" mat-icon-button class="notifications-btn" aria-label="Notificaciones">
+@if (showNotifications()) {
+  <a
+    routerLink="/notificaciones"
+    class="page-header-actions__notif"
+    aria-label="Ir a notificaciones"
+  >
     <mat-icon>notifications</mat-icon>
-    <span class="notify-dot" aria-hidden="true"></span>
-  </button>
-  <mat-icon class="user-avatar" aria-hidden="true">account_circle</mat-icon>
-</div>
+    <span class="page-header-actions__notif-dot" aria-hidden="true"></span>
+  </a>
+}
+
+@if (showUserMenu()) {
+  <app-header-user-menu />
+}

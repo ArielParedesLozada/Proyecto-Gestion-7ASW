@@ -8,7 +8,7 @@ import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/fo
 import { CurrencyPipe } from '@angular/common';
 import { PolizaListRow } from '../../polizas/models/poliza-list.model';
 import { MatInputModule } from '@angular/material/input';
-import { HeaderUserMenuComponent } from "../../../components/header-user-menu/header-user-menu.component";
+import { PageHeaderActions } from '../../../components/page-header-actions/page-header-actions';
 import { RamoService } from '../../../services/ramo.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
@@ -25,7 +25,7 @@ import { ControlMaestroToolbar } from "./components/control-maestro-toolbar/cont
     CurrencyPipe,
     MatInputModule,
     MatFormFieldModule,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
     MatDatepickerModule,
     MatNativeDateModule,
     MatOptionModule,

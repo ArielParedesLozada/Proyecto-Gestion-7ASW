@@ -1,0 +1,60 @@
+@use 'breakpoints' as bp;
+
+// Contenedor horizontal para tablas anchas (reutilizable en plantillas)
+.sicop-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+}
+
+// Cabeceras de página tipo polizas-header / dashboard-header
+.sicop-page-header,
+.polizas-header,
+.dashboard-header,
+.renovaciones-header {
+  @include bp.down(bp.$bp-sm) {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+}
+
+.polizas-header__tools,
+.dashboard-header .user-avatar {
+  @include bp.down(bp.$bp-sm) {
+    align-self: flex-end;
+  }
+}
+
+// En móvil los iconos viven en la barra superior del layout (evitar duplicados)
+@include bp.layout-mobile {
+  .layout.layout--mobile {
+    .polizas-header__tools,
+    .dashboard-header > .user-avatar,
+    .notificaciones-header__tools {
+      display: none !important;
+    }
+  }
+}
+
+// Área de contenido con padding adaptable
+.sicop-content-padding {
+  padding: 1.5rem;
+
+  @include bp.layout-mobile {
+    padding: 1rem;
+  }
+
+  @include bp.down(bp.$bp-sm) {
+    padding: 0.75rem;
+  }
+}

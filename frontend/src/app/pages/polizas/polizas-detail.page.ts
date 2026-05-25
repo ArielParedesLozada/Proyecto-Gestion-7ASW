@@ -16,7 +16,7 @@ import { RenovacionesTable } from '../renovaciones/renovaciones-table/renovacion
 import { LatestRenovation } from '../../shared/components/latest-renovation/latest-renovation';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NuevoValorRenovacionDialogComponent } from '../../shared/components/nuevo-valor-renovacion-dialog-component/nuevo-valor-renovacion-dialog-component';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
 
 @Component({
   selector: 'app-polizas-detail-page',
@@ -26,7 +26,7 @@ import { HeaderUserMenuComponent } from '../../components/header-user-menu/heade
     MatIconModule,
     MatButtonModule,
     PolizaStatusBadge,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
     RenovacionesTable,
     LatestRenovation,
     MatDialogModule

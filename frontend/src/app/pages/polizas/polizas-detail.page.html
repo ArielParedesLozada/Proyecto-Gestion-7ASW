@@ -11,11 +11,7 @@
           <p class="page-subtitle">Vence: {{ p.fechaExpiracion | date: 'dd/MM/yyyy' }}</p>
         </div>
         <div class="polizas-header__tools">
-          <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
-            <mat-icon>notifications</mat-icon>
-            <span class="polizas-header__notif-dot" aria-hidden="true"></span>
-          </button>
-          <app-header-user-menu />
+          <app-page-header-actions />
         </div>
       </header>
 

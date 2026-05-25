@@ -1,21 +1,104 @@
-// Variables
+@use '../../../styles/breakpoints' as bp;
+
 $sidebar-width: 240px;
 $sidebar-collapsed: 68px;
 $sidebar-bg: linear-gradient(180deg, #c1121f 0%, #7a0000 100%);
 $sidebar-text: #ffffff;
 $content-bg: #f5f7fb;
+$mobile-sidebar-width: min(280px, 86vw);
+$mobile-topbar-height: 56px;
+$z-sidebar: 1100;
+$z-backdrop: 1090;
+$z-topbar: 1080;
 
-// ── Layout shell ─────────────────────────────────────────────────────────
 .layout {
   display: flex;
   height: 100vh;
-  font-family: 'Roboto', sans-serif;   // Roboto — igual que el login
-  font-size: 1rem;                     // base normal, NO más zoom 1.5x
-  /* Evitar `transition: all` (repinta todo el shell al cambiar el outlet). */
+  height: 100dvh;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
   overflow: hidden;
+  position: relative;
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────
+// ── Barra superior móvil ───────────────────────────────────────────────────
+.mobile-topbar {
+  display: none;
+}
+
+@include bp.layout-mobile {
+  .layout--mobile {
+    flex-direction: column;
+  }
+
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    height: $mobile-topbar-height;
+    padding: 0 0.5rem 0 0.25rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    z-index: $z-topbar;
+  }
+
+  .mobile-topbar__menu-btn mat-icon {
+    color: #c1121f;
+  }
+
+  .mobile-topbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-topbar__actions {
+    margin-left: auto;
+  }
+
+  .mobile-topbar__logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
+  .mobile-topbar__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: 0.02em;
+  }
+}
+
+.layout-backdrop {
+  display: none;
+}
+
+@include bp.layout-mobile {
+  .layout-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: $z-backdrop;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(15, 23, 42, 0.45);
+    cursor: pointer;
+    animation: layout-fade-in 0.2s ease;
+  }
+}
+
+@keyframes layout-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// ── Sidebar ─────────────────────────────────────────────────────────────────
 .sidebar {
   width: $sidebar-width;
   background: $sidebar-bg;
@@ -23,10 +106,35 @@ $content-bg: #f5f7fb;
   display: flex;
   flex-direction: column;
   padding: 0.75rem;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, transform 0.28s ease;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+}
+
+@include bp.layout-mobile {
+  .layout--mobile .sidebar {
+    position: fixed;
+    top: $mobile-topbar-height;
+    left: 0;
+    bottom: 0;
+    width: $mobile-sidebar-width;
+    max-width: 100%;
+    z-index: $z-sidebar;
+    transform: translateX(-105%);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .layout--mobile-nav-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .layout--mobile .content {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
 }
 
 .layout.collapsed .sidebar {
@@ -44,19 +152,15 @@ $content-bg: #f5f7fb;
     transform: translateX(-50%);
   }
 
-  .menu {
-    padding-top: 2.5rem;
-  }
 }
 
-// ── Header ────────────────────────────────────────────────────────────────
 .sidebar-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 0.5rem 0 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   margin-bottom: 0.75rem;
 
   img {
@@ -64,7 +168,7 @@ $content-bg: #f5f7fb;
     height: 72px;
     object-fit: contain;
     margin-bottom: 0.45rem;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   }
 
   h2 {
@@ -72,11 +176,17 @@ $content-bg: #f5f7fb;
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: 0.01em;
-    color: rgba(255,255,255,0.95);
+    color: rgba(255, 255, 255, 0.95);
   }
 }
 
-// ── Toggle button ─────────────────────────────────────────────────────────
+@include bp.layout-mobile {
+  .layout--mobile .sidebar-header img {
+    width: 56px;
+    height: 56px;
+  }
+}
+
 .toggle-btn {
   position: absolute;
   top: 0.75rem;
@@ -91,10 +201,12 @@ $content-bg: #f5f7fb;
   justify-content: center;
   cursor: pointer;
   z-index: 20;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: box-shadow 0.2s;
 
-  &:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+  &:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
 
   mat-icon {
     font-size: 16px;
@@ -104,78 +216,65 @@ $content-bg: #f5f7fb;
   }
 }
 
-// ── Menu ──────────────────────────────────────────────────────────────────
-.menu {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+// Menú: estilos en app-sidebar-nav.scss (encapsulación del componente hijo)
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.25rem;
-  text-decoration: none;
-  color: rgba(255,255,255,0.88);
-  font-size: 0.88rem;
-  font-weight: 400;
-  /* Sin transición en color/fondo del ítem activo para evitar titileo al actualizar la ruta. */
-  white-space: nowrap;
-
-  &:hover {
-    background: rgba(255,255,255,0.13);
-    color: white;
-  }
-
-  &.active {
-    background: white;
-    color: #c1121f;
-    font-weight: 600;
-
-    mat-icon { color: #c1121f; }
-  }
-
-  mat-icon.icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    opacity: 0.9;
-  }
-
-  span { overflow: hidden; text-overflow: ellipsis; }
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────
 .sidebar-footer {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0.6rem 0.5rem;
-  border-top: 1px solid rgba(255,255,255,0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   margin-top: 0.5rem;
 
   .logout-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
     flex-shrink: 0;
     cursor: pointer;
   }
 }
 
-// ── Content area ──────────────────────────────────────────────────────────
+.sidebar-footer__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
 .content {
   flex: 1;
   background: $content-bg;
   overflow-y: auto;
+  min-width: 0;
+}
+
+// Padding del contenido (clase global sicop-content-padding en _responsive.scss)
+.content.sicop-content-padding {
   padding: 1.5rem;
-  min-width: 0;       // prevents flex overflow
+
+  @include bp.layout-mobile {
+    padding: 1rem;
+  }
+
+  @include bp.down(bp.$bp-sm) {
+    padding: 0.75rem;
+  }
 }
