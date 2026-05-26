@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RenovacionHistorialRow } from '../../../interfaces/renovacion.interface';
 import { EstadoPipe } from '../../../pages/renovaciones/pipes/estado-pipe';
+import { isRenovacionEditable } from '../../utils/renovacion-estado-display.util';
 
 @Component({
   selector: 'app-latest-renovation',
@@ -23,8 +24,7 @@ export class LatestRenovation {
   readonly puedeAccionar = computed(() => {
     const r = this.renovacion();
     if (!r) return false;
-    const estadoText = this.estadoPipe.transform(r.estado);
-    return estadoText === 'Por Vencer';
+    return isRenovacionEditable(r.estado);
   });
 
   onAprobar(): void {

@@ -40,6 +40,11 @@ export class PolizasTable {
   verTodasLink = input<string | null>('/polizas');
   emptyMessage = input<string | undefined>(undefined);
 
+  // ✅ NUEVOS: Inputs y outputs para ordenamiento
+  sortColumn = input<string | null>(null);
+  sortDirection = input<'asc' | 'desc'>('desc');
+  sortChange = output<{ column: string; direction: 'asc' | 'desc' }>();
+
   readonly emptyColspan = computed(() => (this.variant() === 'full' ? 9 : 8));
   readonly resolvedEmptyMessage = computed(() => {
     const custom = this.emptyMessage();
@@ -68,5 +73,15 @@ export class PolizasTable {
 
   onEditar(row: PolizaListRow): void {
     this.editar.emit(row);
+  }
+  // ✅ NUEVO: Método para manejar ordenamiento
+  onSort(column: string): void {
+    let newDirection: 'asc' | 'desc' = 'asc';
+
+    if (this.sortColumn() === column) {
+      newDirection = this.sortDirection() === 'asc' ? 'desc' : 'asc';
+    }
+
+    this.sortChange.emit({ column, direction: newDirection });
   }
 }

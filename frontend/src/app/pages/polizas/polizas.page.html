@@ -1,49 +1,33 @@
 <header class="polizas-header">
-    <div>
-      <h1 class="page-title">Pólizas</h1>
-      <p class="page-subtitle">Gestión de pólizas contractuales</p>
-    </div>
-    <div class="polizas-header__tools">
-      <app-page-header-actions />
-    </div>
-  </header>
+  <div>
+    <h1 class="page-title">Pólizas</h1>
+    <p class="page-subtitle">Gestión de pólizas contractuales</p>
+  </div>
+  <div class="polizas-header__tools">
+    <app-page-header-actions />
+  </div>
+</header>
 
-  <app-polizas-toolbar
-    [searchQuery]="searchQuery()"
-    [estadoFiltro]="estadoFiltro()"
-    [ramoFiltro]="ramoFiltro()"
-    [ramos]="ramos()"
-    (searchQueryChange)="searchQuery.set($event)"
-    (estadoFiltroChange)="onEstadoFiltroFromUser($event)"
-    (ramoFiltroChange)="ramoFiltro.set($event)"
-    (cargarExcel)="onCargarExcel()"
-    (nuevaPoliza)="onNuevaPoliza()"
-    (limpiarFiltros)="limpiarFiltros()"
-    [contratistaFiltro]="contratistaFiltro()"
-    [aseguradoraFiltro]="aseguradoraFiltro()"
-    [fechaDesde]="fechaDesdeFiltro()"
-    [fechaHasta]="fechaHastaFiltro()"
-    (contratistaFiltroChange)="contratistaFiltro.set($event)"
-    (aseguradoraFiltroChange)="aseguradoraFiltro.set($event)"
-    (fechaDesdeChange)="onFechaDesdeChange($event)"
-    (fechaHastaChange)="onFechaHastaChange($event)"
-  />
+<app-polizas-toolbar [searchQuery]="searchQuery()" [estadoFiltro]="estadoFiltro()" [ramoFiltro]="ramoFiltro()"
+  [ramos]="ramos()" (searchQueryChange)="searchQuery.set($event)" (estadoFiltroChange)="onEstadoFiltroFromUser($event)"
+  (ramoFiltroChange)="ramoFiltro.set($event)" (cargarExcel)="onCargarExcel()" (nuevaPoliza)="onNuevaPoliza()"
+  (limpiarFiltros)="limpiarFiltros()" [contratistaFiltro]="contratistaFiltro()"
+  [aseguradoraFiltro]="aseguradoraFiltro()" [fechaDesde]="fechaDesdeFiltro()" [fechaHasta]="fechaHastaFiltro()"
+  (contratistaFiltroChange)="contratistaFiltro.set($event)" (aseguradoraFiltroChange)="aseguradoraFiltro.set($event)"
+  (fechaDesdeChange)="onFechaDesdeChange($event)" (fechaHastaChange)="onFechaHastaChange($event)" />
+<div class="polizas-active-filter">
+  <mat-checkbox [checked]="onlyActive()" (change)="onOnlyActiveChange($event.checked)">
+    Mostrar solo pólizas vigentes
+  </mat-checkbox>
+</div>
 
-  <app-polizas-table
-    [rows]="pagedRows()"
-    [paginatorLength]="totalFiltered()"
-    [pageIndex]="pageIndex()"
-    [pageSize]="pageSize"
-    (pageChange)="onPage($event)"
-    (ver)="onVer($event)"
-    (editar)="onEditar($event)"
-  />
+<app-polizas-table [rows]="pagedRows()" [paginatorLength]="totalFiltered()" [pageIndex]="pageIndex()"
+  [pageSize]="pageSize" (pageChange)="onPage($event)" (ver)="onVer($event)" (editar)="onEditar($event)"
+[sortColumn]="sortBy()"
+[sortDirection]="sortDirection()"
+(sortChange)="onSortChange($event.column, $event.direction)"  
+/>
 
-  <input
-    #excelFileInput
-    type="file"
-    data-testid="polizas-excel-input"
-    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    hidden
-    (change)="onExcelFileSelected($event)"
-  />
+<input #excelFileInput type="file" data-testid="polizas-excel-input"
+  accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden
+  (change)="onExcelFileSelected($event)" />
