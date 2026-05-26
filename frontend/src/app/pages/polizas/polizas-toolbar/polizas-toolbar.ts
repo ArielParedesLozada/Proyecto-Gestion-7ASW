@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,8 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ESTADO_FILTRO_OPTIONS, PolizaEstado } from '../models/poliza-list.model';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { VencimientoDateRangeFields } from '../../../shared/components/vencimiento-date-range-fields/vencimiento-date-range-fields';
+import { countPolizasAdvancedFilters } from '../../../shared/utils/polizas-filters.util';
 
 @Component({
   selector: 'app-polizas-toolbar',
@@ -18,14 +18,7 @@ import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  providers: [
-    {
-      provide: MAT_DATE_LOCALE,
-      useValue: 'en-GB',
-    },
+    VencimientoDateRangeFields,
   ],
   templateUrl: './polizas-toolbar.html',
   styleUrl: './polizas-toolbar.scss',
@@ -44,8 +37,8 @@ export class PolizasToolbar {
   contratistaFiltro = input.required<string>();
   aseguradoraFiltro = input.required<string>();
 
-  fechaDesde = input<Date | null>();
-  fechaHasta = input<Date | null>();
+  fechaDesde = input<Date | null>(null);
+  fechaHasta = input<Date | null>(null);
 
   contratistaFiltroChange = output<string>();
   aseguradoraFiltroChange = output<string>();
@@ -58,6 +51,23 @@ export class PolizasToolbar {
   limpiarFiltros = output<void>();
 
   readonly filtroOptions = ESTADO_FILTRO_OPTIONS;
+  readonly filtersExpanded = signal(false);
+
+  readonly activeFiltersCount = computed(() =>
+    countPolizasAdvancedFilters({
+      contratista: this.contratistaFiltro(),
+      aseguradora: this.aseguradoraFiltro(),
+      fechaDesde: this.fechaDesde(),
+      fechaHasta: this.fechaHasta(),
+      ramo: this.ramoFiltro(),
+      estado: this.estadoFiltro(),
+    }),
+  );
+
+  readonly filtersButtonLabel = computed(() => {
+    const count = this.activeFiltersCount();
+    return count > 0 ? `Filtros (${count})` : 'Filtros';
+  });
 
   onSearchInput(value: string): void {
     this.searchQueryChange.emit(value);
@@ -71,6 +81,10 @@ export class PolizasToolbar {
     this.ramoFiltroChange.emit(value);
   }
 
+  toggleFiltersPanel(): void {
+    this.filtersExpanded.update((open) => !open);
+  }
+
   onCargarExcel(): void {
     this.cargarExcel.emit();
   }
@@ -80,6 +94,7 @@ export class PolizasToolbar {
   }
 
   onLimpiarFiltros(): void {
+    this.filtersExpanded.set(false);
     this.limpiarFiltros.emit();
   }
 }

@@ -1,0 +1,39 @@
+// Breakpoints compartidos SICOP (mobile-first helpers)
+$bp-xs: 480px;
+$bp-sm: 600px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+// Ancho máximo donde el layout usa drawer + hamburguesa
+$layout-mobile-max: $bp-lg - 1px;
+
+@mixin down($max) {
+  @media (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin up($min) {
+  @media (min-width: $min) {
+    @content;
+  }
+}
+
+@mixin between($min, $max) {
+  @media (min-width: $min) and (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin layout-mobile {
+  @media (max-width: $layout-mobile-max) {
+    @content;
+  }
+}
+
+@mixin layout-desktop {
+  @media (min-width: $bp-lg) {
+    @content;
+  }
+}

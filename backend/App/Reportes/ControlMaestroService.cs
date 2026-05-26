@@ -26,15 +26,7 @@ public class ControlMaestroService(AppDatabase context)
     {
         var baseQuery = _context.Polizas
             .AsNoTracking();
-        if (fechaInicio.HasValue)
-        {
-            baseQuery = baseQuery.Where(p => p.FechaEmision >= fechaInicio.Value);
-        }
-
-        if (fechaFin.HasValue)
-        {
-            baseQuery = baseQuery.Where(p => p.FechaEmision <= fechaFin.Value);
-        }
+        baseQuery = ApplyVencimientoRangeFilter(baseQuery, fechaInicio, fechaFin);
 
         if (ramoId.HasValue)
         {
@@ -143,15 +135,7 @@ public class ControlMaestroService(AppDatabase context)
     {
         var baseQuery = _context.Polizas
            .AsNoTracking();
-        if (fechaInicio.HasValue)
-        {
-            baseQuery = baseQuery.Where(p => p.FechaEmision >= fechaInicio.Value);
-        }
-
-        if (fechaFin.HasValue)
-        {
-            baseQuery = baseQuery.Where(p => p.FechaEmision <= fechaFin.Value);
-        }
+        baseQuery = ApplyVencimientoRangeFilter(baseQuery, fechaInicio, fechaFin);
 
         if (ramoId.HasValue)
         {
@@ -233,5 +217,29 @@ public class ControlMaestroService(AppDatabase context)
         var fileName = $"ControlMaestro-{generadoEnUtc:yyyyMMddHHmmss}.pdf";
 
         return (bytes, fileName);
+    }
+
+    /// <summary>
+    /// Filtra por fecha de vencimiento (UI: «Vence desde» / «Vence hasta»).
+    /// El frontend envía inicio/fin de día en ISO; comparación directa traducible a SQL.
+    /// </summary>
+    private static IQueryable<Domain.Models.Poliza> ApplyVencimientoRangeFilter(
+        IQueryable<Domain.Models.Poliza> query,
+        DateTimeOffset? fechaInicio,
+        DateTimeOffset? fechaFin)
+    {
+        if (fechaInicio.HasValue)
+        {
+            var desde = fechaInicio.Value;
+            query = query.Where(p => p.FechaExpiracion >= desde);
+        }
+
+        if (fechaFin.HasValue)
+        {
+            var hasta = fechaFin.Value;
+            query = query.Where(p => p.FechaExpiracion <= hasta);
+        }
+
+        return query;
     }
 }

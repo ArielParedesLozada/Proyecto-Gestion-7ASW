@@ -1,0 +1,22 @@
+// Dimensiones compartidas del popover de notificaciones (header SICOP)
+$notif-popover-width: min(380px, calc(100vw - 1.5rem));
+$notif-popover-max-height: min(26rem, calc(100dvh - 6.5rem));
+$notif-popover-scroll-max: min(16.5rem, calc(100dvh - 13rem));
+
+@mixin notif-popover-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

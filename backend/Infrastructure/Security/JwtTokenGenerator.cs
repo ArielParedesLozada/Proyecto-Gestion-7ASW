@@ -21,6 +21,7 @@ public class JwtTokenGenerator(string privateKeyPath, double jwtTime, string iss
         Claim[] claims =
         [
           new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+          new Claim(ClaimTypes.Name, user.Username),
           new Claim(ClaimTypes.Role, user.Role),
           new Claim("must_change_password", user.MustChangePassword.ToString().ToLower()),
         ];

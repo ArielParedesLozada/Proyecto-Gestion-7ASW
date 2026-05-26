@@ -1,163 +1,80 @@
-.toolbar-card {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem 1.5rem;
-  margin-bottom: 1.25rem;
-  padding: 1.125rem 1.5rem;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 4px 16px rgba(15, 23, 42, 0.06);
-  box-sizing: border-box;
-  width: 100%;
-}
+@use '../../../../styles/breakpoints' as bp;
 
-.toolbar-card__left {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem 1rem;
-  flex: 1 1 auto;
-  min-width: 0;
-}
+$btn-h: 40px;
 
-.toolbar-card__right {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.toolbar__search {
-  flex: 1 1 280px;
-  min-width: 200px;
-  max-width: 100%;
-}
-
-.toolbar__select {
-  flex: 0 1 200px;
-  min-width: 160px;
-}
-
-.toolbar__search-icon {
-  color: #9ca3af;
-  margin-right: 0.25rem;
-}
-
-// Secundario: restablecer búsqueda/filtros (Pólizas y Empresas).
-.toolbar__btn-limpiar {
-  flex-shrink: 0;
-  align-self: center;
-  height: 48px !important;
-  min-height: 48px !important;
-  padding: 0 1rem !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
+.polizas-toolbar__btn-filters {
   border-color: #d1d5db !important;
   color: #374151 !important;
 
-  mat-icon {
-    margin-right: 0.35rem;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    color: #6b7280;
+  &--active {
+    border-color: #c1121f !important;
+    color: #c1121f !important;
+    background: #fff5f5 !important;
   }
 }
 
-::ng-deep .toolbar__btn-limpiar .mdc-button__label {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.25rem;
-}
-
-// Misma altura vertical para ambos botones de acción
-$toolbar-btn-height: 48px;
-
-.toolbar__btn-excel,
-.toolbar__btn-primary {
-  height: $toolbar-btn-height !important;
-  min-height: $toolbar-btn-height !important;
-  max-height: $toolbar-btn-height !important;
-  padding: 0 1.15rem !important;
-  box-sizing: border-box !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-// Gris más claro que el slate oscuro anterior; buen contraste con texto blanco
-.toolbar__btn-excel {
+.polizas-toolbar__btn-excel {
   background: #94a3b8 !important;
   color: #fff !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
     background: #8799ae !important;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
   }
 
-  .toolbar__excel-img {
+  .polizas-toolbar__excel-img {
     display: block;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
-    margin: 0;
-    flex-shrink: 0;
-  }
-}
-
-.toolbar__btn-primary {
-  background: #c1121f !important;
-  color: #fff !important;
-  box-shadow: 0 1px 2px rgba(193, 18, 31, 0.25) !important;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    background: #a50f1a !important;
-    box-shadow: 0 2px 8px rgba(193, 18, 31, 0.35) !important;
-  }
-
-  mat-icon {
     margin-right: 0.35rem;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
   }
 }
 
-::ng-deep .toolbar__btn-excel .mdc-button__label,
-::ng-deep .toolbar__btn-primary .mdc-button__label {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 0.5rem;
-  line-height: 1.2;
-}
-
-::ng-deep .toolbar-card .mat-mdc-form-field-subscript-wrapper {
-  display: none;
-}
-
-::ng-deep .toolbar-card .mat-mdc-text-field-wrapper {
-  border-radius: 10px;
-}
-
-@media (max-width: 900px) {
-  .toolbar-card {
-    flex-direction: column;
-    align-items: stretch;
+.polizas-toolbar__btn-excel-label {
+  @include bp.down(bp.$bp-sm) {
+    display: none;
   }
+}
 
-  .toolbar-card__right {
-    justify-content: flex-end;
+.polizas-toolbar__advanced {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #eef2f7;
+}
+
+.polizas-toolbar__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.polizas-toolbar__field {
+  width: 100%;
+  margin: 0;
+}
+
+.polizas-toolbar__dates {
+  display: contents;
+}
+
+@include bp.down(bp.$bp-lg) {
+  .polizas-toolbar__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include bp.down(bp.$bp-md) {
+  .polizas-toolbar__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include bp.down(bp.$bp-sm) {
+  .polizas-toolbar__actions .polizas-toolbar__btn-excel,
+  .polizas-toolbar__actions .list-toolbar__btn-primary {
+    grid-column: 1 / -1;
+    justify-content: center;
   }
 }

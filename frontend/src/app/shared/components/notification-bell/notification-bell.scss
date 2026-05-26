@@ -1,0 +1,56 @@
+.notification-bell {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.notification-bell__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0.2rem;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 50%;
+  color: inherit;
+
+  mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: #6b7280;
+  }
+
+  &:hover mat-icon {
+    color: #374151;
+  }
+}
+
+.notification-bell__dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #c1121f;
+  border-radius: 50%;
+  border: 2px solid #f5f7fb;
+}
+
+.notification-bell__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 1200;
+  max-height: min(26rem, calc(100dvh - 6.5rem));
+}
+
+@media (max-width: 480px) {
+  .notification-bell__panel {
+    right: -0.25rem;
+    max-width: calc(100vw - 1rem);
+  }
+}

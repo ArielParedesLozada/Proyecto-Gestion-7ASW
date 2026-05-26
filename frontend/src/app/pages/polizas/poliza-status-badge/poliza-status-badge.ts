@@ -1,11 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 import { PolizaEstado } from '../models/poliza-list.model';
+import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 
 @Component({
   selector: 'app-poliza-status-badge',
-  imports: [],
+  imports: [StatusBadge],
   templateUrl: './poliza-status-badge.html',
-  styleUrl: './poliza-status-badge.scss',
 })
 export class PolizaStatusBadge {
   estado = input.required<PolizaEstado>();

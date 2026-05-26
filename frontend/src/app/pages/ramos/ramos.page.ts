@@ -6,7 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 import { RamosTable } from './ramos-table/ramos-table';
 import { RamoListRow } from './models/ramo-list.model';
 import { RamoCreateRequest, RamoService } from '../../services/ramo.service';
@@ -24,7 +26,9 @@ import { RAMO_MAX } from '../../shared/constants/form-field-limits';
     MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './ramos.page.html',
   styleUrl: './ramos.page.scss',

@@ -3,15 +3,21 @@ import { Component, input, output } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
+import { SicopDataTable } from '../../../shared/components/sicop-data-table/sicop-data-table';
 import { RenovacionHistorialRow } from '../../../interfaces/renovacion.interface';
-import { EstadoPipe } from '../pipes/estado-pipe';
+import { RenovacionStatusBadge } from '../../../shared/components/renovacion-status-badge/renovacion-status-badge';
 
 @Component({
   selector: 'app-renovaciones-table',
-  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent, DatePipe, DecimalPipe, EstadoPipe],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    SicopDataTable,
+    DatePipe,
+    DecimalPipe,
+    RenovacionStatusBadge,
+  ],
   templateUrl: './renovaciones-table.html',
-  styleUrl: './renovaciones-table.scss',
 })
 export class RenovacionesTable {
   readonly rows = input.required<RenovacionHistorialRow[]>();
@@ -21,7 +27,6 @@ export class RenovacionesTable {
   readonly pageSize = input(10);
 
   readonly pageChange = output<PageEvent>();
-  /** Igual que `app-polizas-table`: el padre decide la navegación. */
   readonly ver = output<RenovacionHistorialRow>();
 
   onVer(row: RenovacionHistorialRow): void {

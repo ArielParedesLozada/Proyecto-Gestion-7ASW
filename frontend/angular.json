@@ -38,6 +38,11 @@
               "src/styles.scss",
               "src/sicop-long-text.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

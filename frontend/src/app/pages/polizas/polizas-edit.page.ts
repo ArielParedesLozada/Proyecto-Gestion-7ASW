@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -14,7 +14,8 @@ import { catchError, map, switchMap, of, finalize } from 'rxjs';
 import { PolizaContratistaSelectComponent } from './poliza-contratista-select/poliza-contratista-select.component';
 import { PolizaAseguradoraSelect } from './poliza-aseguradora-select/poliza-aseguradora-select';
 import { PolizaStatusBadge } from './poliza-status-badge/poliza-status-badge';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { PageBackLink } from '../../shared/components/page-back-link/page-back-link';
 import { emisionDiaPermitidoEnCalendario, emisionNoFuturaValidator } from './utils/poliza-emision-validators';
 import { calcularEstadoDesdeFechaExpiracion } from './utils/poliza-estado-derivado.util';
 import { EmpresaService } from '../../services/empresa.service';
@@ -44,7 +45,7 @@ function expiracionPosteriorEmisionValidator(): ValidatorFn {
 @Component({
   selector: 'app-polizas-edit-page',
   imports: [
-    RouterLink,
+    PageBackLink,
     DatePipe,
     ReactiveFormsModule,
     MatIconModule,
@@ -56,7 +57,7 @@ function expiracionPosteriorEmisionValidator(): ValidatorFn {
     PolizaContratistaSelectComponent,
     PolizaAseguradoraSelect,
     PolizaStatusBadge,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
   ],
   templateUrl: './polizas-edit.page.html',
   styleUrl: './polizas-edit.page.scss',

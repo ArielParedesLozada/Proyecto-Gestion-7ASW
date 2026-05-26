@@ -11,7 +11,9 @@ import { UsersTable } from './users-table/users-table';
 import { AppUserRole, ROL_FILTRO_OPTIONS, UserListRow, UserRolFiltro, roleLabelEs } from './models/user-list.model';
 import { NotificationService } from '../../shared/services/notification.service';
 import { UserService } from '../../services/user.service';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 import { AuthService } from '../../services/auth.service';
 import { USER_MAX } from '../../shared/constants/form-field-limits';
 
@@ -26,7 +28,9 @@ import { USER_MAX } from '../../shared/constants/form-field-limits';
     FormsModule,
     ReactiveFormsModule,
     UsersTable,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './users.page.html',
   styleUrl: './users.page.scss',
