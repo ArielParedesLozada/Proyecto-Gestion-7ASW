@@ -1,0 +1,106 @@
+@use '../../../../styles/notification-popover' as popover;
+
+.notif-popover {
+  display: flex;
+  flex-direction: column;
+  width: popover.$notif-popover-width;
+  max-height: popover.$notif-popover-max-height;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow:
+    0 10px 24px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.notif-popover__header {
+  flex-shrink: 0;
+  padding: 1rem 1rem 0.65rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notif-popover__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.notif-popover__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.notif-popover__subtitle {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.5rem 1rem 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.notif-popover__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: popover.$notif-popover-scroll-max;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  @include popover.notif-popover-scrollbar;
+}
+
+.notif-popover__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li + li {
+    border-top: 1px solid #f1f5f9;
+  }
+}
+
+.notif-popover__empty {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.notif-popover__footer {
+  flex-shrink: 0;
+  border-top: 1px solid #f1f5f9;
+  padding: 0.35rem 0;
+  background: #ffffff;
+}
+
+.notif-popover__view-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  text-align: left;
+
+  mat-icon {
+    color: #6b7280;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &:hover {
+    background: #f9fafb;
+  }
+}

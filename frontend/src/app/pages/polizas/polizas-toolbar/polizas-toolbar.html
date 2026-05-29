@@ -1,71 +1,105 @@
-<div class="toolbar-card">
-  <div class="toolbar-card__left">
-    <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
-      <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
-      <input matInput placeholder="Buscar por número, contratista u obra..." [ngModel]="searchQuery()"
-        (ngModelChange)="onSearchInput($event)" />
-    </mat-form-field>
+<div class="list-toolbar polizas-toolbar">
+  <div class="list-toolbar__main">
+    <div class="list-toolbar__leading">
+      <mat-form-field appearance="outline" class="list-toolbar__search" subscriptSizing="dynamic">
+        <mat-icon matPrefix class="list-toolbar__search-icon">search</mat-icon>
+        <input
+          matInput
+          placeholder="Buscar por número, contratista u obra..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)"
+        />
+      </mat-form-field>
+    </div>
 
-    <!-- NUEVO -->
-    <mat-form-field appearance="outline" class="toolbar__search">
-      <mat-label>Contratista</mat-label>
-      <input matInput [ngModel]="contratistaFiltro()" (ngModelChange)="contratistaFiltroChange.emit($event)" />
-    </mat-form-field>
+    <div class="list-toolbar__actions polizas-toolbar__actions">
+      <button
+        type="button"
+        mat-stroked-button
+        class="list-toolbar__btn polizas-toolbar__btn-filters"
+        [class.polizas-toolbar__btn-filters--active]="filtersExpanded()"
+        [attr.aria-expanded]="filtersExpanded()"
+        (click)="toggleFiltersPanel()"
+      >
+        <mat-icon>{{ filtersExpanded() ? 'expand_less' : 'tune' }}</mat-icon>
+        {{ filtersButtonLabel() }}
+      </button>
 
-    <mat-form-field appearance="outline" class="toolbar__search">
-      <mat-label>Aseguradora</mat-label>
-      <input matInput [ngModel]="aseguradoraFiltro()" (ngModelChange)="aseguradoraFiltroChange.emit($event)" />
-    </mat-form-field>
+      <button
+        type="button"
+        mat-stroked-button
+        class="list-toolbar__btn list-toolbar__btn-clear"
+        (click)="onLimpiarFiltros()"
+      >
+        <mat-icon>filter_alt_off</mat-icon>
+        Limpiar
+      </button>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Vence desde</mat-label>
-      <input matInput [matDatepicker]="pickerDesde" [ngModel]="fechaDesde()"
-        (ngModelChange)="fechaDesdeChange.emit($event)" />
-      <mat-datepicker-toggle matSuffix [for]="pickerDesde" />
-      <mat-datepicker #pickerDesde />
-    </mat-form-field>
+      <button type="button" mat-flat-button class="list-toolbar__btn polizas-toolbar__btn-excel" (click)="onCargarExcel()">
+        <img class="polizas-toolbar__excel-img" src="/img/ExcelLogo.png" width="28" height="28" alt="" aria-hidden="true" />
+        <span class="polizas-toolbar__btn-excel-label">Cargar por Excel</span>
+      </button>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Vence hasta</mat-label>
-      <input matInput [matDatepicker]="pickerHasta" [ngModel]="fechaHasta()"
-        (ngModelChange)="fechaHastaChange.emit($event)" />
-      <mat-datepicker-toggle matSuffix [for]="pickerHasta" />
-      <mat-datepicker #pickerHasta />
-    </mat-form-field>
-    <!-- NUEVO -->
-    <mat-form-field appearance="outline" class="toolbar__select" subscriptSizing="dynamic">
-      <mat-select [ngModel]="ramoFiltro()" (ngModelChange)="onRamoChange($event)">
-        <mat-option value="todos">Todos los ramos</mat-option>
-
-        @for (ramo of ramos(); track ramo.id) {
-        <mat-option [value]="ramo.id">{{ ramo.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="toolbar__select" subscriptSizing="dynamic">
-      <mat-select [ngModel]="estadoFiltro()" (ngModelChange)="onEstadoChange($event)" panelClass="polizas-select-panel">
-        @for (opt of filtroOptions; track opt.value) {
-        <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="onLimpiarFiltros()">
-      <mat-icon>filter_alt_off</mat-icon>
-      Limpiar filtros
-    </button>
+      <button type="button" mat-flat-button class="list-toolbar__btn list-toolbar__btn-primary" (click)="onNueva()">
+        <mat-icon>add</mat-icon>
+        Nueva Póliza
+      </button>
+    </div>
   </div>
 
-  <div class="toolbar-card__right">
-    <button type="button" mat-flat-button class="toolbar__btn-excel" (click)="onCargarExcel()">
-      <img class="toolbar__excel-img" src="/img/ExcelLogo.png" width="32" height="32" alt="" aria-hidden="true" />
-      Cargar por Excel
-    </button>
+  @if (filtersExpanded()) {
+    <section class="polizas-toolbar__advanced" aria-label="Filtros avanzados">
+      <div class="polizas-toolbar__grid">
+        <mat-form-field appearance="outline" class="polizas-toolbar__field" subscriptSizing="dynamic">
+          <mat-label>Contratista</mat-label>
+          <input
+            matInput
+            [ngModel]="contratistaFiltro()"
+            (ngModelChange)="contratistaFiltroChange.emit($event)"
+          />
+        </mat-form-field>
 
-    <button type="button" mat-flat-button class="toolbar__btn-primary" (click)="onNueva()">
-      <mat-icon>add</mat-icon>
-      Nueva Póliza
-    </button>
-  </div>
+        <mat-form-field appearance="outline" class="polizas-toolbar__field" subscriptSizing="dynamic">
+          <mat-label>Aseguradora</mat-label>
+          <input
+            matInput
+            [ngModel]="aseguradoraFiltro()"
+            (ngModelChange)="aseguradoraFiltroChange.emit($event)"
+          />
+        </mat-form-field>
+
+        <app-vencimiento-date-range-fields
+          class="polizas-toolbar__dates"
+          fieldClass="polizas-toolbar__field"
+          [fechaDesde]="fechaDesde()"
+          [fechaHasta]="fechaHasta()"
+          (fechaDesdeChange)="fechaDesdeChange.emit($event)"
+          (fechaHastaChange)="fechaHastaChange.emit($event)"
+        />
+
+        <mat-form-field appearance="outline" class="polizas-toolbar__field" subscriptSizing="dynamic">
+          <mat-label>Ramo</mat-label>
+          <mat-select [ngModel]="ramoFiltro()" (ngModelChange)="onRamoChange($event)">
+            <mat-option value="todos">Todos los ramos</mat-option>
+            @for (ramo of ramos(); track ramo.id) {
+              <mat-option [value]="ramo.id">{{ ramo.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="polizas-toolbar__field" subscriptSizing="dynamic">
+          <mat-label>Estado</mat-label>
+          <mat-select
+            [ngModel]="estadoFiltro()"
+            (ngModelChange)="onEstadoChange($event)"
+            panelClass="polizas-select-panel"
+          >
+            @for (opt of filtroOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </section>
+  }
 </div>

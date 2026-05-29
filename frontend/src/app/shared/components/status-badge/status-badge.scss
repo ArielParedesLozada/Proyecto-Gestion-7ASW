@@ -8,9 +8,11 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  line-height: 1.2;
 }
 
-.status-badge--vigente {
+.status-badge--vigente,
+.status-badge--confirmada {
   background: #e8f5e9;
   color: #1b5e20;
 }
@@ -20,7 +22,14 @@
   color: #b45309;
 }
 
-.status-badge--expirado {
+.status-badge--expirado,
+.status-badge--vencida {
   background: #c1121f;
   color: #ffffff;
+}
+
+.status-badge--pendiente {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }

@@ -1,0 +1,25 @@
+<div class="notification-bell" #anchor>
+  <button
+    type="button"
+    class="notification-bell__btn"
+    [attr.aria-expanded]="facade.open()"
+    aria-haspopup="dialog"
+    aria-label="Notificaciones del sistema"
+    (click)="onBellClick($event)"
+  >
+    <mat-icon>notifications</mat-icon>
+    @if (facade.hasPending()) {
+      <span
+        class="notification-bell__dot"
+        [style.border-color]="dotBorderColor()"
+        aria-hidden="true"
+      ></span>
+    }
+  </button>
+
+  @if (facade.open()) {
+    <div class="notification-bell__panel" (click)="onPanelClick($event)">
+      <app-notification-popover-panel (viewAll)="onViewAll()" />
+    </div>
+  }
+</div>

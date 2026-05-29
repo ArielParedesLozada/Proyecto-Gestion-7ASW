@@ -4,11 +4,7 @@
       <p class="page-subtitle">Gestión de pólizas contractuales</p>
     </div>
     <div class="polizas-header__tools">
-      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
-        <mat-icon>notifications</mat-icon>
-        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
-      </button>
-      <app-header-user-menu />
+      <app-page-header-actions />
     </div>
   </header>
 
@@ -29,8 +25,8 @@
     [fechaHasta]="fechaHastaFiltro()"
     (contratistaFiltroChange)="contratistaFiltro.set($event)"
     (aseguradoraFiltroChange)="aseguradoraFiltro.set($event)"
-    (fechaDesdeChange)="fechaDesdeFiltro.set($event)"
-    (fechaHastaChange)="fechaHastaFiltro.set($event)"
+    (fechaDesdeChange)="onFechaDesdeChange($event)"
+    (fechaHastaChange)="onFechaHastaChange($event)"
   />
 
   <app-polizas-table
@@ -41,12 +37,12 @@
     (pageChange)="onPage($event)"
     (ver)="onVer($event)"
     (editar)="onEditar($event)"
-    (renovar)="onRenovar($event)"
   />
 
   <input
     #excelFileInput
     type="file"
+    data-testid="polizas-excel-input"
     accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     hidden
     (change)="onExcelFileSelected($event)"

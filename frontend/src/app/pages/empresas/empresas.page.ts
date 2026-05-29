@@ -5,7 +5,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { HeaderUserMenuComponent } from '../../components/header-user-menu/header-user-menu.component';
+import { PageHeaderActions } from '../../components/page-header-actions/page-header-actions';
+import { ListPageToolbar } from '../../shared/components/list-page-toolbar/list-page-toolbar';
+import { ClearFiltersButton } from '../../shared/components/clear-filters-button/clear-filters-button';
 import { EmpresasTable } from './empresas-table/empresas-table';
 import { EmpresaListRow } from './models/empresa-list.model';
 import { EmpresaCreateRequest, EmpresaService } from '../../services/empresa.service';
@@ -23,7 +25,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    HeaderUserMenuComponent,
+    PageHeaderActions,
+    ListPageToolbar,
+    ClearFiltersButton,
   ],
   templateUrl: './empresas.page.html',
   styleUrl: './empresas.page.scss',

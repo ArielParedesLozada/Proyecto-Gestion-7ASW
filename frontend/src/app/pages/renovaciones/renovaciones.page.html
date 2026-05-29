@@ -5,34 +5,35 @@
       <p class="page-subtitle">Revisión y confirmación de renovaciones generadas automáticamente</p>
     </div>
     <div class="polizas-header__tools">
-      <button type="button" class="polizas-header__notif" aria-label="Notificaciones">
-        <mat-icon>notifications</mat-icon>
-        <span class="polizas-header__notif-dot" aria-hidden="true"></span>
-      </button>
-      <mat-icon class="polizas-header__profile" aria-hidden="true">account_circle</mat-icon>
+      <app-page-header-actions />
     </div>
   </header>
 
-  <div class="toolbar-card">
-    <div class="toolbar-card__left">
-      <mat-form-field appearance="outline" class="toolbar__search" subscriptSizing="dynamic">
-        <mat-icon matPrefix class="toolbar__search-icon">search</mat-icon>
-        <input matInput placeholder="Buscar por póliza, contratista u obra..." [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)" />
-      </mat-form-field>
+  <app-list-page-toolbar>
+    <mat-form-field
+      appearance="outline"
+      class="list-toolbar__search"
+      subscriptSizing="dynamic"
+      listToolbarSearch
+    >
+      <mat-icon matPrefix class="list-toolbar__search-icon">search</mat-icon>
+      <input
+        matInput
+        placeholder="Buscar por póliza, contratista u obra..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </mat-form-field>
 
-      <button type="button" mat-stroked-button class="toolbar__btn-limpiar" (click)="limpiarFiltros()">
-        <mat-icon>filter_alt_off</mat-icon>
-        Limpiar filtros
-      </button>
-    </div>
-  </div>
-  <app-renovaciones-table 
-    [rows]="pagedHistorial()" 
-    [paginatorLength]="totalFiltrado()" 
+    <app-clear-filters-button listToolbarActions (clear)="limpiarFiltros()" />
+  </app-list-page-toolbar>
+
+  <app-renovaciones-table
+    [rows]="pagedHistorial()"
+    [paginatorLength]="totalFiltrado()"
     [pageIndex]="pageIndex()"
-    [pageSize]="pageSize" 
-    (pageChange)="onPage($event)" 
-    (ver)="onVer($event)" 
+    [pageSize]="pageSize"
+    (pageChange)="onPage($event)"
+    (ver)="onVer($event)"
   />
 </div>

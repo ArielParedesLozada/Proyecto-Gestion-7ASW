@@ -2,12 +2,12 @@ import { Component, input, output } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { LocalPaginatorComponent } from '../../../shared/components/local-paginator/local-paginator.component';
+import { SicopDataTable } from '../../../shared/components/sicop-data-table/sicop-data-table';
 import { AppUserRole, UserListRow, roleLabelEs } from '../models/user-list.model';
 
 @Component({
   selector: 'app-users-table',
-  imports: [MatIconModule, MatButtonModule, LocalPaginatorComponent],
+  imports: [MatIconModule, MatButtonModule, SicopDataTable],
   templateUrl: './users-table.html',
   styleUrl: './users-table.scss',
 })
