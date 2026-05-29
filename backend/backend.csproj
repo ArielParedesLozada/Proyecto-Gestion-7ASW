@@ -42,9 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Assets\Gobierno.png">
+    <Content Include="Assets\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>

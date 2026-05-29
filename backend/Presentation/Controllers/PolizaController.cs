@@ -53,9 +53,20 @@ public class PolizaController(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
-        [FromQuery] Guid? ramoId = null)
+        [FromQuery] Guid? ramoId = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null,
+        [FromQuery] bool onlyActive = true)
     {
-        var (items, total) = await _polizaService.ObtenerPaginadoAsync(page, pageSize, search, ramoId);
+        var (items, total) = await _polizaService.ObtenerPaginadoAsync(
+            page,
+            pageSize,
+            search,
+            ramoId,
+            sortBy,
+            sortDirection,
+            onlyActive
+        );
 
         return Ok(new PagedDtoResponse<PolizaDtoResponse>
         {
@@ -63,7 +74,6 @@ public class PolizaController(
             TotalCount = total
         });
     }
-
     [HttpGet("{id:guid}")]
     [Authorize(Policy = "ACCESS-GRANTED")]
     public async Task<ActionResult<PolizaDtoResponse>> GetById(Guid id)

@@ -170,8 +170,68 @@ export class PolizaService {
   private readonly api = inject(ApiService);
   private readonly basePath = API_CONFIG.ENDPOINTS.POLIZAS.POLIZAS;
 
-  getList(): Observable<PolizaListRow[]> {
-    return this.fetchAllPages();
+  getListPaginated(options: {
+    page: number;
+    pageSize: number;
+    search?: string;
+    ramoId?: string | null;
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc';
+    onlyActive?: boolean;
+  }): Observable<{ items: PolizaListRow[]; totalCount: number }> {
+    let params = `${this.basePath}?page=${options.page}&pageSize=${options.pageSize}`;
+
+    if (options.search) {
+      params += `&search=${encodeURIComponent(options.search)}`;
+    }
+    if (options.ramoId && options.ramoId !== 'todos') {
+      params += `&ramoId=${options.ramoId}`;
+    }
+    if (options.sortBy) {
+      params += `&sortBy=${options.sortBy}`;
+    }
+    if (options.sortDirection) {
+      params += `&sortDirection=${options.sortDirection}`;
+    }
+    // ✅ NUEVO: pasar el filtro onlyActive al backend
+    if (options.onlyActive !== undefined) {
+      params += `&onlyActive=${options.onlyActive}`;
+    }
+
+    return this.api.get<PolizaPagedApi>(params).pipe(
+      map(response => ({
+        items: response.items.map(item => this.mapListRow(item)),
+        totalCount: response.totalCount
+      })),
+      catchError((err) => throwError(() => new Error(extractHttpErrorMessage(err))))
+    );
+  }
+
+  // Modificar el método getList existente para mantener compatibilidad
+  getList(options?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    ramoId?: string | null;
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc';
+    onlyActive?: boolean;
+  }): Observable<PolizaListRow[]> {
+    // Si no hay opciones, mantener comportamiento original (cargar todo)
+    if (!options) {
+      return this.fetchAllPages();
+    }
+
+    // Nuevo comportamiento: paginado con filtros
+    return this.getListPaginated({
+      page: options.page || 1,
+      pageSize: options.pageSize || 10,
+      search: options.search,
+      ramoId: options.ramoId,
+      sortBy: options.sortBy,
+      sortDirection: options.sortDirection,
+      onlyActive: options.onlyActive
+    }).pipe(map(result => result.items));
   }
 
   getById(id: string): Observable<PolizaDetail | null> {
