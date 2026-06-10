@@ -123,16 +123,22 @@ try
 
     if (!app.Environment.IsEnvironment("Testing"))
     {
+        var timeZoneOptions = new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Guayaquil")
+        };
         RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
             "revision-polizas-diaria",
             x => x.CheckRenovaciones(),
-            "* * * * *"
+            Cron.Daily(10),
+            timeZoneOptions
         );
 
         RecurringJob.AddOrUpdate<SendNotificationsJob>(
             "revision-notificaciones-diaria",
             x => x.NotifyPeople(),
-            "* * * * *"
+            Cron.Daily(10),
+            timeZoneOptions
         );
     }
 
