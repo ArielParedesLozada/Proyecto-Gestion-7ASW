@@ -154,16 +154,47 @@ public class PolizaNotificationService
             var subject = "Notificación de expiración de póliza";
 
             var fileName = $"Poliza-{poliza.Numero}.docx";
+            var destinatario = poliza.UsuarioNav?.Email;
+            var success = false;
+            try
+            {
+                _logger.LogDebug("📤 Enviando a {Email}", destinatario);
 
-            _logger.LogDebug("📤 Enviando a {Email}", email);
+                await _notifier.SendWithAttachmentAsync(
+                    destinatario,
+                    subject,
+                    bodyHtml,
+                    docBytes,
+                    fileName
+                );
 
-            await _notifier.SendWithAttachmentAsync(
-                email,
-                subject,
-                bodyHtml,
-                docBytes,
-                fileName
-            );
+                success = true;
+
+                // 🔥 Throttle para Mailtrap
+                await Task.Delay(500);
+            }
+            catch (SmtpCommandException ex) when (ex.Message.Contains("Too many emails"))
+            {
+                _logger.LogWarning("⏳ Rate limit, reintentando...");
+
+                await Task.Delay(1000);
+
+                await _notifier.SendWithAttachmentAsync(
+                    destinatario,
+                    subject,
+                    bodyHtml,
+                    docBytes,
+                    fileName
+                );
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error enviando a {Email}", destinatario);
+            }
+            if (!success)
+                throw new InvalidOperationException("No se pudo enviar a ningún destinatario");
 
             notificacion.Estado = EstadoNotificacion.Enviada;
             notificacion.FechaEnvio = DateTimeOffset.UtcNow;

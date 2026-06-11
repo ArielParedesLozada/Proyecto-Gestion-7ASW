@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Hangfire;
 using Backend.Infrastructure.Jobs;
-using Serilog;  // ← Agrega esta línea
+using Serilog;
+using Microsoft.AspNetCore.HttpOverrides;  // ← Agrega esta línea
 
 Env.Load();
 
@@ -65,6 +66,10 @@ try
     {
         builder.Services.AddHangFire(CONNECTION_STRING);
     }
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.All;
+    });
     builder.Services.AddMemoryCache();
     builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
     {
@@ -118,19 +123,26 @@ try
 
     if (!app.Environment.IsEnvironment("Testing"))
     {
+        var timeZoneOptions = new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Guayaquil")
+        };
         RecurringJob.AddOrUpdate<CheckRenovacionesJob>(
             "revision-polizas-diaria",
             x => x.CheckRenovaciones(),
-            "* * * * *"
+            Cron.Daily(10),
+            timeZoneOptions
         );
 
         RecurringJob.AddOrUpdate<SendNotificationsJob>(
             "revision-notificaciones-diaria",
             x => x.NotifyPeople(),
-            "* * * * *"
+            Cron.Daily(10),
+            timeZoneOptions
         );
     }
 
+    app.UseForwardedHeaders();
     app.MapControllers();
 
     Log.Information("Aplicación configurada correctamente, iniciando ejecución...");

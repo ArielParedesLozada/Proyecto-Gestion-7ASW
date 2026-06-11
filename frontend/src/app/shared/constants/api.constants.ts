@@ -39,8 +39,8 @@ export const API_CONFIG = {
       POR_POLIZA : (polizaId: string) => `/notificaciones/poliza/${encodeURIComponent(polizaId)}`
     },
     REPORTES: {
-      CONTROL_MAESTRO: 'reportes/control-maestro',
-      CONTROL_MAESTRO_PDF: 'reportes/control-maestro/pdf'
+      CONTROL_MAESTRO: '/reportes/control-maestro',
+      CONTROL_MAESTRO_PDF: '/reportes/control-maestro/pdf'
     }
   }
 } as const;

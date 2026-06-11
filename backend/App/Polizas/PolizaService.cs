@@ -76,15 +76,24 @@ public class PolizaService(AppDatabase context, AuditoriaService auditoriaServic
     }
 
     public async Task<(IEnumerable<PolizaRes>, int)> ObtenerPaginadoAsync(
-        int page,
-        int pageSize,
-        string? search,
-        Guid? ramoId = null)
+    int page,
+    int pageSize,
+    string? search,
+    Guid? ramoId = null,
+    string? sortBy = null,
+    string? sortDirection = null,
+    bool onlyActive = true)
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
 
         var query = _context.Polizas.AsNoTracking().AsQueryable();
+
+        // FILTRO POR VIGENCIA REAL (solo pólizas no expiradas por defecto)
+        if (onlyActive)
+        {
+            query = FiltrarPolizasVigentes(query);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -97,7 +106,6 @@ public class PolizaService(AppDatabase context, AuditoriaService auditoriaServic
                 p.RamoNav.Nombre.Contains(s));
         }
 
-        // Filtro por ramo (punto 9 de especificaciones)
         if (ramoId.HasValue && ramoId.Value != Guid.Empty)
         {
             query = query.Where(p => p.Ramo == ramoId.Value);
@@ -105,8 +113,31 @@ public class PolizaService(AppDatabase context, AuditoriaService auditoriaServic
 
         var total = await query.CountAsync();
 
+        // ORDENAMIENTO DINÁMICO POR FECHA
+        if (!string.IsNullOrWhiteSpace(sortBy))
+        {
+            var isDescending = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+
+            query = sortBy.ToLower() switch
+            {
+                "fechaemision" => isDescending
+                    ? query.OrderByDescending(p => p.FechaEmision)
+                    : query.OrderBy(p => p.FechaEmision),
+                "fechaexpiracion" => isDescending
+                    ? query.OrderByDescending(p => p.FechaExpiracion)
+                    : query.OrderBy(p => p.FechaExpiracion),
+                "createdat" => isDescending
+                    ? query.OrderByDescending(p => p.CreatedAt)
+                    : query.OrderBy(p => p.CreatedAt),
+                _ => query.OrderByDescending(p => p.CreatedAt)
+            };
+        }
+        else
+        {
+            query = query.OrderByDescending(p => p.CreatedAt);
+        }
+
         var items = await query
-            .OrderByDescending(p => p.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(p => new PolizaRes
@@ -135,6 +166,12 @@ public class PolizaService(AppDatabase context, AuditoriaService auditoriaServic
             item.Estado = PolizaEstadoDerivadoHelper.Calcular(item.FechaExpiracion, now);
 
         return (items, total);
+    }
+
+    private static IQueryable<Poliza> FiltrarPolizasVigentes(IQueryable<Poliza> query)
+    {
+        var now = DateTimeOffset.UtcNow;
+        return query.Where(p => p.FechaExpiracion >= now);
     }
 
     public async Task<PolizaRes?> ObtenerPorIdAsync(Guid id) => await ProyectarPorIdAsync(id);
